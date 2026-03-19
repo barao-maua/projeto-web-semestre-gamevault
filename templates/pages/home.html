@@ -1,32 +1,109 @@
 {% extends "base.html" %}
 
-{% block title %}Home | GameVault{% endblock %}
+{% block title %}Login | GameVault{% endblock %}
 
 {% block content %}
-<section class="hero">
-    <div class="container">
-        <p class="eyebrow">Sua biblioteca gamer em um so lugar</p>
-        <h1>Organize sua colecao, acompanhe seu progresso e registre suas experiencias.</h1>
-        <p class="lead">
-            O GameVault reune backlog, status, avaliacoes e listas personalizadas para facilitar o controle da sua jornada com cada jogo.
-        </p>
+<section class="screen">
+    <div class="hero-grid">
+        <div class="hero-copy">
+            <p class="eyebrow">Acesso ao GameVault</p>
+            <h1>Entre na sua biblioteca e acompanhe cada jogo da sua jornada.</h1>
+            <p>
+                O prototipo da plataforma foi reorganizado para refletir melhor a ideia apresentada: autenticacao,
+                dashboard da biblioteca e area de avaliacoes em uma experiencia visual unica.
+            </p>
+            <div class="screen-actions">
+                <a class="button" href="#autenticacao">Entrar agora</a>
+                <a class="ghost-button" href="{% url 'core:sobre' %}">Ver biblioteca</a>
+            </div>
+            <div class="stats-grid">
+                <article class="stat-card">
+                    <strong>120+</strong>
+                    <p>Jogos organizados entre backlog, jogando e concluidos.</p>
+                </article>
+                <article class="stat-card">
+                    <strong>4.8</strong>
+                    <p>Media das notas registradas pela comunidade da plataforma.</p>
+                </article>
+                <article class="stat-card">
+                    <strong>12 listas</strong>
+                    <p>Espacos personalizados para favoritos, metas do ano e colecoes tematicas.</p>
+                </article>
+            </div>
+        </div>
+        <aside class="hero-preview">
+            <div class="preview-window">
+                <div class="preview-bar">
+                    <span>Dashboard ativo</span>
+                    <span>Perfil sincronizado</span>
+                </div>
+                <div class="preview-cards">
+                    <article class="preview-card is-highlighted">
+                        <strong>Biblioteca</strong>
+                        <span>Cards, notas e filtros visuais.</span>
+                    </article>
+                    <article class="preview-card">
+                        <strong>Reviews</strong>
+                        <span>Comentarios salvos por jogo.</span>
+                    </article>
+                    <article class="preview-card">
+                        <strong>Status</strong>
+                        <span>Backlog, jogando e concluido.</span>
+                    </article>
+                </div>
+            </div>
+        </aside>
     </div>
 </section>
 
-<section class="section">
-    <div class="container grid grid-3">
-        <article class="card">
-            <h2>Biblioteca pessoal</h2>
-            <p>Cadastre jogos e mantenha sua colecao organizada por titulo, genero e interesse.</p>
-        </article>
-        <article class="card">
-            <h2>Status e progresso</h2>
-            <p>Defina se o jogo esta no backlog, em andamento, concluido ou dropado.</p>
-        </article>
-        <article class="card">
-            <h2>Reviews e listas</h2>
-            <p>Atribua notas, escreva opinioes e monte listas com seus jogos favoritos.</p>
-        </article>
+<section class="screen" id="autenticacao">
+    <div class="screen-header">
+        <div>
+            <p class="eyebrow">Tela 01</p>
+            <h2>Login e cadastro</h2>
+            <p>Interface estatica inspirada diretamente no prototipo apresentado ao professor.</p>
+        </div>
+    </div>
+    <div class="auth-grid">
+        <section class="auth-panel">
+            <h3 class="panel-title">LOGIN</h3>
+            <form class="form-grid">
+                <div class="field">
+                    <label for="login-username">Username:</label>
+                    <input id="login-username" type="text" placeholder="Digite seu usuario">
+                </div>
+                <div class="field">
+                    <label for="login-password">Password:</label>
+                    <input id="login-password" type="password" placeholder="Digite sua senha">
+                </div>
+                <div class="form-submit">
+                    <button class="button" type="button">Login</button>
+                </div>
+            </form>
+            <p class="mini-note">Acesso rapido para continuar sua <strong>biblioteca pessoal</strong>.</p>
+        </section>
+
+        <section class="auth-panel">
+            <h3 class="panel-title">CADASTRO</h3>
+            <form class="form-grid">
+                <div class="field">
+                    <label for="register-username">Username:</label>
+                    <input id="register-username" type="text" placeholder="Crie seu usuario">
+                </div>
+                <div class="field">
+                    <label for="register-email">E-mail:</label>
+                    <input id="register-email" type="email" placeholder="Digite seu e-mail">
+                </div>
+                <div class="field">
+                    <label for="register-password">Password:</label>
+                    <input id="register-password" type="password" placeholder="Crie uma senha">
+                </div>
+                <div class="form-submit">
+                    <button class="button" type="button">Cadastro</button>
+                </div>
+            </form>
+            <p class="mini-note">Novo jogador? Crie a conta e comece a registrar seus <strong>favoritos</strong>.</p>
+        </section>
     </div>
 </section>
 {% endblock %}

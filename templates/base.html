@@ -7,10 +7,12 @@
     <title>{% block title %}GameVault{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
-<body>
+<body class="app-shell {% block body_class %}{% endblock %}">
     {% include "components/navbar.html" %}
     <main>
-        {% block content %}{% endblock %}
+        <div class="page">
+            {% block content %}{% endblock %}
+        </div>
     </main>
     {% include "components/footer.html" %}
 </body>
