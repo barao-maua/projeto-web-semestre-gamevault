@@ -1,20 +1,84 @@
 {% extends "base.html" %}
 
-{% block title %}Sobre | GameVault{% endblock %}
+{% block title %}Biblioteca | GameVault{% endblock %}
 
 {% block content %}
-<section class="section">
-    <div class="container narrow">
-        <h1>Sobre o projeto</h1>
-        <p>
-            O GameVault e uma aplicacao web transacional criada para ajudar usuarios a gerenciar colecoes de jogos digitais de forma simples e centralizada.
-        </p>
-        <p>
-            A proposta do sistema e permitir o cadastro de jogos na biblioteca pessoal, controle de progresso, registro de avaliacoes e criacao de listas personalizadas.
-        </p>
-        <p>
-            Nesta entrega, o foco esta na estrutura inicial em Django, com paginas estaticas, navegacao entre rotas e reutilizacao de layout por meio de templates.
-        </p>
+<section class="screen">
+    <div class="screen-header">
+        <div>
+            <p class="eyebrow">Tela 02</p>
+            <h1>Biblioteca do jogador</h1>
+            <p>
+                A tela principal da colecao mostra cards com os jogos cadastrados, notas rapidas e acoes visuais
+                para editar ou remover cada item da biblioteca pessoal.
+            </p>
+        </div>
+        <div class="inline-actions">
+            <a class="ghost-button" href="{% url 'core:home' %}">Voltar ao login</a>
+            <a class="button" href="{% url 'core:diferenciais' %}">Abrir detalhes</a>
+        </div>
+    </div>
+
+    <div class="meta-grid">
+        <article class="meta-card">
+            <strong>Busca rapida</strong>
+            <p>Espaco pensado para localizar jogos da biblioteca com facilidade.</p>
+        </article>
+        <article class="meta-card">
+            <strong>Filtro por status</strong>
+            <p>Backlog, jogando, concluido e dropado em uma mesma navegacao.</p>
+        </article>
+        <article class="meta-card">
+            <strong>Acao principal</strong>
+            <p>Botao dedicado para adicionar um novo jogo ao acervo do usuario.</p>
+        </article>
+    </div>
+
+    <div class="library-grid">
+        <article class="game-card">
+            <div class="game-cover cover-hollow">
+                <div class="cover-caption">
+                    <span>Metroidvania</span>
+                    <strong>Hollow Knight</strong>
+                </div>
+            </div>
+            <div class="game-rating">&hearts; &hearts; &hearts; &hearts; &hearts;</div>
+            <div class="game-actions">
+                <a href="{% url 'core:diferenciais' %}">Editar</a>
+                <span>|</span>
+                <a href="#">Remover</a>
+            </div>
+        </article>
+
+        <article class="game-card">
+            <div class="game-cover cover-cyberpunk">
+                <div class="cover-caption">
+                    <span>RPG futurista</span>
+                    <strong>Cyberpunk 2077</strong>
+                </div>
+            </div>
+            <div class="game-rating">&hearts; &hearts; &hearts; &hearts;</div>
+            <div class="game-actions">
+                <a href="{% url 'core:diferenciais' %}">Editar</a>
+                <span>|</span>
+                <a href="#">Remover</a>
+            </div>
+        </article>
+
+        <article class="game-card">
+            <div class="game-cover cover-valhalla">
+                <div class="cover-caption">
+                    <span>Aventura historica</span>
+                    <strong>Assassin's Creed Valhalla</strong>
+                </div>
+            </div>
+            <div class="game-rating">&hearts; &hearts; &hearts; &hearts;</div>
+            <div class="game-actions">
+                <a href="{% url 'core:diferenciais' %}">Editar</a>
+                <span>|</span>
+                <a href="#">Remover</a>
+            </div>
+        </article>
     </div>
 </section>
 {% endblock %}

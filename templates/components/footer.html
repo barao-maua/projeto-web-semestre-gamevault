@@ -1,3 +1,8 @@
 <footer class="site-footer">
-    <p>GameVault - Projeto academico de gerenciamento de jogos.</p>
+    <p>GameVault - prototipo academico em Django para gerenciamento de jogos.</p>
+    <div class="site-footer-nav">
+        <a href="{% url 'core:home' %}">Autenticacao</a>
+        <a href="{% url 'core:sobre' %}">Biblioteca</a>
+        <a href="{% url 'core:diferenciais' %}">Avaliacoes</a>
+    </div>
 </footer>

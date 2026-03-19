@@ -1,25 +1,119 @@
 {% extends "base.html" %}
 
-{% block title %}Diferenciais | GameVault{% endblock %}
+{% block title %}Detalhes | GameVault{% endblock %}
 
 {% block content %}
-<section class="section">
-    <div class="container">
-        <h1>Diferenciais do GameVault</h1>
-        <div class="grid grid-3">
-            <article class="card">
-                <h2>Controle completo</h2>
-                <p>O usuario acompanha status, horas jogadas e historico de cada titulo em sua biblioteca.</p>
-            </article>
-            <article class="card">
-                <h2>Opiniao registrada</h2>
-                <p>Cada jogo pode receber nota e review para guardar a experiencia de forma pessoal.</p>
-            </article>
-            <article class="card">
-                <h2>Organizacao flexivel</h2>
-                <p>As listas personalizadas ajudam a separar favoritos, metas do ano e categorias especificas.</p>
-            </article>
+<section class="screen">
+    <div class="screen-header">
+        <div>
+            <p class="eyebrow">Tela 03</p>
+            <h1>Detalhes do jogo e avaliacoes</h1>
+            <p>
+                Esta pagina aproxima o projeto do prototipo apresentado, mostrando a capa, a nota atribuida pelo
+                usuario e uma area lateral com avaliacoes da comunidade.
+            </p>
         </div>
+    </div>
+
+    <div class="detail-layout">
+        <section class="detail-main">
+            <article class="cover-panel">
+                <div class="game-cover cover-hollow">
+                    <div class="cover-caption">
+                        <span>Jogo selecionado</span>
+                        <strong>Hollow Knight</strong>
+                    </div>
+                </div>
+            </article>
+
+            <article class="rating-panel">
+                <h2>Sua avaliacao:</h2>
+                <div class="rating-stars">&hearts; &hearts; &hearts; &hearts; &hearts;</div>
+                <p class="review-hint">Digite sua avaliacao:</p>
+                <form>
+                    <div class="field">
+                        <textarea placeholder="Escreva o que achou do jogo, do ritmo da campanha e da exploracao."></textarea>
+                    </div>
+                    <button class="button full-button" type="button">Salvar comentario</button>
+                </form>
+            </article>
+        </section>
+
+        <aside>
+            <h2 class="community-panel-title">Avaliacoes da Comunidade</h2>
+            <div class="community-list">
+                <article class="community-card">
+                    <div class="community-card-header">
+                        <span class="community-avatar">P</span>
+                        <strong>Pedro:</strong>
+                    </div>
+                    <p>Jogo muito legal e divertido.</p>
+                </article>
+
+                <article class="community-card">
+                    <div class="community-card-header">
+                        <span class="community-avatar">A</span>
+                        <strong>Augusto:</strong>
+                    </div>
+                    <p>So passei raiva, mas superei todas minhas dificuldades.</p>
+                </article>
+
+                <article class="community-card">
+                    <div class="community-card-header">
+                        <span class="community-avatar">V</span>
+                        <strong>Vitor:</strong>
+                    </div>
+                    <p>Jogo muito dificil, nao gostei.</p>
+                </article>
+
+                <article class="community-card">
+                    <div class="community-card-header">
+                        <span class="community-avatar">G</span>
+                        <strong>Gabriel:</strong>
+                    </div>
+                    <p>Passei muita raiva, mas nao desisti.</p>
+                </article>
+
+                <article class="community-card">
+                    <div class="community-card-header">
+                        <span class="community-avatar">L</span>
+                        <strong>Lucas:</strong>
+                    </div>
+                    <p>Fiquei vendo meus amigos jogarem e achei legal.</p>
+                </article>
+
+                <article class="community-card">
+                    <div class="community-card-header">
+                        <span class="community-avatar">I</span>
+                        <strong>Igor:</strong>
+                    </div>
+                    <p>Jogo muito legal e dificil.</p>
+                </article>
+
+                <article class="community-card">
+                    <div class="community-card-header">
+                        <span class="community-avatar">A</span>
+                        <strong>Ana:</strong>
+                    </div>
+                    <p>Comprei para meu namorado, ele amou.</p>
+                </article>
+            </div>
+        </aside>
+    </div>
+
+    <div class="feature-grid">
+        <article class="feature-card">
+            <strong>Status visual</strong>
+            <p>O detalhe do jogo ajuda a atualizar progresso, status e classificacao de maneira centralizada.</p>
+        </article>
+        <article class="feature-card">
+            <strong>Review pessoal</strong>
+            <p>O usuario pode registrar comentarios para guardar a experiencia com cada titulo finalizado.</p>
+        </article>
+        <article class="feature-card">
+            <strong>Comunidade</strong>
+            <p>A coluna lateral reforca a ideia de comparacao entre avaliacoes de varios jogadores.</p>
+        </article>
     </div>
 </section>
 {% endblock %}
