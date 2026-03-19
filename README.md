@@ -277,4 +277,54 @@ O sistema permite realizar operações **CRUD** sobre os principais recursos da 
 
 Essas operações caracterizam o **GameVault como uma aplicação web transacional**, utilizando banco de dados relacional para persistência das informações.
 
+## Como Rodar o Projeto
+
+Atualmente o projeto esta configurado para ser executado no **Windows PowerShell** usando o ambiente virtual local `.venv`.
+
+### 1. Abrir a pasta do projeto
+
+```powershell
+cd "C:\Users\bruno\OneDrive\Area de Trabalho\Codigos\projeto-web-semestre-gamevault"
+```
+
+### 2. Ativar o ambiente virtual
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Se o PowerShell bloquear a ativacao, execute uma vez:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
+
+### 3. Rodar o servidor Django
+
+```powershell
+python manage.py runserver
+```
+
+Se preferir, tambem e possivel rodar sem ativar o ambiente virtual:
+
+```powershell
+.\.venv\Scripts\python.exe manage.py runserver
+```
+
+### 4. Acessar no navegador
+
+Depois de iniciar o servidor, abrir:
+
+```text
+http://127.0.0.1:8000/
+```
+
+### 5. Verificar se o projeto esta correto
+
+Para validar a configuracao do Django:
+
+```powershell
+python manage.py check
+```
+
 ## LINK FIGMA: https://www.figma.com/design/eSWG1sVcLrNMDDuWZRtGVx/GameValt?node-id=0-1&t=QbiYw86OHCeU2THv-1
