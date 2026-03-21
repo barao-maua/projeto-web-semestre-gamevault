@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Minha Biblioteca - GameVault{% endblock %}
+
+{% block body_class %}library-page{% endblock %}
+
+{% block content %}
+<div class="library-header">
+    <h1>Minha Biblioteca</h1>
+    <a href="{% url 'core:game_catalog' %}" class="btn btn-primary">Explorar Catálogo</a>
+</div>
+
+{% if library_entries %}
+    <div class="library-grid">
+        {% for entry in library_entries %}
+        <div class="library-card">
+            <div class="library-card-header">
+                <h3>{{ entry.game.title }}</h3>
+                <span class="status-badge status-{{ entry.status }}">{{ entry.get_status_display }}</span>
+            </div>
+            
+            {% if entry.game.cover_image %}
+            <div class="library-card-image">
+                <img src="{{ entry.game.cover_image }}" alt="{{ entry.game.title }}">
+            </div>
+            {% endif %}
+            
+            <div class="library-card-body">
+                <p class="progress-text">Progresso: {{ entry.progress }}%</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ entry.progress }}%"></div>
+                </div>
+                
+                <div class="library-card-actions">
+                    <button class="btn btn-sm btn-outline" onclick="updateLibrary({{ entry.id }})">
+                        Atualizar
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="removeFromLibrary({{ entry.id }})">
+                        Remover
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-library">
+        <p>Sua biblioteca está vazia. Comece adicionando jogos!</p>
+        <a href="{% url 'core:game_catalog' %}" class="btn btn-primary">Explorar Catálogo</a>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateLibrary(entryId) {
+    // This would typically open a modal or redirect to an update form
+    alert('Funcionalidade de atualização em desenvolvimento');
+}
+
+function removeFromLibrary(entryId) {
+    if (confirm('Tem certeza que deseja remover este jogo da sua biblioteca?')) {
+        fetch("{% url 'core:remove_from_library' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({entry_id: entryId})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Erro: ' + data.message);
+            }
+        });
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

@@ -131,6 +131,35 @@ select {
     font-size: 1.05rem;
 }
 
+/* Make all headings white for readability */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text);
+}
+
+/* Reviewer names and comments in community cards */
+.community-card .reviewer-name,
+.community-card .reviewer-comment {
+    color: var(--text);
+}
+.community-card .reviewer-name {
+    font-weight: 700;
+}
+
+/* Interactive rating hearts */
+.interactive-rating .rating-stars {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+.interactive-rating .heart {
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+.interactive-rating .heart:hover {
+    transform: scale(1.2);
+}
+
 .nav-links {
     display: flex;
     align-items: center;
@@ -266,7 +295,7 @@ li,
 input,
 textarea,
 select {
-    color: var(--muted);
+    color: var(--text);
     line-height: 1.6;
 }
 

@@ -13,8 +13,8 @@
                 dashboard da biblioteca e area de avaliacoes em uma experiencia visual unica.
             </p>
             <div class="screen-actions">
-                <a class="button" href="#autenticacao">Entrar agora</a>
-                <a class="ghost-button" href="{% url 'core:sobre' %}">Ver biblioteca</a>
+                <a class="button" href="{% url 'core:login' %}">Entrar agora</a>
+                <a class="ghost-button" href="{% url 'core:register' %}">Cadastre-se</a>
             </div>
             <div class="stats-grid">
                 <article class="stat-card">
@@ -67,17 +67,18 @@
     <div class="auth-grid">
         <section class="auth-panel">
             <h3 class="panel-title">LOGIN</h3>
-            <form class="form-grid">
+            <form class="form-grid" method="post" action="{% url 'core:login' %}">
+                {% csrf_token %}
                 <div class="field">
                     <label for="login-username">Username:</label>
-                    <input id="login-username" type="text" placeholder="Digite seu usuario">
+                    <input id="login-username" type="text" name="username" placeholder="Digite seu usuario">
                 </div>
                 <div class="field">
                     <label for="login-password">Password:</label>
-                    <input id="login-password" type="password" placeholder="Digite sua senha">
+                    <input id="login-password" type="password" name="password" placeholder="Digite sua senha">
                 </div>
                 <div class="form-submit">
-                    <button class="button" type="button">Login</button>
+                    <button class="button" type="submit">Login</button>
                 </div>
             </form>
             <p class="mini-note">Acesso rapido para continuar sua <strong>biblioteca pessoal</strong>.</p>
@@ -85,21 +86,22 @@
 
         <section class="auth-panel">
             <h3 class="panel-title">CADASTRO</h3>
-            <form class="form-grid">
+            <form class="form-grid" method="post" action="{% url 'core:register' %}">
+                {% csrf_token %}
                 <div class="field">
                     <label for="register-username">Username:</label>
-                    <input id="register-username" type="text" placeholder="Crie seu usuario">
+                    <input id="register-username" type="text" name="username" placeholder="Crie seu usuario">
                 </div>
                 <div class="field">
-                    <label for="register-email">E-mail:</label>
-                    <input id="register-email" type="email" placeholder="Digite seu e-mail">
+                    <label for="register-password1">Password:</label>
+                    <input id="register-password1" type="password" name="password1" placeholder="Crie uma senha">
                 </div>
                 <div class="field">
-                    <label for="register-password">Password:</label>
-                    <input id="register-password" type="password" placeholder="Crie uma senha">
+                    <label for="register-password2">Confirm Password:</label>
+                    <input id="register-password2" type="password" name="password2" placeholder="Confirme sua senha">
                 </div>
                 <div class="form-submit">
-                    <button class="button" type="button">Cadastro</button>
+                    <button class="button" type="submit">Cadastro</button>
                 </div>
             </form>
             <p class="mini-note">Novo jogador? Crie a conta e comece a registrar seus <strong>favoritos</strong>.</p>

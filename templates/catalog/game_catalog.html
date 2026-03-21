@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Catálogo de Jogos - GameVault{% endblock %}
+
+{% block body_class %}catalog-page{% endblock %}
+
+{% block content %}
+<div class="catalog-header">
+    <h1>Catálogo de Jogos</h1>
+    <form method="get" class="search-form">
+        <input type="text" name="q" placeholder="Buscar jogos..." value="{{ query }}">
+        <button type="submit">Buscar</button>
+    </form>
+</div>
+
+{% if games %}
+    <div class="games-grid">
+        {% for game in games %}
+        <div class="game-card">
+            <div class="game-card-image">
+                {% if game.cover_image %}
+                <img src="{{ game.cover_image }}" alt="{{ game.title }}">
+                {% else %}
+                <div class="placeholder-image">Sem capa</div>
+                {% endif %}
+            </div>
+            <div class="game-card-content">
+                <h3>{{ game.title }}</h3>
+                <p class="game-genre">{{ game.genre|default:"Gênero não informado" }}</p>
+                <p class="game-description">{{ game.description|truncatewords:20 }}</p>
+                <a href="{% url 'core:game_detail' game.id %}" class="btn btn-primary btn-sm">Ver detalhes</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <p>Nenhum jogo encontrado.</p>
+        {% if query %}
+            <p>Tente uma busca diferente.</p>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}
