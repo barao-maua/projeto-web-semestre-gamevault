@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Perfil - GameVault{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <h2>Perfil do Usuário</h2>
+    <div class="user-info">
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email|default:"Não informado" }}</p>
+        <p><strong>Data de cadastro:</strong> {{ user.date_joined }}</p>
+    </div>
+    <a href="{% url 'core:logout' %}" class="btn btn-secondary">Sair</a>
+</div>
+{% endblock %}
