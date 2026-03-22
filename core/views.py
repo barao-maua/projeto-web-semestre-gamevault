@@ -12,7 +12,14 @@ from .models import Game, LibraryEntry, Review, GameList, GameListItem
 
 
 def home_view(request):
-    return render(request, "pages/home.html")
+    """View para exibir a página inicial com catálogo de jogos em destaque"""
+    # Buscar alguns jogos para exibir na homepage (limitar a 6 para não sobrecarregar)
+    featured_games = Game.objects.all()[:6]
+
+    context = {
+        "featured_games": featured_games,
+    }
+    return render(request, "pages/home.html", context)
 
 
 def sobre_view(request):
