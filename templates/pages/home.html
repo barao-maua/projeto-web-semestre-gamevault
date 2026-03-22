@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}Login | GameVault{% endblock %}
+{% block title %}GameVault - Sua Biblioteca de Jogos{% endblock %}
 
 {% block content %}
 <section class="screen">
     <div class="hero-grid">
         <div class="hero-copy">
             <p class="eyebrow">Acesso ao GameVault</p>
-            <h1>Entre na sua biblioteca e acompanhe cada jogo da sua jornada.</h1>
+            <h1 style="color: white;">Entre na sua biblioteca e acompanhe cada jogo da sua jornada.</h1>
             <p>
                 O prototipo da plataforma foi reorganizado para refletir melhor a ideia apresentada: autenticacao,
                 dashboard da biblioteca e area de avaliacoes em uma experiencia visual unica.
@@ -56,56 +56,47 @@
     </div>
 </section>
 
-<section class="screen" id="autenticacao">
+<section class="screen" id="catalogo">
     <div class="screen-header">
         <div>
-            <p class="eyebrow">Tela 01</p>
-            <h2>Login e cadastro</h2>
-            <p>Interface estatica inspirada diretamente no prototipo apresentado ao professor.</p>
+            <p class="eyebrow">Catálogo de Jogos</p>
+            <h2 style="color: white;">Descubra novos jogos para sua biblioteca</h2>
+            <p>Explore nossa coleção e adicione os jogos que você joga ou planeja jogar.</p>
         </div>
     </div>
-    <div class="auth-grid">
-        <section class="auth-panel">
-            <h3 class="panel-title">LOGIN</h3>
-            <form class="form-grid" method="post" action="{% url 'core:login' %}">
-                {% csrf_token %}
-                <div class="field">
-                    <label for="login-username">Username:</label>
-                    <input id="login-username" type="text" name="username" placeholder="Digite seu usuario">
+    
+    <div class="library-grid">
+        {% for jogo in featured_games %}
+        {% comment %} Cycle through cover styles: hollow, cyberpunk, valhalla {% endcomment %}
+        <article class="game-card">
+            <div class="game-cover 
+                {% if forloop.counter0 == 0 %}cover-hollow{% endif %}
+                {% if forloop.counter0 == 1 %}cover-cyberpunk{% endif %}
+                {% if forloop.counter0 == 2 %}cover-valhalla{% endif %}
+                {% if forloop.counter0 > 2 %}cover-hollow{% endif %}">
+                <div class="cover-caption">
+                    <span>{{ jogo.genre|default:"Aventura" }}</span>
+                    <strong>{{ jogo.title }}</strong>
                 </div>
-                <div class="field">
-                    <label for="login-password">Password:</label>
-                    <input id="login-password" type="password" name="password" placeholder="Digite sua senha">
-                </div>
-                <div class="form-submit">
-                    <button class="button" type="submit">Login</button>
-                </div>
-            </form>
-            <p class="mini-note">Acesso rapido para continuar sua <strong>biblioteca pessoal</strong>.</p>
-        </section>
-
-        <section class="auth-panel">
-            <h3 class="panel-title">CADASTRO</h3>
-            <form class="form-grid" method="post" action="{% url 'core:register' %}">
-                {% csrf_token %}
-                <div class="field">
-                    <label for="register-username">Username:</label>
-                    <input id="register-username" type="text" name="username" placeholder="Crie seu usuario">
-                </div>
-                <div class="field">
-                    <label for="register-password1">Password:</label>
-                    <input id="register-password1" type="password" name="password1" placeholder="Crie uma senha">
-                </div>
-                <div class="field">
-                    <label for="register-password2">Confirm Password:</label>
-                    <input id="register-password2" type="password" name="password2" placeholder="Confirme sua senha">
-                </div>
-                <div class="form-submit">
-                    <button class="button" type="submit">Cadastro</button>
-                </div>
-            </form>
-            <p class="mini-note">Novo jogador? Crie a conta e comece a registrar seus <strong>favoritos</strong>.</p>
-        </section>
+            </div>
+            <div class="game-rating">
+                {% comment %} Show varying ratings for visual interest: 3, 4, or 5 hearts {% endcomment %}
+                {% if forloop.counter0 == 0 %}&hearts; &hearts; &hearts;{% endif %}
+                {% if forloop.counter0 == 1 %}&hearts; &hearts; &hearts; &hearts;{% endif %}
+                {% if forloop.counter0 == 2 %}&hearts; &hearts; &hearts; &hearts; &hearts;{% endif %}
+                {% if forloop.counter0 == 3 %}&hearts; &hearts; &hearts; &hearts;{% endif %}
+                {% if forloop.counter0 == 4 %}&hearts; &hearts; &hearts;{% endif %}
+                {% if forloop.counter0 == 5 %}&hearts; &hearts; &hearts; &hearts; &hearts;{% endif %}
+            </div>
+            <div class="game-actions">
+                <a href="{% url 'core:game_detail' jogo.id %}" class="ghost-button">Detalhes</a>
+                <span>|</span>
+                <a href="#" class="ghost-button">Adicionar</a>
+            </div>
+        </article>
+        {% empty %}
+        <p class="eyebrow">Nenhum jogo encontrado no catálogo.</p>
+        {% endfor %}
     </div>
 </section>
 {% endblock %}

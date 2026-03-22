@@ -35,7 +35,7 @@
             <span class="progress-text">{{ library_entry.progress }}%</span>
         </div>
         {% else %}
-        <button class="btn btn-primary" onclick="addToLibrary({{ game.id }})">
+        <button class="btn btn-primary" onclick="showLibraryStatusModal({{ game.id }})">
             Adicionar à Biblioteca
         </button>
         {% endif %}
@@ -79,12 +79,12 @@
         <form id="review-form">
             <div class="form-group">
                 <label for="rating">Nota:</label>
-                <div class="rating-select">
-                    {% for i in "54321" %}
-                    <input type="radio" id="rating{{ forloop.counter }}" name="rating" value="{{ forloop.counter }}">
-                    <label for="rating{{ forloop.counter }}">{{ forloop.counter }}</label>
-                    {% endfor %}
-                </div>
+            <div class="rating-select">
+                {% for i in "12345" %}
+                <input type="radio" id="rating{{ forloop.counter }}" name="rating" value="{{ forloop.counter }}">
+                <label for="rating{{ forloop.counter }}">{{ forloop.counter }}</label>
+                {% endfor %}
+            </div>
             </div>
             <div class="form-group">
                 <label for="comment">Comentário:</label>
@@ -99,16 +99,21 @@
 
 {% block extra_js %}
 <script>
-function addToLibrary(gameId) {
+function addToLibrary(gameId, status) {
     fetch("{% url 'core:add_to_library' %}", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': getCookie('csrftoken')
         },
-        body: JSON.stringify({game_id: gameId, status: 'plan_to_play'})
+        body: JSON.stringify({game_id: gameId, status: status})
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro de rede ou servidor');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             alert(data.message);
@@ -116,7 +121,28 @@ function addToLibrary(gameId) {
         } else {
             alert('Erro: ' + data.message);
         }
+    })
+    .catch(error => {
+        alert('Erro de conexão: ' + error.message);
     });
+}
+
+function showLibraryStatusModal(gameId) {
+    // Simple implementation - in a real app, you'd use a proper modal
+    const status = prompt("Selecione o status para este jogo:\n1. Planejo Jogar\n2. Jogando\n3. Concluído\n4. Pausado\n5. Abandonado\n\nDigite o número do status:", "1");
+    
+    const statusMap = {
+        "1": "plan_to_play",
+        "2": "playing",
+        "3": "completed",
+        "4": "paused",
+        "5": "dropped"
+    };
+    
+    const selectedStatus = statusMap[status] || "plan_to_play";
+    if (status !== null) { // User didn't cancel
+        addToLibrary(gameId, selectedStatus);
+    }
 }
 
 function showReviewForm() {
@@ -143,39 +169,47 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// Handle review form submission
-document.getElementById('review-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const rating = document.querySelector('input[name="rating"]:checked');
-    const comment = document.getElementById('comment').value;
-    
-    if (!rating) {
-        alert('Por favor, selecione uma nota.');
-        return;
-    }
-    
-    fetch("{% url 'core:add_review' %}".replace('0', {{ game.id|default:0 }}), {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify({
-            rating: parseInt(rating.value),
-            comment: comment
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert(data.message);
-            closeReviewForm();
-            location.reload(); // Recarrega a página para mostrar a nova avaliação
-        } else {
-            alert('Erro: ' + data.message);
+    // Handle review form submission
+    document.getElementById('review-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const rating = document.querySelector('input[name="rating"]:checked');
+        const comment = document.getElementById('comment').value;
+        
+        if (!rating) {
+            alert('Por favor, selecione uma nota.');
+            return;
         }
+        
+        fetch("{% url 'core:add_review' game.id %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                rating: parseInt(rating.value),
+                comment: comment
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro de rede ou servidor');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                closeReviewForm();
+                location.reload(); // Recarrega a página para mostrar a nova avaliação
+            } else {
+                alert('Erro: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Erro de conexão: ' + error.message);
+        });
     });
-});
 </script>
 {% endblock %}

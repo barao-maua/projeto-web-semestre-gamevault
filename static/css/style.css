@@ -501,6 +501,12 @@ select {
     color: rgba(243, 246, 251, 0.5);
 }
 
+.form-help-text {
+    color: var(--text);
+    font-size: 0.86rem;
+    margin-top: 4px;
+}
+
 .field input:focus,
 .field textarea:focus,
 .field select:focus {
