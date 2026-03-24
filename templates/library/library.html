@@ -5,9 +5,13 @@
 {% block body_class %}library-page{% endblock %}
 
 {% block content %}
+<section class="screen">
 <div class="library-header">
-    <h1>Minha Biblioteca</h1>
-    <a href="{% url 'core:game_catalog' %}" class="btn btn-primary">Explorar Catálogo</a>
+    <div class="section-heading">
+        <p class="eyebrow">Coleção pessoal</p>
+        <h1>Minha Biblioteca</h1>
+    </div>
+    <a href="{% url 'core:game_catalog' %}" class="button">Explorar Catálogo</a>
 </div>
 
 {% if library_entries %}
@@ -35,7 +39,7 @@
                 <span class="status-badge status-{{ entry.status }}">{{ entry.get_status_display }}</span>
             </div>
 
-            <div class="game-actions" style="margin-top: 10px;">
+            <div class="game-actions game-actions--spaced">
                 <a href="{% url 'core:game_detail' entry.game.id %}" class="ghost-button">Editar</a>
                 <span>|</span>
                 <button class="ghost-button" onclick="removeFromLibrary({{ entry.id }})">Remover</button>
@@ -46,9 +50,10 @@
 {% else %}
     <div class="empty-library">
         <p>Sua biblioteca está vazia. Comece adicionando jogos!</p>
-        <a href="{% url 'core:game_catalog' %}" class="btn btn-primary">Explorar Catálogo</a>
+        <a href="{% url 'core:game_catalog' %}" class="button">Explorar Catálogo</a>
     </div>
 {% endif %}
+</section>
 {% endblock %}
 
 {% block extra_js %}

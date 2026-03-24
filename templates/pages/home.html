@@ -7,10 +7,9 @@
     <div class="hero-grid">
         <div class="hero-copy">
             <p class="eyebrow">Acesso ao GameVault</p>
-            <h1 style="color: white;">Entre na sua biblioteca e acompanhe cada jogo da sua jornada.</h1>
+            <h1>Entre na sua biblioteca e acompanhe cada jogo da sua jornada.</h1>
             <p>
-                O prototipo da plataforma foi reorganizado para refletir melhor a ideia apresentada: autenticacao,
-                dashboard da biblioteca e area de avaliacoes em uma experiencia visual unica.
+                Organize sua colecao, acompanhe seu progresso e registre avaliacoes dos jogos que fazem parte da sua jornada.
             </p>
             <div class="screen-actions">
                 <a class="button" href="{% url 'core:login' %}">Entrar agora</a>
@@ -60,7 +59,7 @@
     <div class="screen-header">
         <div>
             <p class="eyebrow">Catálogo de Jogos</p>
-            <h2 style="color: white;">Descubra novos jogos para sua biblioteca</h2>
+            <h2>Descubra novos jogos para sua biblioteca</h2>
             <p>Explore nossa coleção e adicione os jogos que você joga ou planeja jogar.</p>
         </div>
     </div>
@@ -69,8 +68,9 @@
         {% for jogo in featured_games %}
         <article class="game-card">
             <div class="game-cover" style="
-                {% if jogo.cover_image %}
-                    background-image: url('{{ jogo.cover_image }}');
+                {% if jogo.home_cover_image %}
+                    background-image: url('{{ jogo.home_cover_image }}');
+                    background-position: {{ jogo.home_cover_position }};
                 {% endif %}
             ">
                 <div class="cover-caption">

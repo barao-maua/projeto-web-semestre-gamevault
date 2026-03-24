@@ -5,11 +5,15 @@
 {% block body_class %}catalog-page{% endblock %}
 
 {% block content %}
+<section class="screen">
 <div class="catalog-header">
-    <h1>Catálogo de Jogos</h1>
+    <div class="section-heading">
+        <p class="eyebrow">Exploração</p>
+        <h1>Catálogo de Jogos</h1>
+    </div>
     <form method="get" class="search-form">
         <input type="text" name="q" placeholder="Buscar jogos..." value="{{ query }}">
-        <button type="submit">Buscar</button>
+        <button type="submit" class="button">Buscar</button>
     </form>
 </div>
 
@@ -18,8 +22,8 @@
         {% for game in games %}
         <div class="game-card">
             <div class="game-card-image">
-                {% if game.cover_image %}
-                <img src="{{ game.cover_image }}" alt="{{ game.title }}">
+                {% if game.catalog_cover_image %}
+                <img src="{{ game.catalog_cover_image }}" alt="{{ game.title }}" style="object-position: {{ game.catalog_cover_position }};">
                 {% else %}
                 <div class="placeholder-image">Sem capa</div>
                 {% endif %}
@@ -28,7 +32,7 @@
                 <h3>{{ game.title }}</h3>
                 <p class="game-genre">{{ game.genre|default:"Gênero não informado" }}</p>
                 <p class="game-description">{{ game.description|truncatewords:20 }}</p>
-                <a href="{% url 'core:game_detail' game.id %}" class="btn btn-primary btn-sm">Ver detalhes</a>
+                <a href="{% url 'core:game_detail' game.id %}" class="ghost-button">Ver detalhes</a>
             </div>
         </div>
         {% endfor %}
@@ -41,4 +45,5 @@
         {% endif %}
     </div>
 {% endif %}
+</section>
 {% endblock %}

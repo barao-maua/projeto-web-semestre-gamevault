@@ -23,14 +23,14 @@ def seed_games():
         {
             'title': 'Hades',
             'genre': 'Roguelike',
-            'description': 'Desafie o deus dos mortos em Hades, um jogo de ação e estratégia onde você tenta escapar do submundo grego. Lute, morre e tente novamente, cada vez mais forte.',
+            'description': 'Desafie o deus dos mortos em Hades, um jogo de ação e estratégia onde você tenta escapar do submundo grego. Lute, morra e tente novamente, cada vez mais forte.',
             'release_date': '2020-09-17',
             'cover_image': '/static/img/Hades.jpg'
         },
         {
             'title': 'Elden Ring',
             'genre': 'RPG de Ação',
-            'description': 'Explore as Terras Entre em Elden Ring, um RPG de ação de mundo aberto criado por Hidetaka Miyazaki e George R.R. Martin. Enfrente desafios épicos e descubra um mito profundo.',
+            'description': 'Explore as Terras Intermédias em Elden Ring, um RPG de ação de mundo aberto criado por Hidetaka Miyazaki e George R. R. Martin. Enfrente desafios épicos e descubra um mito profundo.',
             'release_date': '2022-02-25',
             'cover_image': '/static/img/EldenRing.png'
         },

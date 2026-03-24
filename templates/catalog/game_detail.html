@@ -5,48 +5,85 @@
 {% block body_class %}game-detail-page{% endblock %}
 
 {% block content %}
-<div class="game-detail-header">
-    <div class="game-detail-image">
+<section class="screen">
+<div class="game-detail-hero">
+    <article class="game-detail-image">
         {% if game.cover_image %}
         <img src="{{ game.cover_image }}" alt="{{ game.title }}">
         {% else %}
         <div class="placeholder-image">Sem capa</div>
         {% endif %}
-    </div>
-    <div class="game-detail-info">
+    </article>
+
+    <article class="game-detail-info">
+        <p class="eyebrow">Ficha do jogo</p>
         <h1>{{ game.title }}</h1>
-        <p class="game-genre">{{ game.genre|default:"Gênero não informado" }}</p>
-        <p class="game-release">Lançamento: {{ game.release_date|date:"d/m/Y"|default:"Data não informada" }}</p>
-    </div>
-</div>
 
-<div class="game-detail-content">
-    <div class="game-detail-description">
-        <h2>Descrição</h2>
-        <p>{{ game.description|linebreaks }}</p>
-    </div>
+        <div class="game-detail-meta-grid">
+            <div class="detail-meta-item">
+                <span>Plataforma</span>
+                <strong>{{ game.genre|default:"Não informada" }}</strong>
+            </div>
+            <div class="detail-meta-item">
+                <span>Lançamento</span>
+                <strong>{{ game.release_date|date:"d/m/Y"|default:"Data não informada" }}</strong>
+            </div>
+        </div>
 
-    {% if user.is_authenticated %}
-    <div class="game-detail-actions">
-        {% if in_library %}
-        <div class="library-status">
-            <span class="status-badge status-{{ library_entry.status }}">{{ library_entry.get_status_display }}</span>
-            <progress value="{{ library_entry.progress }}" max="100">{{ library_entry.progress }}%</progress>
-            <span class="progress-text">{{ library_entry.progress }}%</span>
+        <p class="game-detail-summary">
+            Organize o status do jogo, acompanhe seu progresso e registre sua avaliação em um só lugar.
+        </p>
+
+        {% if user.is_authenticated %}
+        <div class="game-detail-actions">
+            {% if in_library %}
+            <div class="library-status">
+                <div class="library-status-header">
+                    <span class="status-badge status-{{ library_entry.status }}">{{ library_entry.get_status_display }}</span>
+                    <span class="progress-text">{{ library_entry.progress }}%</span>
+                </div>
+                <progress value="{{ library_entry.progress }}" max="100">{{ library_entry.progress }}%</progress>
+            </div>
+            {% else %}
+            <div class="library-status library-status--empty">
+                <strong>Esse jogo ainda não está na sua biblioteca.</strong>
+                <p>Adicione agora para controlar o progresso e deixar sua coleção mais completa.</p>
+            </div>
+            {% endif %}
+
+            <div class="game-detail-action-buttons">
+                {% if not in_library %}
+                <button class="button" onclick="showLibraryStatusModal({{ game.id }})">
+                    Adicionar à Biblioteca
+                </button>
+                {% endif %}
+
+                <button class="ghost-button" onclick="showReviewForm()">
+                    Avaliar Jogo
+                </button>
+            </div>
         </div>
         {% else %}
-        <button class="btn btn-primary" onclick="showLibraryStatusModal({{ game.id }})">
-            Adicionar à Biblioteca
-        </button>
+        <div class="library-status library-status--empty">
+            <strong>Faça login para interagir com este jogo.</strong>
+            <p>Você poderá adicionar à biblioteca, acompanhar progresso e publicar avaliações.</p>
+        </div>
         {% endif %}
-        
-        <button class="btn btn-secondary" onclick="showReviewForm()">
-            Avaliar Jogo
-        </button>
-    </div>
-    {% endif %}
+    </article>
+</div>
 
-    <div class="game-reviews">
+<div class="game-detail-panels">
+    <article class="game-detail-description">
+        <h2>Descrição</h2>
+        <p>{{ game.description|linebreaks }}</p>
+
+        <div class="game-detail-description-note">
+            <span class="eyebrow">Resumo</span>
+            <p>Essas informações ajudam a contextualizar o jogo antes de adicionar à biblioteca ou registrar sua review.</p>
+        </div>
+    </article>
+
+    <aside class="game-reviews">
         <h2>Avaliações</h2>
         {% if reviews %}
             <div class="reviews-list">
@@ -66,9 +103,11 @@
                 {% endfor %}
             </div>
         {% else %}
-            <p>Ainda não há avaliações para este jogo.</p>
+            <div class="review-card review-card--empty">
+                <p>Ainda não há avaliações para este jogo.</p>
+            </div>
         {% endif %}
-    </div>
+    </aside>
 </div>
 
 {% if user.is_authenticated %}
@@ -90,11 +129,12 @@
                 <label for="comment">Comentário:</label>
                 <textarea id="comment" name="comment" rows="4" placeholder="Digite sua avaliação..."></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">Salvar Avaliação</button>
+            <button type="submit" class="button">Salvar Avaliação</button>
         </form>
     </div>
 </div>
 {% endif %}
+</section>
 {% endblock %}
 
 {% block extra_js %}

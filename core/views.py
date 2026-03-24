@@ -1,3 +1,7 @@
+from pathlib import Path
+from urllib.parse import urlparse
+
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -11,10 +15,75 @@ import json
 from .models import Game, LibraryEntry, Review, GameList, GameListItem
 
 
+IMAGE_VARIANT_EXTENSIONS = (".jpg", ".jpeg", ".png", ".webp", ".avif")
+VARIANT_COVER_POSITIONS = {
+    "home": {
+        "default": "center 34%",
+        "by_title": {
+            "Celeste": "center 20%",
+            "Cyberpunk 2077": "center 24%",
+            "Disco Elysium": "center 18%",
+            "Elden Ring": "center 30%",
+            "Hades": "center 22%",
+            "Hollow Knight": "center 26%",
+        },
+    },
+    "catalog": {
+        "default": "center 30%",
+        "by_title": {
+            "Celeste": "center 16%",
+            "Cyberpunk 2077": "center 24%",
+            "Disco Elysium": "center 18%",
+            "Elden Ring": "center 24%",
+            "Hades": "center 26%",
+            "Hollow Knight": "center 20%",
+        },
+    },
+}
+
+
+def resolve_variant_cover_image(cover_image, variant):
+    if not cover_image:
+        return ""
+
+    cover_path = Path(urlparse(cover_image).path)
+    stem = cover_path.stem
+    if not stem:
+        return cover_image
+
+    variant_dir = Path(settings.BASE_DIR) / "static" / "img" / variant
+    for extension in IMAGE_VARIANT_EXTENSIONS:
+        variant_file = variant_dir / f"{stem}{extension}"
+        if variant_file.exists():
+            return f"{settings.STATIC_URL}img/{variant}/{variant_file.name}"
+
+    return cover_image
+
+
+def resolve_variant_cover_position(title, variant):
+    variant_settings = VARIANT_COVER_POSITIONS.get(variant, {})
+    return variant_settings.get("by_title", {}).get(
+        title, variant_settings.get("default", "center center")
+    )
+
+
+def attach_variant_cover_metadata(games, variant, image_attribute, position_attribute):
+    for game in games:
+        setattr(game, image_attribute, resolve_variant_cover_image(game.cover_image, variant))
+        setattr(game, position_attribute, resolve_variant_cover_position(game.title, variant))
+
+    return games
+
+
 def home_view(request):
     """View para exibir a página inicial com catálogo de jogos em destaque"""
     # Buscar alguns jogos para exibir na homepage (limitar a 6 para não sobrecarregar)
-    featured_games = Game.objects.all()[:6]
+    featured_games = attach_variant_cover_metadata(
+        list(Game.objects.all()[:6]),
+        "home",
+        "home_cover_image",
+        "home_cover_position",
+    )
 
     context = {
         "featured_games": featured_games,
@@ -175,6 +244,13 @@ def game_catalog_view(request):
             | Q(genre__icontains=query)
             | Q(description__icontains=query)
         )
+
+    games = attach_variant_cover_metadata(
+        list(games),
+        "catalog",
+        "catalog_cover_image",
+        "catalog_cover_position",
+    )
 
     context = {"games": games, "query": query}
     return render(request, "catalog/game_catalog.html", context)
