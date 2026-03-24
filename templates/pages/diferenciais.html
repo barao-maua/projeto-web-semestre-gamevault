@@ -28,7 +28,14 @@
 
             <article class="rating-panel">
                 <h2>Sua avaliacao:</h2>
-                <div class="rating-stars">&hearts; &hearts; &hearts; &hearts; &hearts;</div>
+                <div class="rating-stars" data-rating="0">
+                    <span class="star" data-value="1">&hearts;</span>
+                    <span class="star" data-value="2">&hearts;</span>
+                    <span class="star" data-value="3">&hearts;</span>
+                    <span class="star" data-value="4">&hearts;</span>
+                    <span class="star" data-value="5">&hearts;</span>
+                </div>
+                <input type="hidden" name="rating" id="rating-value" value="0">
                 <p class="rating-feedback">5 coracoes para a ambientacao, trilha sonora e exploracao.</p>
                 <p class="review-hint">Digite sua avaliacao:</p>
                 <form>
@@ -117,4 +124,56 @@
         </article>
     </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ratingStars = document.querySelector('.rating-stars');
+    const stars = ratingStars.querySelectorAll('.star');
+    const ratingValueInput = document.getElementById('rating-value');
+    
+    // Function to update star display based on rating
+    function updateStars(rating) {
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.add('active');
+            } else {
+                star.classList.remove('active');
+            }
+        });
+        ratingValueInput.value = rating;
+    }
+    
+    // Add event listeners to stars
+    stars.forEach(star => {
+        // Handle hover effects
+        star.addEventListener('mouseenter', function() {
+            const value = parseInt(this.getAttribute('data-value'));
+            // Highlight stars up to this one
+            stars.forEach((s, index) => {
+                if (index < value) {
+                    s.style.color = 'var(--accent)';
+                    s.style.transform = 'scale(1.2)';
+                }
+            });
+        });
+        
+        star.addEventListener('mouseleave', function() {
+            // Reset to current rating
+            const currentRating = parseInt(ratingValueInput.value);
+            updateStars(currentRating);
+        });
+        
+        // Handle click to set rating
+        star.addEventListener('click', function() {
+            const value = parseInt(this.getAttribute('data-value'));
+            updateStars(value);
+        });
+    });
+    
+    // Initialize with current rating (0)
+    updateStars(0);
+});
+</script>
 {% endblock %}

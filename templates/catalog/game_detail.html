@@ -89,14 +89,14 @@
             <div class="reviews-list">
                 {% for review in reviews %}
                 <div class="review-card">
-                    <div class="review-header">
-                        <strong>{{ review.user.username }}</strong>
-                        <span class="review-rating">
-                            {% for i in "12345" %}
-                            {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
-                            {% endfor %}
-                        </span>
-                    </div>
+<div class="review-header">
+                     <strong>{{ review.user.username }}</strong>
+                     <span class="review-rating hearts">
+                         {% for i in "12345" %}
+                         {% if forloop.counter <= review.rating %}♥{% else %}♡{% endif %}
+                         {% endfor %}
+                     </span>
+                 </div>
                     <p class="review-comment">{{ review.comment|linebreaks }}</p>
                     <small class="review-date">{{ review.created_at|date:"d/m/Y" }}</small>
                 </div>
@@ -116,15 +116,15 @@
         <span class="close-modal" onclick="closeReviewForm()">&times;</span>
         <h2>Avaliar {{ game.title }}</h2>
         <form id="review-form">
-            <div class="form-group">
-                <label for="rating">Nota:</label>
-            <div class="rating-select">
-                {% for i in "12345" %}
-                <input type="radio" id="rating{{ forloop.counter }}" name="rating" value="{{ forloop.counter }}">
-                <label for="rating{{ forloop.counter }}">{{ forloop.counter }}</label>
-                {% endfor %}
-            </div>
-            </div>
+<div class="form-group">
+                 <label for="rating">Nota:</label>
+             <div class="rating-select hearts">
+                 {% for i in "12345" %}
+                 <input type="radio" id="rating{{ forloop.counter }}" name="rating" value="{{ forloop.counter }}">
+                 <label for="rating{{ forloop.counter }}">♥</label>
+                 {% endfor %}
+             </div>
+         </div>
             <div class="form-group">
                 <label for="comment">Comentário:</label>
                 <textarea id="comment" name="comment" rows="4" placeholder="Digite sua avaliação..."></textarea>
@@ -195,19 +195,39 @@ function closeReviewForm() {
 }
 
 function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
             }
         }
+        return cookieValue;
     }
-    return cookieValue;
-}
+
+    // Interactive heart selection for review modal
+    document.addEventListener('DOMContentLoaded', function() {
+        const heartLabels = document.querySelectorAll('.rating-select.hearts label');
+        heartLabels.forEach((label, index) => {
+            label.addEventListener('click', function(e) {
+                // Remove selected class from all labels
+                heartLabels.forEach(l => l.classList.remove('selected'));
+                // Add selected class to clicked label and all previous ones
+                for (let i = 0; i <= index; i++) {
+                    heartLabels[i].classList.add('selected');
+                }
+                // Select the corresponding radio button
+                const radioInput = document.getElementById(`rating${index + 1}`);
+                if (radioInput) {
+                    radioInput.checked = true;
+                }
+            });
+        });
+    });
 
     // Handle review form submission
     document.getElementById('review-form').addEventListener('submit', function(e) {
