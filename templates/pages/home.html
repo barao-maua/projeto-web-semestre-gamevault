@@ -67,13 +67,12 @@
     
     <div class="library-grid">
         {% for jogo in featured_games %}
-        {% comment %} Cycle through cover styles: hollow, cyberpunk, valhalla {% endcomment %}
         <article class="game-card">
-            <div class="game-cover 
-                {% if forloop.counter0 == 0 %}cover-hollow{% endif %}
-                {% if forloop.counter0 == 1 %}cover-cyberpunk{% endif %}
-                {% if forloop.counter0 == 2 %}cover-valhalla{% endif %}
-                {% if forloop.counter0 > 2 %}cover-hollow{% endif %}">
+            <div class="game-cover" style="
+                {% if jogo.cover_image %}
+                    background-image: url('{{ jogo.cover_image }}');
+                {% endif %}
+            ">
                 <div class="cover-caption">
                     <span>{{ jogo.genre|default:"Aventura" }}</span>
                     <strong>{{ jogo.title }}</strong>

@@ -13,32 +13,32 @@
 {% if library_entries %}
     <div class="library-grid">
         {% for entry in library_entries %}
-        <div class="library-card">
-            <div class="library-card-header">
-                <h3>{{ entry.game.title }}</h3>
+        <div class="game-card">
+            <div class="game-cover" style="
+                {% if entry.game.cover_image %}
+                    background-image: url('{{ entry.game.cover_image }}');
+                {% endif %}
+            ">
+                <div class="cover-caption">
+                    <span>{{ entry.game.genre|default:"Jogo" }}</span>
+                    <strong>{{ entry.game.title }}</strong>
+                </div>
+            </div>
+
+            <div class="game-rating">
+                {% for i in "12345" %}
+                    {% if forloop.counter <= 4 %}&hearts;{% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="game-actions">
                 <span class="status-badge status-{{ entry.status }}">{{ entry.get_status_display }}</span>
             </div>
-            
-            {% if entry.game.cover_image %}
-            <div class="library-card-image">
-                <img src="{{ entry.game.cover_image }}" alt="{{ entry.game.title }}">
-            </div>
-            {% endif %}
-            
-            <div class="library-card-body">
-                <p class="progress-text">Progresso: {{ entry.progress }}%</p>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: {{ entry.progress }}%"></div>
-                </div>
-                
-                <div class="library-card-actions">
-                    <button class="btn btn-sm btn-outline" onclick="updateLibrary({{ entry.id }})">
-                        Atualizar
-                    </button>
-                    <button class="btn btn-sm btn-danger" onclick="removeFromLibrary({{ entry.id }})">
-                        Remover
-                    </button>
-                </div>
+
+            <div class="game-actions" style="margin-top: 10px;">
+                <a href="{% url 'core:game_detail' entry.game.id %}" class="ghost-button">Editar</a>
+                <span>|</span>
+                <button class="ghost-button" onclick="removeFromLibrary({{ entry.id }})">Remover</button>
             </div>
         </div>
         {% endfor %}
