@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Detalhes | GameVault{% endblock %}
 
@@ -6,7 +7,7 @@
 <section class="screen">
     <div class="screen-header">
         <div>
-            <h1 style="color: white;">Detalhes do jogo e avaliações</h1>
+            <h1>Detalhes do jogo e avaliacoes</h1>
             <p>
                 Esta pagina aproxima o projeto do prototipo apresentado, mostrando a capa, a nota atribuida pelo
                 usuario e uma area lateral com avaliacoes da comunidade.
@@ -17,7 +18,8 @@
     <div class="detail-layout">
         <section class="detail-main">
             <article class="cover-panel">
-                <div class="game-cover cover-hollow">
+                <div class="game-cover game-cover--detail game-cover--focus-top">
+                    <img src="{% static 'img/HollowKnight.jpg' %}" alt="Capa de Hollow Knight">
                     <div class="cover-caption">
                         <span>Jogo selecionado</span>
                         <strong>Hollow Knight</strong>
@@ -26,29 +28,26 @@
             </article>
 
             <article class="rating-panel">
-                <h2 style="color: white;">Sua avaliacao:</h2>
-                <div class="interactive-rating" data-game-id="1">
-                    <span class="rating-stars"></span>
-                    <input type="hidden" id="user-rating" value="0">
-                    <p class="rating-feedback">Selecione sua avaliação</p>
-                </div>
+                <h2>Sua avaliacao:</h2>
+                <div class="rating-stars">&hearts; &hearts; &hearts; &hearts; &hearts;</div>
+                <p class="rating-feedback">5 coracoes para a ambientacao, trilha sonora e exploracao.</p>
                 <p class="review-hint">Digite sua avaliacao:</p>
-                <form id="review-form">
+                <form>
                     <div class="field">
                         <textarea placeholder="Escreva o que achou do jogo, do ritmo da campanha e da exploracao."></textarea>
                     </div>
-                    <button class="button full-button" type="submit">Salvar comentario</button>
+                    <button class="button full-button" type="button">Salvar comentario</button>
                 </form>
             </article>
         </section>
 
         <aside>
-            <h2 style="color: white;", class="community-panel-title">Avaliacoes da Comunidade</h2>
+            <h2 class="community-panel-title">Avaliacoes da Comunidade</h2>
             <div class="community-list">
                 <article class="community-card">
                     <div class="community-card-header">
                         <span class="community-avatar">P</span>
-                        <span class="reviewer-name">Pedro:</span>
+                        <strong>Pedro:</strong>
                     </div>
                     <p class="reviewer-comment">Jogo muito legal e divertido.</p>
                 </article>
@@ -56,7 +55,7 @@
                 <article class="community-card">
                     <div class="community-card-header">
                         <span class="community-avatar">A</span>
-                        <span class="reviewer-name">Augusto:</span>
+                        <strong>Augusto:</strong>
                     </div>
                     <p class="reviewer-comment">So passei raiva, mas superei todas minhas dificuldades.</p>
                 </article>
@@ -64,7 +63,7 @@
                 <article class="community-card">
                     <div class="community-card-header">
                         <span class="community-avatar">V</span>
-                        <span class="reviewer-name">Vitor:</span>
+                        <strong>Vitor:</strong>
                     </div>
                     <p class="reviewer-comment">Jogo muito dificil, nao gostei.</p>
                 </article>
@@ -72,7 +71,7 @@
                 <article class="community-card">
                     <div class="community-card-header">
                         <span class="community-avatar">G</span>
-                        <span class="reviewer-name">Gabriel:</span>
+                        <strong>Gabriel:</strong>
                     </div>
                     <p class="reviewer-comment">Passei muita raiva, mas nao desisti.</p>
                 </article>
@@ -80,7 +79,7 @@
                 <article class="community-card">
                     <div class="community-card-header">
                         <span class="community-avatar">L</span>
-                        <span class="reviewer-name">Lucas:</span>
+                        <strong>Lucas:</strong>
                     </div>
                     <p class="reviewer-comment">Fiquei vendo meus amigos jogarem e achei legal.</p>
                 </article>
@@ -88,7 +87,7 @@
                 <article class="community-card">
                     <div class="community-card-header">
                         <span class="community-avatar">I</span>
-                        <span class="reviewer-name">Igor:</span>
+                        <strong>Igor:</strong>
                     </div>
                     <p class="reviewer-comment">Jogo muito legal e dificil.</p>
                 </article>
@@ -96,7 +95,7 @@
                 <article class="community-card">
                     <div class="community-card-header">
                         <span class="community-avatar">A</span>
-                        <span class="reviewer-name">Ana:</span>
+                        <strong>Ana:</strong>
                     </div>
                     <p class="reviewer-comment">Comprei para meu namorado, ele amou.</p>
                 </article>
@@ -119,113 +118,4 @@
         </article>
     </div>
 </section>
-
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const ratingContainer = document.querySelector('.interactive-rating');
-    if (!ratingContainer) return;
-    
-    const gameId = ratingContainer.dataset.gameId;
-    const starsContainer = ratingContainer.querySelector('.rating-stars');
-    const ratingInput = document.getElementById('user-rating');
-    const feedbackText = ratingContainer.querySelector('.rating-feedback');
-    const form = document.getElementById('review-form');
-    
-    // Criar 5 corações
-    for (let i = 1; i <= 5; i++) {
-        const heart = document.createElement('span');
-        heart.classList.add('heart');
-        heart.innerHTML = '&hearts;';
-        heart.dataset.value = i;
-        heart.addEventListener('click', () => setRating(i));
-        heart.addEventListener('mouseover', () => previewRating(i));
-        heart.addEventListener('mouseout', () => previewRating(ratingInput.value));
-        starsContainer.appendChild(heart);
-    }
-    
-    function setRating(value) {
-        ratingInput.value = value;
-        updateHeartDisplay(value);
-        feedbackText.textContent = `Você selecionou ${value} coração${value !== 1 ? 's' : ''}`;
-        
-        // Enviar avaliação via AJAX
-        const comment = form.querySelector('textarea').value.trim();
-        fetch(`/game/${gameId}/review/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({
-                rating: value,
-                comment: comment
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                feedbackText.style.color = 'var(--accent)';
-                feedbackText.textContent = 'Avaliação salva!';
-                // Opcional: recarregar a página para mostrar a nova avaliação na lista
-                // setTimeout(() => location.reload(), 1500);
-            } else {
-                feedbackText.style.color = 'var(--danger)';
-                feedbackText.textContent = 'Erro ao salvar avaliação';
-            }
-        })
-        .catch(error => {
-            feedbackText.style.color = 'var(--danger)';
-            feedbackText.textContent = 'Erro de conexão';
-        });
-    }
-    
-    function previewRating(value) {
-        updateHeartDisplay(value);
-    }
-    
-    function updateHeartDisplay(value) {
-        const hearts = starsContainer.querySelectorAll('.heart');
-        hearts.forEach((heart, index) => {
-            if (index < value) {
-                heart.style.color = 'var(--accent)'; // Coração preenchido
-            } else {
-                heart.style.color = 'var(--muted)'; // Coração vazio
-            }
-        });
-    }
-    
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    
-    // Manipular envio do formulário de comentário
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const rating = parseInt(ratingInput.value);
-        const comment = this.querySelector('textarea').value.trim();
-        
-        if (rating === 0) {
-            feedbackText.style.color = 'var(--danger)';
-            feedbackText.textContent = 'Por favor, selecione uma avaliação';
-            return;
-        }
-        
-        // Reutilizar a função de envio de avaliação
-        setRating(rating); // Isso já enviará tanto a nota quanto o comentário
-    });
-});
-</script>
-{% endblock %}
 {% endblock %}
