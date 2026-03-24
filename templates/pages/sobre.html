@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Biblioteca | GameVault{% endblock %}
 
@@ -6,7 +7,7 @@
 <section class="screen">
     <div class="screen-header">
         <div>
-            <h1 style="color: white;">Biblioteca do jogador</h1>
+            <h1>Catalogo de jogos</h1>
             <p>
                 A tela principal da colecao mostra cards com os jogos cadastrados, notas rapidas e acoes visuais
                 para editar ou remover cada item da biblioteca pessoal.
@@ -35,7 +36,8 @@
 
     <div class="library-grid">
         <article class="game-card">
-            <div class="game-cover cover-hollow">
+            <div class="game-cover">
+                <img src="{% static 'img/HollowKnight.jpg' %}" alt="Capa de Hollow Knight">
                 <div class="cover-caption">
                     <span>Metroidvania</span>
                     <strong>Hollow Knight</strong>
@@ -50,7 +52,8 @@
         </article>
 
         <article class="game-card">
-            <div class="game-cover cover-cyberpunk">
+            <div class="game-cover">
+                <img src="{% static 'img/cyberpunk2077.jpg' %}" alt="Capa de Cyberpunk 2077">
                 <div class="cover-caption">
                     <span>RPG futurista</span>
                     <strong>Cyberpunk 2077</strong>
@@ -65,10 +68,11 @@
         </article>
 
         <article class="game-card">
-            <div class="game-cover cover-valhalla">
+            <div class="game-cover game-cover--focus-top">
+                <img src="{% static 'img/EldenRing.png' %}" alt="Capa de Elden Ring">
                 <div class="cover-caption">
-                    <span>Aventura historica</span>
-                    <strong>Assassin's Creed Valhalla</strong>
+                    <span>Fantasia sombria</span>
+                    <strong>Elden Ring</strong>
                 </div>
             </div>
             <div class="game-rating">&hearts; &hearts; &hearts; &hearts;</div>

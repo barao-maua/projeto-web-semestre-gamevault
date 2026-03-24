@@ -549,10 +549,22 @@ select {
     border: 4px solid rgba(60, 168, 255, 0.35);
     border-radius: 12px;
     overflow: hidden;
-    background-size: cover;
-    background-position: center top;
-    background-repeat: no-repeat;
-    background-color: #1f2d40;
+    background: linear-gradient(180deg, rgba(30, 43, 60, 0.85) 0%, rgba(17, 24, 34, 0.98) 100%);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.game-cover img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transform: scale(1.02);
+}
+
+.game-cover--focus-top img {
+    object-position: center top;
 }
 
 .game-cover::before {
@@ -561,8 +573,9 @@ select {
     inset: 0;
     background: linear-gradient(
         to bottom,
-        rgba(0, 0, 0, 0.0) 30%,
-        rgba(0, 0, 0, 0.80) 100%
+        rgba(0, 0, 0, 0.08) 10%,
+        rgba(0, 0, 0, 0.22) 42%,
+        rgba(0, 0, 0, 0.88) 100%
     );
     z-index: 0;
 }
@@ -590,36 +603,6 @@ select {
 .cover-caption strong {
     font-size: 1.35rem;
     line-height: 1.08;
-}
-
-.game-cover::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0.0) 30%,
-        rgba(0, 0, 0, 0.80) 100%
-    );
-    z-index: 0;
-}
-
-.cover-hollow {
-    background:
-        linear-gradient(180deg, rgba(227, 237, 246, 0.18) 0%, rgba(14, 20, 29, 0.94) 100%),
-        linear-gradient(135deg, #5f7c8f 0%, #243142 100%);
-}
-
-.cover-cyberpunk {
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(14, 20, 29, 0.82) 100%),
-        linear-gradient(135deg, #ffe600 0%, #ffb703 52%, #1b2a41 100%);
-}
-
-.cover-valhalla {
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(14, 20, 29, 0.88) 100%),
-        linear-gradient(135deg, #eef3f8 0%, #9bb2c5 35%, #4c6f87 100%);
 }
 
 .cover-caption {
@@ -680,20 +663,27 @@ select {
 
 .detail-main {
     display: grid;
-    grid-template-columns: 220px minmax(0, 1fr);
-    gap: 22px;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 24px;
     padding-right: 28px;
     border-right: 2px solid rgba(255, 255, 255, 0.65);
 }
 
 .cover-panel,
 .rating-panel {
-    padding: 18px;
+    padding: 20px;
 }
 
 .cover-panel .game-cover {
-    min-height: 360px;
+    min-height: 390px;
+    height: 390px;
     margin-bottom: 0;
+}
+
+.game-cover--detail {
+    border-width: 3px;
+    border-color: rgba(60, 168, 255, 0.42);
+    border-radius: 16px;
 }
 
 .rating-stars {
@@ -701,6 +691,12 @@ select {
     color: var(--danger);
     font-size: 1.3rem;
     letter-spacing: 0.26em;
+}
+
+.rating-feedback {
+    margin-bottom: 14px;
+    color: var(--text);
+    font-size: 0.92rem;
 }
 
 .review-hint {
@@ -723,6 +719,7 @@ select {
     margin-bottom: 14px;
     padding: 14px 16px;
     border-radius: 12px;
+    color: var(--text);
     background: rgba(47, 76, 103, 0.7);
 }
 
@@ -755,6 +752,10 @@ select {
 
 .community-card strong {
     font-size: 0.82rem;
+}
+
+.reviewer-comment {
+    margin-bottom: 0;
 }
 
 .community-card p {
