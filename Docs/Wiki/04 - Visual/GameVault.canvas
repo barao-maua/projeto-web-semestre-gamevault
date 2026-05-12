@@ -1,0 +1,292 @@
+{
+  "nodes": [
+    {
+      "id": "a100000000000001",
+      "type": "group",
+      "x": -40,
+      "y": -60,
+      "width": 520,
+      "height": 640,
+      "label": "Produto e Navegacao",
+      "color": "5"
+    },
+    {
+      "id": "a100000000000002",
+      "type": "group",
+      "x": 540,
+      "y": -60,
+      "width": 780,
+      "height": 640,
+      "label": "Fluxo Funcional",
+      "color": "4"
+    },
+    {
+      "id": "a100000000000003",
+      "type": "group",
+      "x": 1380,
+      "y": -60,
+      "width": 620,
+      "height": 640,
+      "label": "Camada Tecnica",
+      "color": "6"
+    },
+    {
+      "id": "a100000000000004",
+      "type": "file",
+      "x": 20,
+      "y": 20,
+      "width": 380,
+      "height": 220,
+      "file": "Docs/Wiki/01 - Projeto/GameVault.md",
+      "color": "5"
+    },
+    {
+      "id": "a100000000000005",
+      "type": "file",
+      "x": 20,
+      "y": 300,
+      "width": 380,
+      "height": 220,
+      "file": "Docs/Wiki/00 - Inicio/00 - Mapa do Projeto.md",
+      "color": "5"
+    },
+    {
+      "id": "a100000000000006",
+      "type": "file",
+      "x": 600,
+      "y": 20,
+      "width": 280,
+      "height": 180,
+      "file": "Docs/Wiki/03 - Funcionalidades/Autenticacao.md",
+      "color": "4"
+    },
+    {
+      "id": "a100000000000007",
+      "type": "file",
+      "x": 960,
+      "y": 20,
+      "width": 280,
+      "height": 180,
+      "file": "Docs/Wiki/03 - Funcionalidades/Catalogo de Jogos.md",
+      "color": "4"
+    },
+    {
+      "id": "a100000000000008",
+      "type": "file",
+      "x": 960,
+      "y": 300,
+      "width": 280,
+      "height": 180,
+      "file": "Docs/Wiki/03 - Funcionalidades/Biblioteca do Usuario.md",
+      "color": "4"
+    },
+    {
+      "id": "a100000000000009",
+      "type": "file",
+      "x": 600,
+      "y": 300,
+      "width": 280,
+      "height": 180,
+      "file": "Docs/Wiki/03 - Funcionalidades/Paginas Institucionais.md",
+      "color": "4"
+    },
+    {
+      "id": "a10000000000000a",
+      "type": "text",
+      "x": 760,
+      "y": 220,
+      "width": 320,
+      "height": 120,
+      "text": "# Usuario\n\nFluxo principal: entrar, navegar, escolher jogo, salvar na biblioteca e avaliar.",
+      "color": "3"
+    },
+    {
+      "id": "a10000000000000b",
+      "type": "file",
+      "x": 1440,
+      "y": 20,
+      "width": 240,
+      "height": 160,
+      "file": "Docs/Wiki/02 - Tecnico/Arquitetura.md",
+      "color": "6"
+    },
+    {
+      "id": "a10000000000000c",
+      "type": "file",
+      "x": 1720,
+      "y": 20,
+      "width": 240,
+      "height": 160,
+      "file": "Docs/Wiki/02 - Tecnico/Views e URLs.md",
+      "color": "6"
+    },
+    {
+      "id": "a10000000000000d",
+      "type": "file",
+      "x": 1440,
+      "y": 240,
+      "width": 240,
+      "height": 160,
+      "file": "Docs/Wiki/02 - Tecnico/Models.md",
+      "color": "6"
+    },
+    {
+      "id": "a10000000000000e",
+      "type": "file",
+      "x": 1720,
+      "y": 240,
+      "width": 240,
+      "height": 160,
+      "file": "Docs/Wiki/02 - Tecnico/Templates.md",
+      "color": "6"
+    },
+    {
+      "id": "a10000000000000f",
+      "type": "file",
+      "x": 1580,
+      "y": 440,
+      "width": 240,
+      "height": 120,
+      "file": "Docs/Wiki/02 - Tecnico/Static e CSS.md",
+      "color": "6"
+    },
+    {
+      "id": "a100000000000010",
+      "type": "text",
+      "x": 600,
+      "y": 500,
+      "width": 640,
+      "height": 60,
+      "text": "Endpoints JSON: adicionar/remover biblioteca, atualizar progresso e salvar avaliacao.",
+      "color": "2"
+    }
+  ],
+  "edges": [
+    {
+      "id": "b100000000000001",
+      "fromNode": "a100000000000005",
+      "fromSide": "top",
+      "toNode": "a100000000000004",
+      "toSide": "bottom",
+      "toEnd": "arrow",
+      "label": "entrada"
+    },
+    {
+      "id": "b100000000000002",
+      "fromNode": "a100000000000004",
+      "fromSide": "right",
+      "toNode": "a10000000000000a",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "define experiencia"
+    },
+    {
+      "id": "b100000000000003",
+      "fromNode": "a10000000000000a",
+      "fromSide": "top",
+      "toNode": "a100000000000006",
+      "toSide": "bottom",
+      "toEnd": "arrow",
+      "label": "login/cadastro"
+    },
+    {
+      "id": "b100000000000004",
+      "fromNode": "a100000000000006",
+      "fromSide": "right",
+      "toNode": "a100000000000007",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "navega"
+    },
+    {
+      "id": "b100000000000005",
+      "fromNode": "a100000000000007",
+      "fromSide": "bottom",
+      "toNode": "a100000000000008",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "label": "adiciona jogo"
+    },
+    {
+      "id": "b100000000000006",
+      "fromNode": "a100000000000009",
+      "fromSide": "right",
+      "toNode": "a10000000000000a",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "apresenta"
+    },
+    {
+      "id": "b100000000000007",
+      "fromNode": "a100000000000008",
+      "fromSide": "left",
+      "toNode": "a10000000000000a",
+      "toSide": "right",
+      "toEnd": "arrow",
+      "label": "acompanha"
+    },
+    {
+      "id": "b100000000000008",
+      "fromNode": "a100000000000007",
+      "fromSide": "right",
+      "toNode": "a10000000000000c",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "rota/view"
+    },
+    {
+      "id": "b100000000000009",
+      "fromNode": "a100000000000008",
+      "fromSide": "right",
+      "toNode": "a10000000000000d",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "LibraryEntry"
+    },
+    {
+      "id": "b10000000000000a",
+      "fromNode": "a10000000000000c",
+      "fromSide": "bottom",
+      "toNode": "a10000000000000d",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "label": "consulta/persiste"
+    },
+    {
+      "id": "b10000000000000b",
+      "fromNode": "a10000000000000c",
+      "fromSide": "bottom",
+      "toNode": "a10000000000000e",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "label": "renderiza"
+    },
+    {
+      "id": "b10000000000000c",
+      "fromNode": "a10000000000000e",
+      "fromSide": "bottom",
+      "toNode": "a10000000000000f",
+      "toSide": "top",
+      "toEnd": "arrow",
+      "label": "estiliza"
+    },
+    {
+      "id": "b10000000000000d",
+      "fromNode": "a10000000000000b",
+      "fromSide": "right",
+      "toNode": "a10000000000000c",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "organiza"
+    },
+    {
+      "id": "b10000000000000e",
+      "fromNode": "a100000000000010",
+      "fromSide": "right",
+      "toNode": "a10000000000000c",
+      "toSide": "left",
+      "toEnd": "arrow",
+      "label": "implementados em"
+    }
+  ]
+}

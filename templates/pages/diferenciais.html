@@ -3,6 +3,10 @@
 
 {% block title %}Detalhes | GameVault{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/diferenciais.css' %}">
+{% endblock %}
+
 {% block content %}
 <section class="screen">
     <div class="screen-header">
@@ -133,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const stars = ratingStars.querySelectorAll('.star');
     const ratingValueInput = document.getElementById('rating-value');
     
-    // Function to update star display based on rating
+    // Atualiza a exibicao dos coracoes com base na nota
     function updateStars(rating) {
         stars.forEach((star, index) => {
             if (index < rating) {
@@ -145,12 +149,12 @@ document.addEventListener('DOMContentLoaded', function() {
         ratingValueInput.value = rating;
     }
     
-    // Add event listeners to stars
+    // Adiciona eventos de interacao aos coracoes
     stars.forEach(star => {
-        // Handle hover effects
+        // Controla os efeitos ao passar o mouse
         star.addEventListener('mouseenter', function() {
             const value = parseInt(this.getAttribute('data-value'));
-            // Highlight stars up to this one
+            // Destaca os coracoes ate o item atual
             stars.forEach((s, index) => {
                 if (index < value) {
                     s.style.color = 'var(--accent)';
@@ -160,19 +164,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         star.addEventListener('mouseleave', function() {
-            // Reset to current rating
+            // Retorna para a nota selecionada atualmente
             const currentRating = parseInt(ratingValueInput.value);
             updateStars(currentRating);
         });
         
-        // Handle click to set rating
+        // Define a nota ao clicar
         star.addEventListener('click', function() {
             const value = parseInt(this.getAttribute('data-value'));
             updateStars(value);
         });
     });
     
-    // Initialize with current rating (0)
+    // Inicializa sem nota selecionada
     updateStars(0);
 });
 </script>

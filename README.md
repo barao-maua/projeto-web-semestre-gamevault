@@ -38,12 +38,13 @@ Funcionalidades:
 
 **Como usuário**, quero definir o status de um jogo e registrar meu progresso, para acompanhar minha evolução.
 
-Status possíveis:
+Status possíveis no código atual:
 
-- Backlog
 - Jogando
+- Pausado
 - Concluído
-- Dropado
+- Abandonado
+- Planejo Jogar
 
 Também é possível registrar o progresso do jogo.
 
@@ -189,9 +190,12 @@ Representa um jogo disponível no sistema.
 ```
 id (PK)
 title
-release_year
-developer
-cover_url
+description
+release_date
+genre
+cover_image
+created_at
+updated_at
 ```
 
 ---
@@ -205,9 +209,9 @@ id (PK)
 user_id (FK)
 game_id (FK)
 status
-progress_hours
-started_at
-finished_at
+progress
+added_at
+updated_at
 ```
 
 ---
@@ -221,8 +225,9 @@ id (PK)
 user_id (FK)
 game_id (FK)
 rating
-text
+comment
 created_at
+updated_at
 ```
 
 ---
@@ -236,6 +241,9 @@ id (PK)
 user_id (FK)
 name
 description
+is_public
+created_at
+updated_at
 ```
 
 ---
@@ -246,9 +254,9 @@ Representa os jogos contidos em uma lista.
 
 ```
 id (PK)
-list_id (FK)
+game_list_id (FK)
 game_id (FK)
-position
+added_at
 ```
 
 ---

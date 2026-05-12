@@ -1,21 +1,25 @@
 import os
 import django
 
-# Set up Django
+# Configura o Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 
-from core.models import Game  # Adjust the import according to your app name
+from core.models import Game  # Importa o model de jogos do app principal
 
-# Mapping of game titles to image paths
+# Mapeamento dos titulos dos jogos para os caminhos das imagens principais.
+# As variantes visuais de home/catalogo continuam em static/img/home e static/img/catalog.
 image_mapping = {
-    "Hollow Knight": "/static/img/Hollow_Knight.jpg",
+    "Hollow Knight": "/static/img/HollowKnight.jpg",
+    "Hades": "/static/img/Hades.jpg",
+    "Elden Ring": "/static/img/EldenRing.png",
+    "Disco Elysium": "/static/img/discoelysium.jpg",
     "Cyberpunk 2077": "/static/img/cyberpunk2077.jpg",
-    "Assassin's Creed Valhalla": "/static/img/AssassinsCreedValhalla.jpg"
+    "Celeste": "/static/img/celeste.png",
 }
 
 for title, image_path in image_mapping.items():
-    # Find game by title (case-insensitive contains)
+    # Busca o jogo pelo titulo sem diferenciar maiusculas e minusculas
     games = Game.objects.filter(title__icontains=title)
     if games.exists():
         game = games.first()

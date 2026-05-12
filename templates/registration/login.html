@@ -1,6 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Login - GameVault{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/auth.css' %}">
+{% endblock %}
 
 {% block content %}
 <section class="screen auth-shell">
@@ -18,6 +23,14 @@
     {% endif %}
     <form method="post">
         {% csrf_token %}
+        {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
+        {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+            <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        {% endif %}
         <div class="field">
             {{ form.username.label_tag }}
             {{ form.username }}

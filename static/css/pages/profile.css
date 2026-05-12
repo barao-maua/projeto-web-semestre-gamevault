@@ -1,0 +1,28 @@
+.profile-container {
+    display: grid;
+    gap: 18px;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 28px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(180deg, rgba(31, 45, 64, 0.98) 0%, rgba(27, 38, 54, 0.98) 100%);
+    box-shadow: var(--shadow);
+}
+
+.user-info {
+    display: grid;
+    gap: 10px;
+    padding: 18px;
+    border: 1px solid rgba(214, 227, 244, 0.12);
+    border-radius: var(--radius-md);
+    background: rgba(47, 76, 103, 0.42);
+}
+
+.user-info p {
+    margin-bottom: 0;
+}
+
+.user-info strong {
+    color: var(--text);
+}

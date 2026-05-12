@@ -1,6 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Perfil - GameVault{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/profile.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="profile-container">
@@ -10,6 +15,6 @@
         <p><strong>Email:</strong> {{ user.email|default:"Não informado" }}</p>
         <p><strong>Data de cadastro:</strong> {{ user.date_joined }}</p>
     </div>
-    <a href="{% url 'core:logout' %}" class="btn btn-secondary">Sair</a>
+    <a href="{% url 'core:logout' %}" class="ghost-button">Sair</a>
 </div>
 {% endblock %}

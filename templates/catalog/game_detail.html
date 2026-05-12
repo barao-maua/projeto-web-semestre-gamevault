@@ -1,8 +1,13 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ game.title }} - GameVault{% endblock %}
 
 {% block body_class %}game-detail-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/game-detail.css' %}">
+{% endblock %}
 
 {% block content %}
 <section class="screen">
@@ -157,7 +162,7 @@ function addToLibrary(gameId, status) {
     .then(data => {
         if (data.success) {
             alert(data.message);
-            location.reload(); // Recarrega a página para atualizar o status
+            location.reload(); // Recarrega a pagina para atualizar o status
         } else {
             alert('Erro: ' + data.message);
         }
@@ -168,7 +173,7 @@ function addToLibrary(gameId, status) {
 }
 
 function showLibraryStatusModal(gameId) {
-    // Simple implementation - in a real app, you'd use a proper modal
+    // Implementacao simples: em uma versao completa, isso pode virar um modal proprio
     const status = prompt("Selecione o status para este jogo:\n1. Planejo Jogar\n2. Jogando\n3. Concluído\n4. Pausado\n5. Abandonado\n\nDigite o número do status:", "1");
     
     const statusMap = {
@@ -180,7 +185,7 @@ function showLibraryStatusModal(gameId) {
     };
     
     const selectedStatus = statusMap[status] || "plan_to_play";
-    if (status !== null) { // User didn't cancel
+    if (status !== null) { // O usuario nao cancelou
         addToLibrary(gameId, selectedStatus);
     }
 }
@@ -209,18 +214,18 @@ function getCookie(name) {
         return cookieValue;
     }
 
-    // Interactive heart selection for review modal
+    // Selecao interativa de coracoes no modal de avaliacao
     document.addEventListener('DOMContentLoaded', function() {
         const heartLabels = document.querySelectorAll('.rating-select.hearts label');
         heartLabels.forEach((label, index) => {
             label.addEventListener('click', function(e) {
-                // Remove selected class from all labels
+                // Remove a classe de selecao de todos os rotulos
                 heartLabels.forEach(l => l.classList.remove('selected'));
-                // Add selected class to clicked label and all previous ones
+                // Marca o coracao clicado e todos os anteriores
                 for (let i = 0; i <= index; i++) {
                     heartLabels[i].classList.add('selected');
                 }
-                // Select the corresponding radio button
+                // Seleciona o campo de radio correspondente
                 const radioInput = document.getElementById(`rating${index + 1}`);
                 if (radioInput) {
                     radioInput.checked = true;
@@ -229,7 +234,7 @@ function getCookie(name) {
         });
     });
 
-    // Handle review form submission
+    // Controla o envio do formulario de avaliacao
     document.getElementById('review-form').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -262,7 +267,7 @@ function getCookie(name) {
             if (data.success) {
                 alert(data.message);
                 closeReviewForm();
-                location.reload(); // Recarrega a página para mostrar a nova avaliação
+                location.reload(); // Recarrega a pagina para mostrar a nova avaliacao
             } else {
                 alert('Erro: ' + data.message);
             }

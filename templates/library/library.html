@@ -1,8 +1,13 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Minha Biblioteca - GameVault{% endblock %}
 
 {% block body_class %}library-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/library.css' %}">
+{% endblock %}
 
 {% block content %}
 <section class="screen">
@@ -59,7 +64,7 @@
 {% block extra_js %}
 <script>
 function updateLibrary(entryId) {
-    // This would typically open a modal or redirect to an update form
+    // Em uma versao completa, isso abriria um modal ou redirecionaria para um formulario de edicao
     alert('Funcionalidade de atualização em desenvolvimento');
 }
 

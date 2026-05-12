@@ -4,15 +4,16 @@ from urllib.parse import urlparse
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 from django.db.models import Q
 import json
 
 from .models import Game, LibraryEntry, Review, GameList, GameListItem
+from .forms import GameVaultAuthenticationForm, GameVaultUserCreationForm
 
 
 IMAGE_VARIANT_EXTENSIONS = (".jpg", ".jpeg", ".png", ".webp", ".avif")
@@ -100,8 +101,10 @@ def diferenciais_view(request):
 
 
 def login_view(request):
+    next_url = request.POST.get("next") or request.GET.get("next")
+
     if request.method == "POST":
-        form = AuthenticationForm(request, data=request.POST)
+        form = GameVaultAuthenticationForm(request, data=request.POST)
         if form.is_valid():
             username = form.cleaned_data.get("username")
             password = form.cleaned_data.get("password")
@@ -109,13 +112,21 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.info(request, f"Você está logado como {username}.")
+                if next_url and url_has_allowed_host_and_scheme(
+                    next_url,
+                    allowed_hosts={request.get_host()},
+                    require_https=request.is_secure(),
+                ):
+                    return redirect(next_url)
                 return redirect("core:home")
             else:
                 messages.error(request, "Nome de usuário ou senha inválido.")
         else:
             messages.error(request, "Nome de usuário ou senha inválido.")
-    form = AuthenticationForm()
-    return render(request, "registration/login.html", {"form": form})
+    else:
+        form = GameVaultAuthenticationForm()
+
+    return render(request, "registration/login.html", {"form": form, "next": next_url})
 
 
 def logout_view(request):
@@ -126,17 +137,17 @@ def logout_view(request):
 
 def register_view(request):
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = GameVaultUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             username = form.cleaned_data.get("username")
             messages.success(request, f"Conta criada para {username}!")
             login(request, user)
             return redirect("core:home")
-        else:
-            for msg in form.error_messages:
-                messages.error(request, f"{msg}: {form.error_messages[msg]}")
-    form = UserCreationForm()
+        messages.error(request, "Corrija os campos destacados para criar sua conta.")
+    else:
+        form = GameVaultUserCreationForm()
+
     return render(request, "registration/register.html", {"form": form})
 
 

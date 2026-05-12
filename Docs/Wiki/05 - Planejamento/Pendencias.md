@@ -1,0 +1,62 @@
+---
+title: Pendencias
+aliases:
+  - Pendências
+tipo: pendencia
+status: ativo
+area: planejamento
+projeto: GameVault
+tags:
+  - gamevault
+  - pendencias
+  - planejamento
+---
+
+# Pendencias
+
+Esta nota centraliza tarefas, inconsistencias e pontos que precisam de revisao no [[GameVault]].
+
+## Documentacao
+
+- [x] Atualizar o [README principal](../../../README.md) para alinhar o modelo de dados com o codigo atual.
+- [x] Revisar termos antigos como `release_year` e `progress_hours`, pois o codigo usa `release_date` e `progress`.
+- [ ] Validar se [[Entrega2]] deve continuar na raiz ou ser arquivado em uma pasta de entregas.
+- [ ] Adicionar instrucoes de uso da wiki no README principal do repositorio, se fizer sentido.
+
+## Funcionalidades
+
+- [ ] Criar interface completa para atualizar status e progresso na [[Biblioteca do Usuario]].
+- [ ] Avaliar se `GameList` e `GameListItem` terao telas proprias.
+- [ ] Melhorar o fluxo de adicionar jogo a biblioteca sem usar `prompt`.
+- [ ] Verificar se visitantes devem conseguir acessar detalhes completos de jogos ou apenas uma previa.
+- [ ] Revisar mensagens de erro retornadas pelos endpoints JSON.
+
+## Interface
+
+- [ ] Validar responsividade das principais telas em mobile.
+- [ ] Revisar acessibilidade dos botoes e formularios.
+- [ ] Trocar interacoes com `alert` e `prompt` por componentes visuais.
+- [ ] Garantir consistencia entre paginas demonstrativas e telas dinamicas reais.
+
+## Tecnico
+
+- [x] Confirmar se arquivos `__pycache__` e banco local devem ficar fora do versionamento.
+- [x] Revisar `.gitignore` para ambiente Python/Django.
+- [ ] Rodar `python manage.py check` no ambiente local antes da proxima entrega.
+- [ ] Verificar se as views JSON devem usar `@require_POST` em todos os endpoints de alteracao.
+- [ ] Avaliar tratamento de excecoes genericas em `core/views.py`.
+
+## Obsidian/Wiki
+
+- [ ] Abrir [[GameVault.canvas]] no Obsidian e ajustar layout se necessario.
+- [ ] Abrir [[Projeto GameVault.base]] no Obsidian e validar se as views renderizam como esperado.
+- [ ] Decidir se os documentos de entrega devem ganhar uma pasta propria dentro de `Docs/Wiki/`.
+- [ ] Criar padrao de propriedades para futuras notas.
+
+## Prioridades Sugeridas
+
+1. Alinhar README com o codigo atual.
+2. Melhorar edicao de status/progresso na biblioteca.
+3. Validar responsividade e apresentacao.
+4. Revisar versionamento de arquivos gerados.
+5. Validar base e canvas no Obsidian.
