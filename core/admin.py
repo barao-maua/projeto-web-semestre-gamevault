@@ -14,25 +14,25 @@ class GameAdmin(admin.ModelAdmin):
 class LibraryEntryAdmin(admin.ModelAdmin):
     list_display = ("user", "game", "status", "progress", "added_at")
     search_fields = ("user__username", "game__title")
-    list_filter = ("status", "added_at")
+    list_filter = ("status", "user", "added_at")
 
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ("user", "game", "rating", "created_at")
     search_fields = ("user__username", "game__title", "comment")
-    list_filter = ("rating", "created_at")
+    list_filter = ("rating", "user", "created_at")
 
 
 @admin.register(GameList)
 class GameListAdmin(admin.ModelAdmin):
     list_display = ("user", "name", "is_public", "created_at")
     search_fields = ("user__username", "name", "description")
-    list_filter = ("is_public", "created_at")
+    list_filter = ("is_public", "user", "created_at")
 
 
 @admin.register(GameListItem)
 class GameListItemAdmin(admin.ModelAdmin):
     list_display = ("game_list", "game", "added_at")
     search_fields = ("game_list__name", "game__title")
-    list_filter = ("added_at",)
+    list_filter = ("game_list", "added_at")

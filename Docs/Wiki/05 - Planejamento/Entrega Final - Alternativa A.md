@@ -86,7 +86,8 @@ CRUD esperado:
 - [ ] Rodar `python manage.py migrate`.
 - [ ] Confirmar que o servidor inicia com `python manage.py runserver`.
 - [ ] Confirmar que `/`, `/catalog/`, `/login/`, `/register/` e `/admin/` abrem corretamente.
-- [ ] Verificar se `db.sqlite3` sera mantido localmente ou se a entrega dependera de fixtures.
+- [x] Verificar se `db.sqlite3` sera mantido localmente ou se a entrega dependera de fixtures.
+  Estrategia definida: a entrega deve carregar os dados iniciais por comando Django (`python manage.py seed_games`), sem depender de versionar `db.sqlite3`.
 
 ## Parte 2 - Autenticacao
 
@@ -108,21 +109,27 @@ Critério de pronto:
 
 ## Parte 3 - ORM, Admin E Dados
 
-- [ ] Registrar `Game` no Django Admin.
-- [ ] Registrar `LibraryEntry` no Django Admin.
-- [ ] Registrar `Review` no Django Admin.
-- [ ] Registrar `GameList` no Django Admin.
-- [ ] Registrar `GameListItem` no Django Admin.
-- [ ] Configurar `list_display` nos admins principais.
-- [ ] Configurar `search_fields` para facilitar demonstracao.
-- [ ] Configurar `list_filter` para status, genero e usuario quando fizer sentido.
-- [ ] Criar superusuario para demonstracao.
-- [ ] Definir dados iniciais: fixture ou script `seed_games.py`.
-- [ ] Documentar comando para carregar jogos iniciais.
+- [x] Registrar `Game` no Django Admin.
+- [x] Registrar `LibraryEntry` no Django Admin.
+- [x] Registrar `Review` no Django Admin.
+- [x] Registrar `GameList` no Django Admin.
+- [x] Registrar `GameListItem` no Django Admin.
+- [x] Configurar `list_display` nos admins principais.
+- [x] Configurar `search_fields` para facilitar demonstracao.
+- [x] Configurar `list_filter` para status, genero e usuario quando fizer sentido.
+- [x] Criar superusuario para demonstracao.
+- [x] Definir dados iniciais: fixture ou script `seed_games.py`.
+- [x] Documentar comando para carregar jogos iniciais.
+
+Implementacao adotada:
+
+- Dados iniciais carregados por `python manage.py seed_games`.
+- Superusuario de demonstracao criado/atualizado por `python manage.py create_demo_superuser`.
+- Credenciais padrao de demonstracao: `admin` / `admin123`.
 
 Critério de pronto:
 
-- [ ] O admin mostra os models principais e permite consultar os dados do projeto.
+- [x] O admin mostra os models principais e permite consultar os dados do projeto.
 
 ## Parte 4 - CRUD Da Biblioteca
 

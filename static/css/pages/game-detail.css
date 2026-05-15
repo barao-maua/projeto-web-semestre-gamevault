@@ -104,6 +104,38 @@
     gap: 12px;
 }
 
+.inline-action-form {
+    display: flex;
+    align-items: end;
+    gap: 12px;
+}
+
+.inline-action-form--stacked {
+    display: grid;
+    gap: 10px;
+    min-width: min(100%, 280px);
+}
+
+.inline-form-label {
+    color: var(--muted);
+    font-size: 0.86rem;
+}
+
+.inline-form-select {
+    width: 100%;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    color: var(--text);
+    background: #365777;
+    outline: none;
+}
+
+.inline-form-select:focus {
+    border-color: rgba(181, 224, 0, 0.6);
+    box-shadow: 0 0 0 3px rgba(181, 224, 0, 0.12);
+}
+
 .game-detail-description {
     display: grid;
     gap: 20px;
@@ -172,6 +204,10 @@ progress {
     min-height: 120px;
     display: flex;
     align-items: center;
+}
+
+.review-form-card {
+    margin-top: 16px;
 }
 
 .review-header {

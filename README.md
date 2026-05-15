@@ -309,6 +309,28 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 
 ### 3. Rodar o servidor Django
 
+Antes de subir o servidor pela primeira vez, aplique as migracoes, carregue os jogos iniciais e crie o superusuario de demonstracao:
+
+```powershell
+python manage.py migrate
+python manage.py seed_games
+python manage.py create_demo_superuser
+```
+
+Credenciais padrao do admin de demonstracao:
+
+```text
+usuario: admin
+senha: admin123
+```
+
+Ao rodar `python manage.py create_demo_superuser`, o projeto tambem prepara um exemplo visual para demonstracao:
+
+- `Cyberpunk 2077` adicionado a biblioteca do usuario `admin`
+- status `playing`
+- progresso `45%`
+- review de exemplo cadastrada para o mesmo jogo
+
 ```powershell
 python manage.py runserver
 ```
@@ -333,6 +355,14 @@ Para validar a configuracao do Django:
 
 ```powershell
 python manage.py check
+```
+
+### 6. Acessar o Django Admin
+
+Abra a rota abaixo e entre com o superusuario de demonstracao:
+
+```text
+http://127.0.0.1:8000/admin/
 ```
 
 ## LINK FIGMA: https://www.figma.com/design/eSWG1sVcLrNMDDuWZRtGVx/GameValt?node-id=0-1&t=QbiYw86OHCeU2THv-1

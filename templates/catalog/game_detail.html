@@ -58,14 +58,24 @@
 
             <div class="game-detail-action-buttons">
                 {% if not in_library %}
-                <button class="button" onclick="showLibraryStatusModal({{ game.id }})">
-                    Adicionar à Biblioteca
-                </button>
+                <form method="post" action="{% url 'core:add_to_library' %}" class="inline-action-form inline-action-form--stacked">
+                    {% csrf_token %}
+                    <input type="hidden" name="game_id" value="{{ game.id }}">
+                    <label for="library-status-select" class="inline-form-label">Status inicial</label>
+                    <select id="library-status-select" name="status" class="inline-form-select">
+                        <option value="plan_to_play">Planejo Jogar</option>
+                        <option value="playing">Jogando</option>
+                        <option value="completed">Concluido</option>
+                        <option value="paused">Pausado</option>
+                        <option value="dropped">Abandonado</option>
+                    </select>
+                    <button type="submit" class="button">Adicionar à Biblioteca</button>
+                </form>
+                {% else %}
+                <a href="{% url 'core:library' %}" class="button">Ver na Biblioteca</a>
                 {% endif %}
 
-                <button class="ghost-button" onclick="showReviewForm()">
-                    Avaliar Jogo
-                </button>
+                <a href="#review-form-section" class="ghost-button">Avaliar Jogo</a>
             </div>
         </div>
         {% else %}
@@ -112,169 +122,34 @@
                 <p>Ainda não há avaliações para este jogo.</p>
             </div>
         {% endif %}
+
+        {% if user.is_authenticated %}
+        <div id="review-form-section" class="review-card review-form-card">
+            <h3>Registrar avaliacao</h3>
+            <form method="post" action="{% url 'core:add_review' game.id %}">
+                {% csrf_token %}
+                <div class="field">
+                    <label for="rating">Nota</label>
+                    <select id="rating" name="rating" required>
+                        <option value="">Selecione</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="comment">Comentario</label>
+                    <textarea id="comment" name="comment" rows="4" placeholder="Digite sua avaliacao..."></textarea>
+                </div>
+                <div class="screen-actions">
+                    <button type="submit" class="button">Salvar Avaliacao</button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
     </aside>
 </div>
-
-{% if user.is_authenticated %}
-<div id="review-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeReviewForm()">&times;</span>
-        <h2>Avaliar {{ game.title }}</h2>
-        <form id="review-form">
-<div class="form-group">
-                 <label for="rating">Nota:</label>
-             <div class="rating-select hearts">
-                 {% for i in "12345" %}
-                 <input type="radio" id="rating{{ forloop.counter }}" name="rating" value="{{ forloop.counter }}">
-                 <label for="rating{{ forloop.counter }}">♥</label>
-                 {% endfor %}
-             </div>
-         </div>
-            <div class="form-group">
-                <label for="comment">Comentário:</label>
-                <textarea id="comment" name="comment" rows="4" placeholder="Digite sua avaliação..."></textarea>
-            </div>
-            <button type="submit" class="button">Salvar Avaliação</button>
-        </form>
-    </div>
-</div>
-{% endif %}
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-function addToLibrary(gameId, status) {
-    fetch("{% url 'core:add_to_library' %}", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify({game_id: gameId, status: status})
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Erro de rede ou servidor');
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            alert(data.message);
-            location.reload(); // Recarrega a pagina para atualizar o status
-        } else {
-            alert('Erro: ' + data.message);
-        }
-    })
-    .catch(error => {
-        alert('Erro de conexão: ' + error.message);
-    });
-}
-
-function showLibraryStatusModal(gameId) {
-    // Implementacao simples: em uma versao completa, isso pode virar um modal proprio
-    const status = prompt("Selecione o status para este jogo:\n1. Planejo Jogar\n2. Jogando\n3. Concluído\n4. Pausado\n5. Abandonado\n\nDigite o número do status:", "1");
-    
-    const statusMap = {
-        "1": "plan_to_play",
-        "2": "playing",
-        "3": "completed",
-        "4": "paused",
-        "5": "dropped"
-    };
-    
-    const selectedStatus = statusMap[status] || "plan_to_play";
-    if (status !== null) { // O usuario nao cancelou
-        addToLibrary(gameId, selectedStatus);
-    }
-}
-
-function showReviewForm() {
-    document.getElementById('review-modal').style.display = 'block';
-}
-
-function closeReviewForm() {
-    document.getElementById('review-modal').style.display = 'none';
-    document.getElementById('review-form').reset();
-}
-
-function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    // Selecao interativa de coracoes no modal de avaliacao
-    document.addEventListener('DOMContentLoaded', function() {
-        const heartLabels = document.querySelectorAll('.rating-select.hearts label');
-        heartLabels.forEach((label, index) => {
-            label.addEventListener('click', function(e) {
-                // Remove a classe de selecao de todos os rotulos
-                heartLabels.forEach(l => l.classList.remove('selected'));
-                // Marca o coracao clicado e todos os anteriores
-                for (let i = 0; i <= index; i++) {
-                    heartLabels[i].classList.add('selected');
-                }
-                // Seleciona o campo de radio correspondente
-                const radioInput = document.getElementById(`rating${index + 1}`);
-                if (radioInput) {
-                    radioInput.checked = true;
-                }
-            });
-        });
-    });
-
-    // Controla o envio do formulario de avaliacao
-    document.getElementById('review-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const rating = document.querySelector('input[name="rating"]:checked');
-        const comment = document.getElementById('comment').value;
-        
-        if (!rating) {
-            alert('Por favor, selecione uma nota.');
-            return;
-        }
-        
-        fetch("{% url 'core:add_review' game.id %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({
-                rating: parseInt(rating.value),
-                comment: comment
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erro de rede ou servidor');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                alert(data.message);
-                closeReviewForm();
-                location.reload(); // Recarrega a pagina para mostrar a nova avaliacao
-            } else {
-                alert('Erro: ' + data.message);
-            }
-        })
-        .catch(error => {
-            alert('Erro de conexão: ' + error.message);
-        });
-    });
-</script>
 {% endblock %}

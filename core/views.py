@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db.models import Q
 import json
 
@@ -74,6 +75,10 @@ def attach_variant_cover_metadata(games, variant, image_attribute, position_attr
         setattr(game, position_attribute, resolve_variant_cover_position(game.title, variant))
 
     return games
+
+
+def request_expects_json(request):
+    return request.headers.get("Content-Type", "").startswith("application/json")
 
 
 def home_view(request):
@@ -167,37 +172,49 @@ def library_view(request):
 
 
 @login_required
+@require_POST
 def add_to_library_view(request):
     """View para adicionar um jogo à biblioteca"""
-    if request.method == "POST":
-        try:
+    try:
+        if request_expects_json(request):
             data = json.loads(request.body)
             game_id = data.get("game_id")
             status = data.get("status", "plan_to_play")
+        else:
+            game_id = request.POST.get("game_id")
+            status = request.POST.get("status", "plan_to_play")
 
-            game = get_object_or_404(Game, id=game_id)
+        game = get_object_or_404(Game, id=game_id)
 
-            # Verifica se o jogo já está na biblioteca
-            library_entry, created = LibraryEntry.objects.get_or_create(
-                user=request.user, game=game, defaults={"status": status}
-            )
+        library_entry, created = LibraryEntry.objects.get_or_create(
+            user=request.user, game=game, defaults={"status": status}
+        )
 
-            if not created:
-                # Se já existir, atualiza o status
-                library_entry.status = status
-                library_entry.save()
+        if not created:
+            library_entry.status = status
+            library_entry.save()
 
+        message = "Jogo adicionado à biblioteca!"
+        if request_expects_json(request):
             return JsonResponse(
                 {
                     "success": True,
-                    "message": "Jogo adicionado à biblioteca!",
+                    "message": message,
                     "created": created,
                 }
             )
-        except Exception as e:
+
+        messages.success(request, message)
+        return redirect("core:game_detail", game_id=game.id)
+    except Exception as e:
+        if request_expects_json(request):
             return JsonResponse({"success": False, "message": str(e)})
 
-    return JsonResponse({"success": False, "message": "Método não permitido"})
+        messages.error(request, f"Nao foi possivel adicionar o jogo: {e}")
+        game_id = request.POST.get("game_id")
+        if game_id:
+            return redirect("core:game_detail", game_id=game_id)
+        return redirect("core:game_catalog")
 
 
 @login_required
@@ -267,6 +284,7 @@ def game_catalog_view(request):
     return render(request, "catalog/game_catalog.html", context)
 
 
+@ensure_csrf_cookie
 def game_detail_view(request, game_id):
     """View para exibir detalhes de um jogo"""
     game = get_object_or_404(Game, id=game_id)
@@ -294,37 +312,46 @@ def game_detail_view(request, game_id):
 
 
 @login_required
+@require_POST
 def add_review_view(request, game_id):
     """View para adicionar ou atualizar uma avaliação"""
-    if request.method == "POST":
-        try:
+    try:
+        if request_expects_json(request):
             data = json.loads(request.body)
             rating = data.get("rating")
             comment = data.get("comment", "")
+        else:
+            rating = request.POST.get("rating")
+            comment = request.POST.get("comment", "")
 
-            game = get_object_or_404(Game, id=game_id)
+        game = get_object_or_404(Game, id=game_id)
 
-            # Verifica se o usuário já avaliou este jogo
-            review, created = Review.objects.get_or_create(
-                user=request.user,
-                game=game,
-                defaults={"rating": rating, "comment": comment},
-            )
+        review, created = Review.objects.get_or_create(
+            user=request.user,
+            game=game,
+            defaults={"rating": rating, "comment": comment},
+        )
 
-            if not created:
-                # Se já existir, atualiza a avaliação
-                review.rating = rating
-                review.comment = comment
-                review.save()
+        if not created:
+            review.rating = rating
+            review.comment = comment
+            review.save()
 
+        message = "Avaliacao salva com sucesso!"
+        if request_expects_json(request):
             return JsonResponse(
                 {
                     "success": True,
-                    "message": "Avaliação salva com sucesso!",
+                    "message": message,
                     "created": created,
                 }
             )
-        except Exception as e:
+
+        messages.success(request, message)
+        return redirect("core:game_detail", game_id=game.id)
+    except Exception as e:
+        if request_expects_json(request):
             return JsonResponse({"success": False, "message": str(e)})
 
-    return JsonResponse({"success": False, "message": "Método não permitido"})
+        messages.error(request, f"Nao foi possivel salvar a avaliacao: {e}")
+        return redirect("core:game_detail", game_id=game_id)
