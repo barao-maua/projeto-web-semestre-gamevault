@@ -90,12 +90,19 @@ Os coracoes exibidos no card da biblioteca representam a avaliacao do usuario lo
 
 ## Adicionar Jogo
 
-`add_to_library_view` recebe JSON com:
+`add_to_library_view` aceita dois formatos de entrada:
+
+- JSON via `fetch`;
+- `POST` tradicional com formulario.
+
+Campos esperados:
 
 - `game_id`;
 - `status` opcional.
 
 A view usa `get_or_create`. Se a entrada ja existir, atualiza o status em vez de duplicar.
+
+Essa decisao foi mantida para preservar compatibilidade com os fluxos visuais atuais do detalhe do jogo e com formularios simples quando necessario.
 
 Depois da adicao no detalhe do jogo, a interface pode sugerir uma avaliacao quando o status escolhido indicar que o usuario ja tem experiencia com o jogo (`playing`, `completed`, `paused` ou `dropped`). Para `plan_to_play`, a avaliacao nao e incentivada imediatamente.
 

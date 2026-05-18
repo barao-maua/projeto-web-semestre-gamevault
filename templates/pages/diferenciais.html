@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const ratingStars = document.querySelector('.rating-stars');
     const stars = ratingStars.querySelectorAll('.star');
     const ratingValueInput = document.getElementById('rating-value');
-    
+
     // Atualiza a exibicao dos coracoes com base na nota
     function updateStars(rating) {
         stars.forEach((star, index) => {
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         ratingValueInput.value = rating;
     }
-    
+
     // Adiciona eventos de interacao aos coracoes
     stars.forEach(star => {
         // Controla os efeitos ao passar o mouse
@@ -162,20 +162,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
-        
+
         star.addEventListener('mouseleave', function() {
             // Retorna para a nota selecionada atualmente
             const currentRating = parseInt(ratingValueInput.value);
             updateStars(currentRating);
         });
-        
+
         // Define a nota ao clicar
         star.addEventListener('click', function() {
             const value = parseInt(this.getAttribute('data-value'));
             updateStars(value);
         });
     });
-    
+
     // Inicializa sem nota selecionada
     updateStars(0);
 });

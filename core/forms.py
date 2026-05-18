@@ -7,6 +7,8 @@ from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
+from .models import Review
+
 
 def validate_gamevault_password_strength(password):
     if len(password) < 8:
@@ -175,3 +177,15 @@ class GameVaultSetPasswordForm(SetPasswordForm):
         password = self.cleaned_data["new_password1"]
         validate_gamevault_password_strength(password)
         return password
+
+
+class GameVaultReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ("rating", "comment")
+
+    def clean_rating(self):
+        rating = self.cleaned_data["rating"]
+        if rating < 1 or rating > 5:
+            raise forms.ValidationError("A nota deve estar entre 1 e 5.")
+        return rating

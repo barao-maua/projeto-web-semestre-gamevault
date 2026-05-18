@@ -61,6 +61,7 @@ Esta nota e o ponto de entrada da wiki do [[GameVault]]. Use este mapa para nave
 - [[Spec - Listas Personalizadas]]: plano para interface futura de listas do usuario.
 - [[Spec - Foto de Perfil]]: plano para trocar avatar por foto real.
 - [[Spec - Integracao Steam]]: plano para integrar o catalogo com dados da Steam.
+- [[Plano de Saneamento do Codigo]]: lotes tecnicos para estabilizar o projeto antes de novas features.
 - [[Backlog Pos-Entrega]]: melhorias futuras que nao bloqueiam a entrega final.
 - [[Dificuldades Tecnicas]]: pontos de maior complexidade e refinamento do projeto.
 - [[Decisoes Tecnicas]]: decisoes importantes tomadas durante o desenvolvimento.

@@ -23,6 +23,7 @@ from .models import Game, LibraryEntry, Review, UserEmailVerification
 from .forms import (
     GameVaultAuthenticationForm,
     GameVaultProfileForm,
+    GameVaultReviewForm,
     GameVaultUserCreationForm,
 )
 
@@ -534,43 +535,52 @@ def game_detail_view(request, game_id):
 @require_POST
 def add_review_view(request, game_id):
     """View para adicionar ou atualizar uma avaliação"""
+    is_json_request = request_expects_json(request)
+
     try:
-        if request_expects_json(request):
+        if is_json_request:
             data = json.loads(request.body)
-            rating = data.get("rating")
-            comment = data.get("comment", "")
+            form_data = {
+                "rating": data.get("rating"),
+                "comment": data.get("comment", ""),
+            }
         else:
-            rating = request.POST.get("rating")
-            comment = request.POST.get("comment", "")
-
-        game = get_object_or_404(Game, id=game_id)
-
-        review, created = Review.objects.get_or_create(
-            user=request.user,
-            game=game,
-            defaults={"rating": rating, "comment": comment},
+            form_data = request.POST
+    except json.JSONDecodeError:
+        return JsonResponse(
+            {"success": False, "message": "Dados inválidos."}, status=400
         )
 
-        if not created:
-            review.rating = rating
-            review.comment = comment
-            review.save()
+    game = get_object_or_404(Game, id=game_id)
+    review = Review.objects.filter(user=request.user, game=game).first()
+    form = GameVaultReviewForm(form_data, instance=review)
 
-        message = "Avaliacao salva com sucesso!"
-        if request_expects_json(request):
+    if not form.is_valid():
+        message = form.errors.get("rating", form.non_field_errors())
+        error_message = message[0] if message else "Nao foi possivel salvar a avaliacao."
+        if is_json_request:
             return JsonResponse(
-                {
-                    "success": True,
-                    "message": message,
-                    "created": created,
-                }
+                {"success": False, "message": error_message}, status=400
             )
 
-        messages.success(request, message)
-        return redirect("core:game_detail", game_id=game.id)
-    except Exception as e:
-        if request_expects_json(request):
-            return JsonResponse({"success": False, "message": str(e)})
-
-        messages.error(request, f"Nao foi possivel salvar a avaliacao: {e}")
+        messages.error(request, error_message)
         return redirect("core:game_detail", game_id=game_id)
+
+    created = review is None
+    review = form.save(commit=False)
+    review.user = request.user
+    review.game = game
+    review.save()
+
+    message = "Avaliacao salva com sucesso!"
+    if is_json_request:
+        return JsonResponse(
+            {
+                "success": True,
+                "message": message,
+                "created": created,
+            }
+        )
+
+    messages.success(request, message)
+    return redirect("core:game_detail", game_id=game.id)

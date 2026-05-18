@@ -40,6 +40,7 @@ Use [[Projeto GameVault.base|Base do Projeto GameVault]] para filtrar notas por 
 - [[Spec - Listas Personalizadas]]: plano para criar interface de `GameList` e `GameListItem`.
 - [[Spec - Foto de Perfil]]: plano para evoluir o avatar atual para foto real.
 - [[Spec - Integracao Steam]]: plano para evoluir o catalogo com dados externos da Steam.
+- [[Plano de Saneamento do Codigo]]: lotes tecnicos para estabilizar o projeto antes de novos recursos.
 - [[Backlog Pos-Entrega]]: melhorias futuras que nao bloqueiam a entrega final.
 - [[Dificuldades Tecnicas]]: registro das areas que exigiram maior refinamento e iteracoes.
 - [[Pendencias]]: tarefas e lacunas abertas do projeto.

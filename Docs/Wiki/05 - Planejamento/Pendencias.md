@@ -16,6 +16,9 @@ tags:
 
 Esta nota centraliza tarefas, inconsistencias e pontos que precisam de revisao no [[GameVault]].
 
+> [!note]
+> A organizacao dos ajustes tecnicos prioritarios agora tambem esta consolidada em [[Plano de Saneamento do Codigo]].
+
 ## Documentacao
 
 - [x] Atualizar o [README principal](../../../README.md) para alinhar o modelo de dados com o codigo atual.

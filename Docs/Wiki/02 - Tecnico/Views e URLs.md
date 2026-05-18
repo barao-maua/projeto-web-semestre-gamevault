@@ -76,7 +76,7 @@ O layout base tambem pode exibir um banner global quando o usuario autenticado a
 ### Biblioteca e avaliacoes
 
 - `library_view`: exige login e lista entradas do usuario com `select_related("game")`.
-- `add_to_library_view`: exige login, recebe JSON e usa `get_or_create` para evitar duplicidade.
+- `add_to_library_view`: exige login, aceita JSON e `POST` tradicional, e usa `get_or_create` para evitar duplicidade.
 - `update_library_entry_view`: exige login e `POST`; altera status e progresso.
 - `remove_from_library_view`: exige login e `POST`; remove entrada da biblioteca.
 - `add_review_view`: exige login; cria ou atualiza avaliacao do usuario para um jogo.
