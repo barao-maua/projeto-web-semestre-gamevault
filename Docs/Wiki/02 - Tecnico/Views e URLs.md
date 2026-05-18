@@ -35,8 +35,14 @@ As rotas do [[GameVault]] sao definidas em `core/urls.py` e apontam para funcoes
 | `/diferenciais/` | `core:diferenciais` | `diferenciais_view` | Pagina institucional de diferenciais. |
 | `/login/` | `core:login` | `login_view` | Login de usuario. |
 | `/logout/` | `core:logout` | `logout_view` | Encerramento de sessao. |
+| `/password-reset/` | `core:password_reset` | `PasswordResetView` | Solicita redefinicao de senha por email. |
+| `/password-reset/done/` | `core:password_reset_done` | `PasswordResetDoneView` | Confirma solicitacao de reset. |
+| `/reset/<uidb64>/<token>/` | `core:password_reset_confirm` | `PasswordResetConfirmView` | Define nova senha. |
+| `/reset/done/` | `core:password_reset_complete` | `PasswordResetCompleteView` | Confirma senha redefinida. |
 | `/register/` | `core:register` | `register_view` | Cadastro de usuario. |
 | `/profile/` | `core:profile` | `profile_view` | Perfil do usuario logado. |
+| `/verify-email/<token>/` | `core:verify_email` | `verify_email_view` | Confirma email do usuario. |
+| `/resend-verification-email/` | `core:resend_verification_email` | `resend_verification_email_view` | Reenvia verificacao de email. |
 | `/library/` | `core:library` | `library_view` | Biblioteca pessoal. |
 | `/add-to-library/` | `core:add_to_library` | `add_to_library_view` | Adiciona jogo via JSON. |
 | `/update-library-entry/` | `core:update_library_entry` | `update_library_entry_view` | Atualiza status/progresso via JSON. |
@@ -57,10 +63,15 @@ As rotas do [[GameVault]] sao definidas em `core/urls.py` e apontam para funcoes
 
 ### Autenticacao
 
-- `login_view`: usa `AuthenticationForm`, autentica e redireciona para home.
+- `login_view`: usa `GameVaultAuthenticationForm`, aceita username ou email e redireciona para a biblioteca quando nao ha `next`.
 - `logout_view`: encerra a sessao e redireciona para home.
-- `register_view`: usa `UserCreationForm`, cria usuario, autentica e redireciona para home.
-- `profile_view`: exige login com `@login_required`.
+- `register_view`: usa `GameVaultUserCreationForm`, cria usuario com email, envia verificacao e autentica.
+- `profile_view`: exige login com `@login_required` e permite editar username/email.
+- `verify_email_view`: valida token e marca email como verificado.
+- `resend_verification_email_view`: exige login e reenvia link de verificacao.
+- Views nativas de reset de senha: solicitam, confirmam e concluem redefinicao por email.
+
+O layout base tambem pode exibir um banner global quando o usuario autenticado ainda nao verificou o email.
 
 ### Biblioteca e avaliacoes
 

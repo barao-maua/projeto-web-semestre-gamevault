@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from .models import Game, GameList, GameListItem, LibraryEntry, Review
+from .models import (
+    Game,
+    GameList,
+    GameListItem,
+    LibraryEntry,
+    Review,
+    UserEmailVerification,
+)
 
 
 @admin.register(Game)
@@ -36,3 +43,15 @@ class GameListItemAdmin(admin.ModelAdmin):
     list_display = ("game_list", "game", "added_at")
     search_fields = ("game_list__name", "game__title")
     list_filter = ("game_list", "added_at")
+
+
+@admin.register(UserEmailVerification)
+class UserEmailVerificationAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+        "is_verified",
+        "verified_at",
+        "last_verification_email_sent_at",
+    )
+    search_fields = ("user__username", "user__email")
+    list_filter = ("is_verified", "verified_at", "last_verification_email_sent_at")

@@ -12,4 +12,5 @@ venv/
 db.sqlite3
 media/
 
-.obsidian/
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json

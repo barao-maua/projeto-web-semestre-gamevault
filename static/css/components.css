@@ -82,6 +82,11 @@
     transition: 0.2s ease;
 }
 
+.nav-link-button {
+    font: inherit;
+    cursor: pointer;
+}
+
 .nav-link:hover,
 .nav-link.is-active {
     color: var(--text);
@@ -105,6 +110,16 @@
     box-shadow: var(--shadow);
 }
 
+.user-chip-link {
+    transition: 0.2s ease;
+}
+
+.user-chip-link:hover {
+    border-color: rgba(181, 224, 0, 0.3);
+    background: rgba(31, 45, 64, 1);
+    transform: translateY(-1px);
+}
+
 .user-chip-text {
     text-align: right;
 }
@@ -124,6 +139,10 @@
     font-size: 0.7rem;
 }
 
+.user-chip-text .session-active-label {
+    color: #b9f85d;
+}
+
 .user-avatar {
     display: grid;
     place-items: center;
@@ -134,6 +153,89 @@
     font-size: 0.9rem;
     font-weight: 700;
     background: linear-gradient(135deg, #f6f8fb 0%, #96afd2 100%);
+}
+
+.site-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    place-items: center;
+    padding: 20px;
+    background: rgba(9, 13, 20, 0.72);
+    z-index: 40;
+}
+
+.site-modal[aria-hidden="true"] {
+    display: none;
+}
+
+.site-modal-content {
+    width: min(480px, 100%);
+    position: relative;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    background: rgba(31, 45, 64, 0.96);
+    box-shadow: var(--shadow);
+}
+
+.site-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    border: 0;
+    color: var(--muted);
+    font-size: 1.5rem;
+    background: transparent;
+    cursor: pointer;
+}
+
+.site-modal-description {
+    margin-bottom: 18px;
+}
+
+.site-modal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.email-verification-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 20px;
+    padding: 16px 18px;
+    border: 1px solid rgba(255, 211, 105, 0.3);
+    border-radius: 18px;
+    background: rgba(255, 211, 105, 0.08);
+}
+
+.email-verification-banner strong,
+.email-verification-banner span {
+    display: block;
+}
+
+.email-verification-banner strong {
+    color: var(--text);
+}
+
+.email-verification-banner span {
+    color: var(--muted);
+    font-size: 0.92rem;
+}
+
+.email-verification-banner-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.email-verification-banner-actions form {
+    margin: 0;
 }
 
 .button,
@@ -149,10 +251,17 @@
 
 .button {
     border: none;
-    color: #14202d;
+    color: #0f1724;
     font-weight: 700;
     background: linear-gradient(135deg, var(--accent) 0%, #d7ff55 100%);
     box-shadow: 0 18px 30px rgba(181, 224, 0, 0.22);
+}
+
+.button,
+.button:visited,
+.button:hover,
+.button:focus {
+    color: #0f1724;
 }
 
 .button:hover {

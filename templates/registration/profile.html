@@ -10,11 +10,69 @@
 {% block content %}
 <div class="profile-container">
     <h2>Perfil do Usuário</h2>
-    <div class="user-info">
-        <p><strong>Username:</strong> {{ user.username }}</p>
-        <p><strong>Email:</strong> {{ user.email|default:"Não informado" }}</p>
-        <p><strong>Data de cadastro:</strong> {{ user.date_joined }}</p>
+
+    <div class="email-status-card {% if email_verification.is_verified %}is-verified{% else %}is-pending{% endif %}">
+        <span>Status do email</span>
+        <strong>
+            {% if email_verification.is_verified %}
+                Email verificado
+            {% else %}
+                Email pendente de verificação
+            {% endif %}
+        </strong>
+        {% if email_verification.verified_at %}
+        <small>Verificado em {{ email_verification.verified_at|date:"d/m/Y H:i" }}</small>
+        {% else %}
+        <small>Verifique seu email para confirmar que este endereço pertence a você.</small>
+        {% endif %}
     </div>
+
+    <form method="post" class="profile-form">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+            <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="field">
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            {% if form.username.help_text %}
+            <div class="form-help-text">{{ form.username.help_text }}</div>
+            {% endif %}
+            {% for error in form.username.errors %}
+            <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="field">
+            {{ form.email.label_tag }}
+            {{ form.email }}
+            {% if form.email.help_text %}
+            <div class="form-help-text">{{ form.email.help_text }}</div>
+            {% endif %}
+            {% for error in form.email.errors %}
+            <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="profile-actions">
+            <button type="submit" class="button">Salvar alterações</button>
+        </div>
+    </form>
+
+    {% if not email_verification.is_verified %}
+    <form method="post" action="{% url 'core:resend_verification_email' %}" class="profile-secondary-action">
+        {% csrf_token %}
+        <button type="submit" class="ghost-button">Reenviar verificação</button>
+    </form>
+    {% endif %}
+
+    <div class="user-info">
+        <p><strong>Data de cadastro:</strong> {{ user.date_joined|date:"d/m/Y H:i" }}</p>
+    </div>
+
     <a href="{% url 'core:logout' %}" class="ghost-button">Sair</a>
 </div>
 {% endblock %}

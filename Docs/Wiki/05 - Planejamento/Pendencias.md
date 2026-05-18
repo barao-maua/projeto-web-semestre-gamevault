@@ -25,25 +25,28 @@ Esta nota centraliza tarefas, inconsistencias e pontos que precisam de revisao n
 
 ## Funcionalidades
 
-- [ ] Criar interface completa para atualizar status e progresso na [[Biblioteca do Usuario]].
+- [x] Criar interface visual para atualizar status na [[Biblioteca do Usuario]].
 - [ ] Avaliar se `GameList` e `GameListItem` terao telas proprias.
-- [ ] Melhorar o fluxo de adicionar jogo a biblioteca sem usar `prompt`.
+- [x] Melhorar o fluxo de adicionar jogo a biblioteca sem usar `prompt`.
 - [ ] Verificar se visitantes devem conseguir acessar detalhes completos de jogos ou apenas uma previa.
-- [ ] Revisar mensagens de erro retornadas pelos endpoints JSON.
+- [x] Revisar mensagens de erro retornadas pelos endpoints JSON.
+- [x] Implementar verificacao de email e redefinicao de senha por email.
+- [x] Permitir login por usuario ou email.
 
 ## Interface
 
 - [ ] Validar responsividade das principais telas em mobile.
 - [ ] Revisar acessibilidade dos botoes e formularios.
-- [ ] Trocar interacoes com `alert` e `prompt` por componentes visuais.
+- [x] Trocar a maior parte das interacoes com `alert` e `prompt` por componentes visuais.
 - [ ] Garantir consistencia entre paginas demonstrativas e telas dinamicas reais.
+- [ ] Decidir se a proxima iteracao inclui foto de perfil real no lugar do avatar por inicial.
 
 ## Tecnico
 
 - [x] Confirmar se arquivos `__pycache__` e banco local devem ficar fora do versionamento.
 - [x] Revisar `.gitignore` para ambiente Python/Django.
 - [ ] Rodar `python manage.py check` no ambiente local antes da proxima entrega.
-- [ ] Verificar se as views JSON devem usar `@require_POST` em todos os endpoints de alteracao.
+- [x] Verificar se as views JSON principais usam `@require_POST` nos endpoints de alteracao.
 - [ ] Avaliar tratamento de excecoes genericas em `core/views.py`.
 
 ## Obsidian/Wiki
@@ -55,8 +58,8 @@ Esta nota centraliza tarefas, inconsistencias e pontos que precisam de revisao n
 
 ## Prioridades Sugeridas
 
-1. Alinhar README com o codigo atual.
-2. Melhorar edicao de status/progresso na biblioteca.
-3. Validar responsividade e apresentacao.
-4. Revisar versionamento de arquivos gerados.
+1. Validar responsividade e apresentacao.
+2. Revisar excecoes e robustez do backend.
+3. Definir futuro de `GameList` e `GameListItem`.
+4. Revisar paginas demonstrativas publicas.
 5. Validar base e canvas no Obsidian.

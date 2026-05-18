@@ -15,7 +15,7 @@ tags:
 
 # Models
 
-Os models do [[GameVault]] ficam em `core/models.py` e representam o catalogo de jogos, a biblioteca pessoal do usuario, avaliacoes e listas personalizadas.
+Os models do [[GameVault]] ficam em `core/models.py` e representam o catalogo de jogos, a biblioteca pessoal do usuario, avaliacoes, listas personalizadas e o estado de verificacao do email do usuario.
 
 ## Entidades
 
@@ -107,6 +107,21 @@ Regra importante:
 
 - `unique_together = ["game_list", "game"]`: o mesmo jogo nao aparece duas vezes na mesma lista.
 
+### UserEmailVerification
+
+Representa o estado de verificacao do email atual de um usuario.
+
+Campos principais:
+
+- `user`: usuario relacionado.
+- `is_verified`: informa se o email atual foi confirmado.
+- `verified_at`: data e hora da verificacao.
+- `last_verification_email_sent_at`: controle do ultimo envio de email.
+
+Regra importante:
+
+- existe no maximo um registro por usuario, via `OneToOneField`.
+
 ## Relacionamentos
 
 ```mermaid
@@ -118,12 +133,15 @@ erDiagram
     User ||--o{ GameList : cria
     GameList ||--o{ GameListItem : contem
     Game ||--o{ GameListItem : listado_em
+    User ||--|| UserEmailVerification : possui
 ```
 
 ## Observacoes
 
 - O projeto usa o model `User` padrao de `django.contrib.auth.models`.
 - As constraints evitam duplicacao de jogos na biblioteca, avaliacoes duplicadas e itens duplicados em listas.
+- O email do usuario fica em `User.email`, enquanto a verificacao desse email fica separada em `UserEmailVerification`.
+- `LibraryEntry.progress` continua existindo no model, mas a interface atual da entrega prioriza status e avaliacao na experiencia principal.
 - O `README` principal foi alinhado ao codigo atual durante a limpeza do vault.
 
 ## Notas Relacionadas

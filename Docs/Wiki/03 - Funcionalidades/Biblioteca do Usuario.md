@@ -30,7 +30,7 @@ Ela conecta:
 - `User`: usuario dono da biblioteca;
 - `Game`: jogo salvo;
 - `status`: estado atual do jogo;
-- `progress`: progresso em porcentagem.
+- `progress`: campo tecnico de progresso, mantido no model, mas sem exibicao na interface atual.
 
 ## Rotas
 
@@ -49,6 +49,8 @@ Ela conecta:
 LibraryEntry.objects.filter(user=request.user).select_related("game")
 ```
 
+A view tambem busca as avaliacoes do proprio usuario para os jogos presentes na biblioteca e anexa cada review ao respectivo card. Isso evita consultas repetidas por item no template.
+
 O template `templates/library/library.html` exibe:
 
 - titulo da biblioteca;
@@ -57,9 +59,17 @@ O template `templates/library/library.html` exibe:
 - capa;
 - genero;
 - titulo;
+- avaliacao pessoal com coracoes dinamicos;
 - status;
-- link para editar pelo detalhe;
+- botao para editar status em modal;
+- link para abrir detalhes;
 - botao para remover.
+
+Tambem foram adicionados refinamentos de UX:
+
+- layout de acoes mais limpo, sem separadores textuais;
+- feedback visual mais consistente com o restante do projeto;
+- integracao visual entre biblioteca, detalhe do jogo e avaliacao pessoal.
 
 ## Status Disponiveis
 
@@ -68,6 +78,15 @@ O template `templates/library/library.html` exibe:
 - `paused`: Pausado.
 - `dropped`: Abandonado.
 - `plan_to_play`: Planejo Jogar.
+
+## Avaliacao No Card
+
+Os coracoes exibidos no card da biblioteca representam a avaliacao do usuario logado para aquele jogo.
+
+- Coracao preenchido usa a cor de destaque verde (`var(--accent)`).
+- Coracao vazio usa uma cor neutra.
+- Se o usuario ainda nao avaliou o jogo, todos os coracoes aparecem vazios.
+- A avaliacao exibida e pessoal, nao uma media global da comunidade.
 
 ## Adicionar Jogo
 
@@ -78,25 +97,44 @@ O template `templates/library/library.html` exibe:
 
 A view usa `get_or_create`. Se a entrada ja existir, atualiza o status em vez de duplicar.
 
+Depois da adicao no detalhe do jogo, a interface pode sugerir uma avaliacao quando o status escolhido indicar que o usuario ja tem experiencia com o jogo (`playing`, `completed`, `paused` ou `dropped`). Para `plan_to_play`, a avaliacao nao e incentivada imediatamente.
+
 ## Remover Jogo
 
 `remove_from_library_view` recebe JSON com `entry_id`, valida se a entrada pertence ao usuario atual e remove o registro.
 
-## Atualizar Status E Progresso
+Na interface atual, a acao de sair da conta ganhou modal de confirmacao visual, mas a remocao do item da biblioteca ainda usa confirmacao simples do navegador e pode ser refinada em iteracoes futuras.
 
-`update_library_entry_view` aceita `entry_id`, `status` e `progress` via JSON.
+## Atualizar Status
 
-Estado atual:
+`update_library_entry_view` aceita `entry_id`, `status` e, tecnicamente, `progress` via JSON. Na interface atual da biblioteca, apenas o status e editado.
 
-- a view existe;
-- a tela da biblioteca ainda nao possui uma interface completa de edicao inline;
-- o template indica que a atualizacao esta em desenvolvimento.
+Fluxo atual:
+
+- o usuario clica em `Editar` no card da biblioteca;
+- um modal abre com o status atual;
+- o status e selecionado por cards visuais;
+- o formulario envia `entry_id` e `status` para `update_library_entry_view`;
+- a view valida se a entrada pertence ao usuario logado;
+- a view valida se o status e permitido;
+- ao salvar com sucesso, a pagina recarrega para exibir os dados atualizados.
+
+Exemplo de payload:
+
+```json
+{
+  "entry_id": 12,
+  "status": "playing"
+}
+```
 
 ## Regras Importantes
 
 - Acesso exige usuario autenticado.
 - Um usuario so pode ter uma entrada por jogo.
 - Todas as operacoes buscam entradas filtrando pelo `request.user`, evitando alterar dados de outro usuario.
+- `status` precisa ser um dos valores definidos em `LibraryEntry.STATUS_CHOICES`.
+- Caso o backend receba `progress`, ele precisa ser inteiro entre 0 e 100.
 
 ## Relacoes Com Outras Areas
 
@@ -104,3 +142,10 @@ Estado atual:
 - [[Autenticacao]] controla o acesso.
 - [[Views e URLs]] documenta os endpoints JSON.
 - [[Models]] documenta as constraints de `LibraryEntry`.
+
+## O Que Mudou Recentemente
+
+- A biblioteca passou a mostrar coracoes dinamicos com base na avaliacao do proprio usuario.
+- O progresso deixou de ser enfatizado na interface da entrega.
+- A edicao principal foi simplificada para status, mantendo o campo de progresso apenas no model.
+- O visual dos botoes foi refinado para melhorar leitura e apresentacao.

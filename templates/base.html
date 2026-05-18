@@ -10,13 +10,28 @@
     <!-- Font Awesome para icones -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
-    <link rel="stylesheet" href="{% static 'css/components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}?v=2">
     {% block extra_css %}{% endblock %}
     <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
 </head>
 <body class="app-shell {% block body_class %}{% endblock %}">
     {% include "components/navbar.html" %}
     <main class="site-main">
+        {% if global_email_verification and not global_email_verification.is_verified %}
+            <div class="email-verification-banner">
+                <div>
+                    <strong>Seu email ainda nao foi verificado.</strong>
+                    <span>Verifique sua caixa de entrada ou reenvie o link de confirmacao.</span>
+                </div>
+                <div class="email-verification-banner-actions">
+                    <form method="post" action="{% url 'core:resend_verification_email' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="ghost-button">Reenviar verificacao</button>
+                    </form>
+                    <a href="{% url 'core:profile' %}" class="button">Ir para perfil</a>
+                </div>
+            </div>
+        {% endif %}
         {% if messages %}
             <div class="flash-messages">
                 {% for message in messages %}

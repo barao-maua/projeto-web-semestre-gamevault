@@ -58,3 +58,66 @@
 .mini-note strong {
     color: var(--text);
 }
+
+.password-checklist {
+    display: grid;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.password-checklist-item,
+.password-match-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 0.88rem;
+}
+
+.password-rule-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    background: rgba(214, 227, 244, 0.1);
+}
+
+.password-checklist-item.is-valid,
+.password-match-status.is-valid {
+    color: #b9f85d;
+}
+
+.password-checklist-item.is-valid .password-rule-icon,
+.password-match-status.is-valid::before {
+    color: #13202c;
+    background: #b9f85d;
+}
+
+.password-match-status.is-valid::before,
+.password-match-status.is-invalid::before {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    content: "";
+}
+
+.password-match-status.is-valid::before {
+    content: "✓";
+}
+
+.password-match-status.is-invalid {
+    color: #ffb2b8;
+}
+
+.password-match-status.is-invalid::before {
+    color: #fff;
+    background: rgba(255, 107, 107, 0.7);
+    content: "!";
+}

@@ -15,6 +15,34 @@
 
 .search-form input {
     flex: 1;
+    padding: 12px 14px;
+    border: 1px solid rgba(214, 227, 244, 0.18);
+    border-radius: 12px;
+    color: var(--text);
+    -webkit-text-fill-color: var(--text);
+    caret-color: var(--text);
+    background: rgba(18, 26, 37, 0.82);
+    outline: none;
+}
+
+.search-form input::placeholder {
+    color: rgba(243, 246, 251, 0.68);
+}
+
+.search-form input:focus {
+    border-color: rgba(181, 224, 0, 0.6);
+    box-shadow: 0 0 0 3px rgba(181, 224, 0, 0.12);
+}
+
+.search-form input:-webkit-autofill,
+.search-form input:-webkit-autofill:hover,
+.search-form input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text);
+    caret-color: var(--text);
+    border: 1px solid rgba(214, 227, 244, 0.18);
+    -webkit-box-shadow: 0 0 0 1000px rgba(18, 26, 37, 1) inset;
+    box-shadow: 0 0 0 1000px rgba(18, 26, 37, 1) inset;
+    transition: background-color 9999s ease-in-out 0s;
 }
 
 .games-grid {

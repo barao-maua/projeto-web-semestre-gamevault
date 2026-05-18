@@ -6,7 +6,7 @@
 {% block body_class %}library-page{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/pages/library.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/library.css' %}?v=3">
 {% endblock %}
 
 {% block content %}
@@ -22,7 +22,7 @@
 {% if library_entries %}
     <div class="library-grid">
         {% for entry in library_entries %}
-        <div class="game-card">
+        <div class="game-card" data-entry-card="{{ entry.id }}">
             <div class="game-cover" style="
                 {% if entry.game.cover_image %}
                     background-image: url('{{ entry.game.cover_image }}');
@@ -34,9 +34,9 @@
                 </div>
             </div>
 
-            <div class="game-rating">
+            <div class="game-rating library-rating" aria-label="{% if entry.user_review %}Sua avaliação: {{ entry.user_review.rating }} de 5{% else %}Jogo ainda sem avaliação{% endif %}">
                 {% for i in "12345" %}
-                    {% if forloop.counter <= 4 %}&hearts;{% endif %}
+                    <span class="{% if entry.user_review and forloop.counter <= entry.user_review.rating %}heart-selected{% else %}heart-empty{% endif %}">&hearts;</span>
                 {% endfor %}
             </div>
 
@@ -44,10 +44,16 @@
                 <span class="status-badge status-{{ entry.status }}">{{ entry.get_status_display }}</span>
             </div>
 
-            <div class="game-actions game-actions--spaced">
-                <a href="{% url 'core:game_detail' entry.game.id %}" class="ghost-button">Editar</a>
-                <span>|</span>
-                <button class="ghost-button" onclick="removeFromLibrary({{ entry.id }})">Remover</button>
+            <div class="library-card-actions">
+                <button
+                    class="library-action-button edit-library-button"
+                    type="button"
+                    data-entry-id="{{ entry.id }}"
+                    data-game-title="{{ entry.game.title }}"
+                    data-status="{{ entry.status }}"
+                >Editar</button>
+                <a href="{% url 'core:game_detail' entry.game.id %}" class="library-action-button library-action-button--primary">Detalhes</a>
+                <button class="library-action-button library-action-button--danger" type="button" onclick="removeFromLibrary({{ entry.id }})">Remover</button>
             </div>
         </div>
         {% endfor %}
@@ -59,13 +65,86 @@
     </div>
 {% endif %}
 </section>
+
+<div id="edit-library-modal" class="library-modal" aria-hidden="true">
+    <div class="library-modal-content" role="dialog" aria-modal="true" aria-labelledby="edit-library-title">
+        <button class="close-modal" type="button" onclick="closeEditLibraryModal()" aria-label="Fechar">&times;</button>
+        <p class="eyebrow">Editar biblioteca</p>
+        <h2 id="edit-library-title">Atualizar jogo</h2>
+        <p class="modal-description">Altere o status deste jogo na sua coleção.</p>
+
+        <form id="edit-library-form">
+            <input type="hidden" id="edit-entry-id" name="entry_id">
+            <input type="hidden" id="edit-entry-status" name="status">
+
+            <div class="status-card-grid">
+                <button type="button" class="status-card" data-status="plan_to_play">
+                    <strong>Planejo Jogar</strong>
+                    <span>Salvar para jogar depois.</span>
+                </button>
+                <button type="button" class="status-card" data-status="playing">
+                    <strong>Jogando</strong>
+                    <span>Estou jogando agora.</span>
+                </button>
+                <button type="button" class="status-card" data-status="completed">
+                    <strong>Concluído</strong>
+                    <span>Já finalizei o jogo.</span>
+                </button>
+                <button type="button" class="status-card" data-status="paused">
+                    <strong>Pausado</strong>
+                    <span>Parei temporariamente.</span>
+                </button>
+                <button type="button" class="status-card" data-status="dropped">
+                    <strong>Abandonado</strong>
+                    <span>Não pretendo continuar.</span>
+                </button>
+            </div>
+
+            <p id="edit-library-feedback" class="library-modal-feedback" role="status"></p>
+
+            <button type="submit" class="button full-button">Salvar alterações</button>
+        </form>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-function updateLibrary(entryId) {
-    // Em uma versao completa, isso abriria um modal ou redirecionaria para um formulario de edicao
-    alert('Funcionalidade de atualização em desenvolvimento');
+function openEditLibraryModal(button) {
+    const entryId = button.dataset.entryId;
+    const title = button.dataset.gameTitle;
+    const status = button.dataset.status;
+
+    document.getElementById('edit-entry-id').value = entryId;
+    document.getElementById('edit-library-title').textContent = `Atualizar ${title}`;
+    setSelectedLibraryStatus(status);
+    setEditFeedback('');
+
+    const modal = document.getElementById('edit-library-modal');
+    modal.style.display = 'grid';
+    modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeEditLibraryModal() {
+    const modal = document.getElementById('edit-library-modal');
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+    document.getElementById('edit-library-form').reset();
+    setEditFeedback('');
+}
+
+function setSelectedLibraryStatus(status) {
+    document.getElementById('edit-entry-status').value = status;
+
+    document.querySelectorAll('#edit-library-modal .status-card').forEach(card => {
+        card.classList.toggle('is-selected', card.dataset.status === status);
+    });
+}
+
+function setEditFeedback(message, isError = false) {
+    const feedback = document.getElementById('edit-library-feedback');
+    feedback.textContent = message;
+    feedback.classList.toggle('is-error', isError);
 }
 
 function removeFromLibrary(entryId) {
@@ -103,5 +182,52 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.edit-library-button').forEach(button => {
+        button.addEventListener('click', function() {
+            openEditLibraryModal(this);
+        });
+    });
+
+    document.querySelectorAll('#edit-library-modal .status-card').forEach(card => {
+        card.addEventListener('click', function() {
+            setSelectedLibraryStatus(this.dataset.status);
+        });
+    });
+
+    const editForm = document.getElementById('edit-library-form');
+    if (editForm) {
+        editForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            setEditFeedback('Salvando alterações...');
+
+            fetch("{% url 'core:update_library_entry' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    entry_id: document.getElementById('edit-entry-id').value,
+                    status: document.getElementById('edit-entry-status').value
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    setEditFeedback(data.message);
+                    location.reload();
+                    return;
+                }
+
+                setEditFeedback(data.message || 'Erro ao atualizar entrada.', true);
+            })
+            .catch(error => {
+                setEditFeedback('Erro de conexão: ' + error.message, true);
+            });
+        });
+    }
+});
 </script>
 {% endblock %}

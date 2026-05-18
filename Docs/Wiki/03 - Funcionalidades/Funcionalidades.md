@@ -12,17 +12,17 @@ tags:
 
 # Funcionalidades
 
-Esta nota resume as principais funcionalidades do [[GameVault]] e aponta para as notas especificas de cada area.
+Esta nota resume as principais funcionalidades do [[GameVault]] e aponta para as notas especificas de cada area. Ela reflete o estado atual do codigo e as principais evolucoes feitas durante os ajustes de entrega.
 
 ## Visao Geral
 
-O produto permite que usuarios naveguem por um catalogo de jogos, criem uma conta, mantenham uma biblioteca pessoal, acompanhem status/progresso e registrem avaliacoes.
+O produto permite que usuarios naveguem por um catalogo de jogos, criem uma conta com email, mantenham uma biblioteca pessoal, organizem o status dos jogos, registrem avaliacoes e recuperem acesso por email quando necessario.
 
 ## Areas Funcionais
 
-- [[Autenticacao]]: cadastro, login, logout e perfil.
+- [[Autenticacao]]: cadastro, login, logout, perfil, verificacao de email e recuperacao de senha.
 - [[Catalogo de Jogos]]: busca e navegacao pelos jogos disponiveis.
-- [[Biblioteca do Usuario]]: jogos salvos pelo usuario, status e progresso.
+- [[Biblioteca do Usuario]]: jogos salvos pelo usuario, status e avaliacao pessoal.
 - [[Paginas Institucionais]]: home, paginas demonstrativas e apresentacao do produto.
 
 ## Funcionalidades Implementadas No Codigo
@@ -33,12 +33,15 @@ O produto permite que usuarios naveguem por um catalogo de jogos, criem uma cont
 | Cadastro de usuario | Implementada | `register_view`, `templates/registration/register.html` |
 | Login e logout | Implementada | `login_view`, `logout_view` |
 | Perfil do usuario | Implementada | `profile_view`, `templates/registration/profile.html` |
+| Verificacao de email | Implementada | `verify_email_view`, `resend_verification_email_view` |
+| Esqueci minha senha | Implementada | views nativas de `password_reset` |
 | Catalogo com busca | Implementada | `game_catalog_view`, `templates/catalog/game_catalog.html` |
 | Detalhe do jogo | Implementada | `game_detail_view`, `templates/catalog/game_detail.html` |
 | Adicionar jogo a biblioteca | Implementada | `add_to_library_view` |
 | Remover jogo da biblioteca | Implementada | `remove_from_library_view` |
-| Atualizar status/progresso | Parcial | `update_library_entry_view` existe, mas a interface ainda e limitada |
+| Atualizar status da biblioteca | Implementada | `update_library_entry_view` e modal em `library.html` |
 | Avaliar jogo | Implementada | `add_review_view` e modal no detalhe |
+| Atualizar avaliacao existente | Implementada | `add_review_view` sobrescreve a review anterior |
 | Listas personalizadas | Modelada | `GameList` e `GameListItem`, sem fluxo de tela documentado no codigo atual |
 
 ## Fluxo Principal Do Usuario
@@ -48,13 +51,23 @@ graph TD
     Visitante[Visitante] --> Home[Home]
     Home --> Cadastro[Cadastro]
     Home --> Login[Login]
-    Login --> Catalogo[Catalogo]
-    Cadastro --> Catalogo
+    Login --> Biblioteca[Minha Biblioteca]
+    Cadastro --> Biblioteca
+    Biblioteca --> Catalogo[Catalogo]
     Catalogo --> Detalhe[Detalhe do Jogo]
-    Detalhe --> Biblioteca[Biblioteca]
+    Detalhe --> Biblioteca
     Detalhe --> Review[Avaliacao]
     Biblioteca --> Detalhe
 ```
+
+## O Que Mudou Recentemente
+
+- O login passou a aceitar username ou email.
+- O cadastro passou a exigir email unico.
+- O sistema ganhou verificacao de email sem bloquear login.
+- O perfil passou a permitir editar username e email.
+- O fluxo de redefinicao de senha foi integrado por email.
+- A biblioteca passou a priorizar status e avaliacao pessoal na UX da entrega.
 
 ## Dependencias Tecnicas
 

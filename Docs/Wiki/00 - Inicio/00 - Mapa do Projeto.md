@@ -57,6 +57,12 @@ Esta nota e o ponto de entrada da wiki do [[GameVault]]. Use este mapa para nave
 ## Planejamento
 
 - [[Entrega Final - Alternativa A]]: plano consolidado para a entrega final do projeto.
+- [[Spec - Email Verificacao e Reset de Senha]]: plano de email unico, verificacao e recuperacao de senha.
+- [[Spec - Listas Personalizadas]]: plano para interface futura de listas do usuario.
+- [[Spec - Foto de Perfil]]: plano para trocar avatar por foto real.
+- [[Spec - Integracao Steam]]: plano para integrar o catalogo com dados da Steam.
+- [[Backlog Pos-Entrega]]: melhorias futuras que nao bloqueiam a entrega final.
+- [[Dificuldades Tecnicas]]: pontos de maior complexidade e refinamento do projeto.
 - [[Decisoes Tecnicas]]: decisoes importantes tomadas durante o desenvolvimento.
 - [[Pendencias]]: tarefas e lacunas conhecidas.
 - [[Proximas Melhorias]]: ideias para evolucao do projeto.

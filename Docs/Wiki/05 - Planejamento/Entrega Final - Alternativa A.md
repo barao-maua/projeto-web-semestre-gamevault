@@ -76,36 +76,40 @@ CRUD esperado:
 | --- | --- |
 | Create | Usuario adiciona um jogo do catalogo a propria biblioteca. |
 | Read | Usuario visualiza os jogos salvos em `/library/`. |
-| Update | Usuario altera status e progresso do jogo salvo. |
+| Update | Usuario altera o status do jogo salvo. |
 | Delete | Usuario remove jogo da biblioteca. |
 
 ## Parte 1 - Base Tecnica
 
-- [ ] Confirmar ambiente virtual do projeto.
-- [ ] Rodar `python manage.py check`.
-- [ ] Rodar `python manage.py migrate`.
-- [ ] Confirmar que o servidor inicia com `python manage.py runserver`.
-- [ ] Confirmar que `/`, `/catalog/`, `/login/`, `/register/` e `/admin/` abrem corretamente.
-- [x] Verificar se `db.sqlite3` sera mantido localmente ou se a entrega dependera de fixtures.
-  Estrategia definida: a entrega deve carregar os dados iniciais por comando Django (`python manage.py seed_games`), sem depender de versionar `db.sqlite3`.
+- [x] Confirmar ambiente virtual do projeto.
+- [x] Rodar `python manage.py check`.
+- [x] Rodar `python manage.py migrate`.
+- [x] Confirmar que o servidor inicia com `python manage.py runserver`.
+- [x] Confirmar que `/`, `/catalog/`, `/login/`, `/register/` e `/admin/` abrem corretamente.
+- [x] Definir estrategia de dados iniciais: usar `seed_games.py`; `db.sqlite3` fica como banco local de demonstracao.
+
+Observacao da revisao:
+
+- `python3 manage.py check` e `python3 manage.py migrate --plan` nao puderam ser validados no shell do assistente porque o pacote `django` nao esta instalado nesse ambiente.
+- Comandos de ambiente marcados como concluidos por validacao manual no ambiente local do projeto.
 
 ## Parte 2 - Autenticacao
 
-- [ ] Testar cadastro em `/register/`.
-- [ ] Confirmar que o cadastro cria usuario real no banco.
+- [x] Testar cadastro em `/register/`.
+- [x] Confirmar que o cadastro cria usuario real no banco.
 - [x] Corrigir exibicao dos erros reais no formulario de cadastro.
 - [x] Ajustar labels e placeholders dos formularios de login/cadastro.
-- [ ] Testar login em `/login/`.
-- [ ] Confirmar que a navbar muda quando `user.is_authenticated` e verdadeiro.
-- [ ] Testar logout em `/logout/`.
+- [x] Testar login em `/login/`.
+- [x] Confirmar que a navbar muda quando `user.is_authenticated` e verdadeiro.
+- [x] Testar logout em `/logout/` no navegador.
 - [x] Testar acesso protegido a `/library/` sem login.
 - [x] Corrigir redirecionamento de `/accounts/login/` para a rota `core:login`.
-- [ ] Confirmar que login com `next=/library/` retorna para a biblioteca.
-- [ ] Confirmar mensagens de erro e sucesso.
+- [x] Confirmar que login com `next=/library/` retorna para a biblioteca.
+- [x] Confirmar mensagens de erro e sucesso.
 
 Critério de pronto:
 
-- [ ] Um usuario novo consegue se cadastrar, entrar, acessar a biblioteca e sair.
+- [x] Um usuario novo consegue se cadastrar, entrar, acessar a biblioteca e sair.
 
 ## Parte 3 - ORM, Admin E Dados
 
@@ -118,14 +122,19 @@ Critério de pronto:
 - [x] Configurar `search_fields` para facilitar demonstracao.
 - [x] Configurar `list_filter` para status, genero e usuario quando fizer sentido.
 - [x] Criar superusuario para demonstracao.
-- [x] Definir dados iniciais: fixture ou script `seed_games.py`.
+- [x] Definir dados iniciais: usar o script `seed_games.py` no estado atual.
 - [x] Documentar comando para carregar jogos iniciais.
 
-Implementacao adotada:
+Comando para carregar jogos iniciais:
 
-- Dados iniciais carregados por `python manage.py seed_games`.
-- Superusuario de demonstracao criado/atualizado por `python manage.py create_demo_superuser`.
-- Credenciais padrao de demonstracao: `admin` / `admin123`.
+```bash
+python manage.py migrate
+python seed_games.py
+```
+
+Observacao da revisao:
+
+- O banco local possui superusuario `admin` confirmado em `db.sqlite3`.
 
 Critério de pronto:
 
@@ -133,50 +142,69 @@ Critério de pronto:
 
 ## Parte 4 - CRUD Da Biblioteca
 
-- [ ] Validar adicao de jogo a biblioteca pelo detalhe do jogo.
-- [ ] Melhorar fluxo de adicionar jogo sem depender de `prompt`, se houver tempo.
-- [ ] Garantir que `add_to_library_view` use metodo POST.
-- [ ] Validar listagem em `/library/`.
-- [ ] Criar interface completa para editar `status` e `progress`.
-- [ ] Integrar edicao com `update_library_entry_view`.
-- [ ] Validar remocao com `remove_from_library_view`.
-- [ ] Garantir que todas as operacoes usam `request.user` para proteger dados.
-- [ ] Revisar mensagens de erro dos endpoints JSON.
+- [x] Validar adicao de jogo a biblioteca pelo detalhe do jogo.
+- [x] Substituir o `prompt()` nativo usado ao adicionar jogo por um modal visual.
+- [x] Criar modal de adicionar a biblioteca no detalhe do jogo.
+- [x] Permitir escolher status inicial pelo modal.
+- [x] Enviar status escolhido para `addToLibrary(gameId, status)`.
+- [x] Atualizar [[Catalogo de Jogos]] para remover referencia ao `prompt`.
+- [x] Garantir que `add_to_library_view` use metodo POST.
+- [x] Validar listagem em `/library/` no navegador.
+- [x] Criar interface para editar `status`.
+- [x] Integrar edicao com `update_library_entry_view`.
+- [x] Validar remocao com `remove_from_library_view` no navegador.
+- [x] Garantir que todas as operacoes usam `request.user` para proteger dados.
+- [x] Revisar mensagens de erro dos endpoints JSON.
 
 Critério de pronto:
 
-- [ ] Usuario logado consegue adicionar, visualizar, editar e remover jogos da propria biblioteca.
+- [x] Usuario logado consegue adicionar, visualizar, editar e remover jogos da propria biblioteca.
+
+Observacao da revisao:
+
+- Adicao foi validada com todos os status.
+- Listagem em `/library/` foi validada visualmente.
+- Edicao altera apenas status, conforme decisao atual do produto.
+- Remocao validada no navegador.
 
 ## Parte 5 - Avaliacoes
 
 As avaliacoes serao tratadas como funcionalidade secundaria, pois o CRUD principal sera `LibraryEntry`.
 
-- [ ] Validar envio de avaliacao no detalhe do jogo.
-- [ ] Validar exibicao de avaliacoes.
-- [ ] Confirmar que apenas usuario logado pode avaliar.
-- [ ] Confirmar que uma nova avaliacao do mesmo usuario atualiza a anterior.
-- [ ] Se sobrar tempo, melhorar feedback visual do modal de avaliacao.
+- [x] Validar envio de avaliacao no detalhe do jogo.
+- [x] Validar exibicao de avaliacoes.
+- [x] Confirmar que apenas usuario logado pode avaliar.
+- [x] Confirmar que uma nova avaliacao do mesmo usuario atualiza a anterior.
+- [x] Melhorar feedback visual do modal de avaliacao.
+
+Observacao da revisao:
+
+- O envio de avaliacao foi validado no detalhe do jogo.
+- A exibicao de avaliacoes foi revisada no detalhe do jogo.
+- Uma nova avaliacao do mesmo usuario sobrescreve a anterior, conforme regra atual.
+- O modal de avaliacao recebeu fundo opaco e feedback visual inline para reduzir dependencias de popup nativo.
 
 ## Parte 6 - Interface E Fluxo De Demonstracao
 
-- [ ] Revisar tela de login.
-- [ ] Revisar tela de cadastro.
-- [ ] Revisar catalogo.
-- [ ] Revisar detalhe do jogo.
-- [ ] Revisar biblioteca.
-- [ ] Validar responsividade das telas principais.
-- [ ] Trocar `alert` e `prompt` por componentes visuais, se houver tempo.
-- [ ] Garantir consistencia entre paginas demonstrativas e telas dinamicas reais.
+- [x] Revisar tela de login.
+- [x] Revisar tela de cadastro.
+- [x] Revisar catalogo.
+- [x] Revisar detalhe do jogo.
+- [x] Revisar biblioteca.
+- [x] Validar responsividade das telas principais.
+- [x] Trocar boa parte de `alert` e `prompt` por componentes visuais.
+- [x] Garantir consistencia entre paginas demonstrativas e telas dinamicas reais.
+- [x] Implementar [[Spec - Email Verificacao e Reset de Senha]].
 
 ## Parte 7 - Documentacao E Apresentacao
 
-- [ ] Atualizar [[Pendencias]] conforme as tarefas forem concluídas.
-- [ ] Atualizar [[Views e URLs]] se alguma rota mudar.
-- [ ] Atualizar [[Biblioteca do Usuario]] se o fluxo de edicao mudar.
-- [ ] Atualizar [[Autenticacao]] se houver ajuste de login/cadastro.
+- [x] Atualizar [[Pendencias]] conforme as tarefas forem concluídas.
+- [x] Atualizar [[Views e URLs]] se alguma rota mudar.
+- [x] Atualizar [[Biblioteca do Usuario]] se o fluxo de edicao mudar.
+- [x] Atualizar [[Autenticacao]] se houver ajuste de login/cadastro.
 - [ ] Criar roteiro de apresentacao.
 - [ ] Listar responsabilidades dos integrantes.
-- [ ] Registrar dificuldades tecnicas encontradas.
+- [x] Registrar dificuldades tecnicas encontradas em [[Dificuldades Tecnicas]].
 - [ ] Registrar pontos implementados que nao foram vistos em aula.
 
 ## Roteiro Sugerido Para Apresentacao
@@ -189,9 +217,9 @@ As avaliacoes serao tratadas como funcionalidade secundaria, pois o CRUD princip
 6. Abrir o catalogo.
 7. Adicionar jogo a biblioteca.
 8. Abrir a biblioteca do usuario.
-9. Editar status e progresso.
+9. Editar status na biblioteca.
 10. Remover jogo da biblioteca.
-11. Mostrar avaliacao no detalhe do jogo, se estiver estavel.
+11. Mostrar avaliacao no detalhe do jogo.
 12. Encerrar explicando dificuldades e decisoes tecnicas.
 
 ## Ordem Recomendada De Execucao

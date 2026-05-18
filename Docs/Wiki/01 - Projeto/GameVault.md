@@ -14,11 +14,11 @@ tags:
 
 # GameVault
 
-O **GameVault** e uma aplicacao web transacional para gerenciamento de colecoes pessoais de jogos digitais. O sistema permite que usuarios organizem sua biblioteca, acompanhem progresso, registrem avaliacoes e mantenham listas personalizadas.
+O **GameVault** e uma aplicacao web transacional para gerenciamento de colecoes pessoais de jogos digitais. O sistema permite que usuarios organizem sua biblioteca, registrem avaliacoes e mantenham listas personalizadas, com foco atual de interface em autenticacao, catalogo e biblioteca.
 
 ## Objetivo
 
-Centralizar o controle da colecao de jogos de cada usuario, permitindo registrar informacoes como status, progresso, notas, reviews e listas organizadas por interesse.
+Centralizar o controle da colecao de jogos de cada usuario, permitindo registrar informacoes como status, notas, reviews e listas organizadas por interesse. O model ainda possui campo de progresso, mas a experiencia principal da entrega prioriza status e avaliacao.
 
 ## Tipo de Aplicacao
 
@@ -30,7 +30,7 @@ Centralizar o controle da colecao de jogos de cada usuario, permitindo registrar
 ## Areas Principais
 
 - [[Autenticacao]]: cadastro, login, logout e perfil.
-- [[Catalogo de Jogos]]: visualizacao dos jogos disponiveis no sistema.
+- [[Catalogo de Jogos]]: visualizacao dos jogos disponiveis no sistema e base futura para integracao com dados da Steam.
 - [[Biblioteca do Usuario]]: relacao entre usuario e jogos salvos.
 - [[Funcionalidades]]: visao geral das capacidades planejadas e implementadas.
 - [[Static e CSS]]: organizacao visual e arquivos estaticos.
@@ -53,6 +53,7 @@ As entidades descritas na documentacao atual incluem:
 - `Review`: avaliacao feita por um usuario sobre um jogo.
 - `GameList`: lista personalizada criada pelo usuario.
 - `GameListItem`: item dentro de uma lista personalizada.
+- `UserEmailVerification`: estado de verificacao do email do usuario.
 
 ## Fluxo Geral
 
@@ -61,7 +62,12 @@ As entidades descritas na documentacao atual incluem:
 3. O usuario navega pelo catalogo de jogos.
 4. O usuario visualiza detalhes de um jogo.
 5. O usuario adiciona jogos a biblioteca pessoal.
-6. O usuario registra status, progresso e avaliacoes.
+6. O usuario registra status e avaliacoes.
+
+## Evolucao Planejada
+
+- Integracao futura do catalogo com dados da Steam para reduzir cadastro manual de jogos.
+- Evolucao futura da interface de listas personalizadas.
 
 ## Arquivos e Pastas Relevantes
 

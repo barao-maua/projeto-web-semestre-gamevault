@@ -36,6 +36,12 @@ Use [[Projeto GameVault.base|Base do Projeto GameVault]] para filtrar notas por 
 ## Planejamento Atual
 
 - [[Entrega Final - Alternativa A]]: checklist central da proxima entrega.
+- [[Spec - Email Verificacao e Reset de Senha]]: plano de email unico, verificacao e recuperacao de senha.
+- [[Spec - Listas Personalizadas]]: plano para criar interface de `GameList` e `GameListItem`.
+- [[Spec - Foto de Perfil]]: plano para evoluir o avatar atual para foto real.
+- [[Spec - Integracao Steam]]: plano para evoluir o catalogo com dados externos da Steam.
+- [[Backlog Pos-Entrega]]: melhorias futuras que nao bloqueiam a entrega final.
+- [[Dificuldades Tecnicas]]: registro das areas que exigiram maior refinamento e iteracoes.
 - [[Pendencias]]: tarefas e lacunas abertas do projeto.
 - [[Decisoes Tecnicas]]: decisoes arquiteturais ja adotadas.
 

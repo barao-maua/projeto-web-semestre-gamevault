@@ -14,7 +14,7 @@
                 <a class="nav-link{% if request.path == '/library/' %} is-active{% endif %}" href="{% url 'core:library' %}">Minha Biblioteca</a>
                 <a class="nav-link{% if request.path == '/catalog/' %} is-active{% endif %}" href="{% url 'core:game_catalog' %}">Catálogo</a>
                 <a class="nav-link{% if request.path == '/profile/' %} is-active{% endif %}" href="{% url 'core:profile' %}">Perfil</a>
-                <a class="nav-link{% if request.path == '/logout/' %} is-active{% endif %}" href="{% url 'core:logout' %}">Sair</a>
+                <button class="nav-link nav-link-button" type="button" onclick="openLogoutModal()">Sair</button>
             {% else %}
                 <a class="nav-link{% if request.path == '/' %} is-active{% endif %}" href="{% url 'core:home' %}">Início</a>
                 <a class="nav-link{% if request.path == '/sobre/' %} is-active{% endif %}" href="{% url 'core:sobre' %}">Biblioteca</a>
@@ -24,19 +24,66 @@
             {% endif %}
         </div>
 
-        <div class="user-chip">
+        {% if user.is_authenticated %}
+        <a href="{% url 'core:profile' %}" class="user-chip user-chip-link">
             <div class="user-chip-text">
-                {% if user.is_authenticated %}
-                    <strong>{{ user.username }}</strong>
-                    <span>Sessão ativa</span>
-                {% else %}
-                    <strong>Visitante</strong>
-                    <span>Explore o GameVault</span>
-                {% endif %}
+                <strong>{{ user.username }}</strong>
+                <span class="session-active-label">Sessão ativa</span>
             </div>
             <span class="user-avatar">
-                {% if user.is_authenticated %}{{ user.username|first|upper }}{% else %}G{% endif %}
+                {{ user.username|first|upper }}
             </span>
+        </a>
+        {% else %}
+        <div class="user-chip">
+            <div class="user-chip-text">
+                <strong>Visitante</strong>
+                <span>Explore o GameVault</span>
+            </div>
+            <span class="user-avatar">G</span>
         </div>
+        {% endif %}
     </nav>
 </header>
+
+{% if user.is_authenticated %}
+<div id="logout-modal" class="site-modal" aria-hidden="true">
+    <div class="site-modal-content" role="dialog" aria-modal="true" aria-labelledby="logout-modal-title">
+        <button class="site-modal-close" type="button" onclick="closeLogoutModal()" aria-label="Fechar">&times;</button>
+        <p class="eyebrow">Encerrar sessão</p>
+        <h2 id="logout-modal-title">Deseja sair da sua conta?</h2>
+        <p class="site-modal-description">Você pode voltar a entrar quando quiser usando seu usuário ou email.</p>
+        <div class="site-modal-actions">
+            <button class="ghost-button" type="button" onclick="closeLogoutModal()">Cancelar</button>
+            <a href="{% url 'core:logout' %}" class="button">Sair</a>
+        </div>
+    </div>
+</div>
+<script>
+function openLogoutModal() {
+    const modal = document.getElementById('logout-modal');
+    if (!modal) {
+        return;
+    }
+
+    modal.style.display = 'grid';
+    modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeLogoutModal() {
+    const modal = document.getElementById('logout-modal');
+    if (!modal) {
+        return;
+    }
+
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+}
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeLogoutModal();
+    }
+});
+</script>
+{% endif %}

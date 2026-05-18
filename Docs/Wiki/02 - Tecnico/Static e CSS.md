@@ -41,9 +41,9 @@ static/css/
 ## Responsabilidades
 
 - `base.css`: variaveis, reset, estrutura global, tipografia, telas base e mensagens.
-- `components.css`: navbar, botoes, formularios, cards, capas, estados vazios, status e footer.
+- `components.css`: navbar, botoes, formularios, cards, capas, estados vazios, status, footer, banner global de verificacao e modal de logout.
 - `responsive.css`: ajustes globais de responsividade, carregado por ultimo.
-- `pages/*.css`: estilos especificos de cada pagina.
+- `pages/*.css`: estilos especificos de cada pagina, incluindo feedback visual de formularios e modais.
 
 ## Ordem De Carregamento
 
@@ -71,6 +71,31 @@ Essa ordem permite que estilos globais sejam definidos primeiro, estilos de pagi
 | `templates/registration/login.html` | `static/css/pages/auth.css` |
 | `templates/registration/register.html` | `static/css/pages/auth.css` |
 | `templates/registration/profile.html` | `static/css/pages/profile.css` |
+
+## Ajustes Relevantes Recentes
+
+- `components.css` passou a incluir:
+  - chip de sessao ativa em destaque;
+  - modal de confirmacao de logout;
+  - banner global para email pendente de verificacao;
+  - contraste reforcado para botoes principais.
+- `auth.css` passou a incluir:
+  - checklist visual de senha;
+  - status de confirmacao de senha em tempo real.
+- `catalog.css` recebeu:
+  - contraste reforcado no campo de busca;
+  - tratamento para autofill do navegador.
+- `game-detail.css` recebeu:
+  - modal de avaliacao opaco;
+  - feedback visual inline ao salvar avaliacao;
+  - etapa de confirmacao apos adicionar jogo a biblioteca.
+- `profile.css` passou a incluir:
+  - card de status de verificacao de email;
+  - estilos do formulario editavel de perfil.
+
+## Observacao De Manutencao
+
+Alguns estilos passaram a usar query string de versao no carregamento do template base ou da pagina para contornar cache agressivo do navegador durante os ajustes iterativos da interface.
 
 ## Documentacao Visual Existente
 

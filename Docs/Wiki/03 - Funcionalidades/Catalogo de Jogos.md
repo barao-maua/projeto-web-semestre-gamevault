@@ -43,6 +43,7 @@ O template renderiza:
 
 - titulo da pagina;
 - formulario de busca;
+- contraste reforcado no campo de busca;
 - grid de jogos;
 - capa ou placeholder;
 - genero;
@@ -51,7 +52,7 @@ O template renderiza:
 
 ## Detalhe Do Jogo
 
-`game_detail_view` busca um `Game` por ID, carrega avaliacoes e verifica se o jogo ja esta na biblioteca do usuario autenticado.
+`game_detail_view` busca um `Game` por ID, carrega avaliacoes, verifica se o jogo ja esta na biblioteca do usuario autenticado e identifica se o usuario ja avaliou o jogo.
 
 O template mostra:
 
@@ -61,7 +62,6 @@ O template mostra:
 - data de lancamento;
 - descricao;
 - status na biblioteca, quando existe;
-- progresso;
 - avaliacoes da comunidade;
 - modal de avaliacao para usuario autenticado;
 - acao para adicionar a biblioteca.
@@ -71,9 +71,28 @@ O template mostra:
 Na pagina de detalhe, o JavaScript permite:
 
 - adicionar o jogo a biblioteca via `fetch` para `core:add_to_library`;
-- selecionar status inicial por `prompt`;
+- selecionar status inicial em modal visual;
+- sugerir avaliacao apos adicionar o jogo, dependendo do status escolhido;
 - abrir e fechar o modal de avaliacao;
-- enviar avaliacao via `fetch` para `core:add_review`.
+- enviar avaliacao via `fetch` para `core:add_review`;
+- mostrar feedback visual inline ao salvar avaliacao;
+- permitir avaliar mesmo antes de adicionar o jogo a biblioteca.
+
+## Sugestao De Avaliacao Apos Adicionar
+
+Apos adicionar um jogo a biblioteca, o modal mostra uma etapa de confirmacao.
+
+- Para `plan_to_play`, o sistema apenas confirma a adicao e permite continuar.
+- Para `playing`, `completed`, `paused` e `dropped`, o sistema sugere avaliar o jogo.
+- Se o usuario ja tiver uma avaliacao, a chamada muda para atualizar a avaliacao.
+- A avaliacao continua opcional e nao bloqueia a adicao a biblioteca.
+
+## O Que Mudou Recentemente
+
+- O detalhe do jogo deixou de destacar progresso como elemento principal da experiencia atual.
+- O modal de avaliacao recebeu fundo mais opaco e feedback visual inline.
+- O fluxo de adicionar a biblioteca ganhou uma etapa de confirmacao com CTA de avaliacao.
+- A busca do catalogo recebeu ajustes de contraste e tratamento de autofill do navegador.
 
 ## Capas E Variantes
 

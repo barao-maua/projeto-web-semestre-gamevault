@@ -4,7 +4,9 @@
 
 O **GameVault** é uma aplicação web transacional voltada para o gerenciamento de coleções de jogos digitais. O sistema permite que usuários organizem sua biblioteca pessoal de jogos, acompanhem o progresso, registrem avaliações e criem listas personalizadas.
 
-O objetivo principal é **centralizar e facilitar o controle da coleção de jogos de cada usuário**, permitindo registrar status (como *Jogando* ou *Zerado*), avaliações e histórico de interação com os títulos cadastrados.
+O objetivo principal é **centralizar e facilitar o controle da coleção de jogos de cada usuário**, permitindo registrar status, avaliações e histórico de interação com os títulos cadastrados.
+
+No estado atual da entrega, o foco principal esta em autenticacao, biblioteca pessoal e avaliacoes. Como evolucao futura prioritaria, o projeto pretende integrar o catalogo a dados vindos da Steam para reduzir cadastro manual de jogos e melhorar consistencia visual das capas.
 
 ---
 
@@ -16,9 +18,11 @@ O objetivo principal é **centralizar e facilitar o controle da coleção de jog
 
 Funcionalidades:
 
-- Cadastro de usuário
-- Autenticação no sistema
-- Acesso à biblioteca pessoal
+- Cadastro com email obrigatorio
+- Login com usuario ou email
+- Verificacao de email sem bloquear acesso
+- Recuperacao de senha por email
+- Acesso a biblioteca pessoal
 
 ---
 
@@ -34,9 +38,9 @@ Funcionalidades:
 
 ---
 
-### 3. Controle de Status e Progresso
+### 3. Controle de Status
 
-**Como usuário**, quero definir o status de um jogo e registrar meu progresso, para acompanhar minha evolução.
+**Como usuário**, quero definir o status de um jogo, para manter minha coleção organizada e coerente com o que já joguei ou pretendo jogar.
 
 Status possíveis no código atual:
 
@@ -46,7 +50,7 @@ Status possíveis no código atual:
 - Abandonado
 - Planejo Jogar
 
-Também é possível registrar o progresso do jogo.
+O model ainda possui campo de progresso, mas a experiencia principal atual da interface prioriza status e avaliacao.
 
 ---
 
@@ -71,6 +75,10 @@ Exemplos de listas:
 - Jogos para Jogar em 2026
 - RPGs Preferidos
 
+Observacao:
+
+- A modelagem de listas personalizadas existe no codigo atual, mas a interface completa desse recurso ficou fora do escopo principal da entrega.
+
 ---
 
 ## Tipo de Aplicação
@@ -84,6 +92,13 @@ As operações principais do sistema seguem o modelo **CRUD (Create, Read, Updat
 - Entradas na biblioteca
 - Avaliações
 - Listas personalizadas
+
+Na interface atual, o fluxo mais maduro do sistema esta em:
+
+- autenticacao;
+- catalogo;
+- biblioteca do usuario;
+- avaliacoes.
 
 ---
 
@@ -103,10 +118,11 @@ Permitir que o usuário crie uma conta ou acesse o sistema.
 
 #### Elementos da interface
 
-- Campo de e-mail
+- Campo de usuario ou email
 - Campo de senha
-- Botão de login
+- Botao de login
 - Link para cadastro
+- Link de esqueci minha senha
 
 ---
 
@@ -141,17 +157,17 @@ Permitir visualizar informações detalhadas e registrar avaliações.
 #### Funcionalidades
 
 - Alterar status do jogo
-- Registrar progresso
 - Avaliar jogo
 - Escrever review
+- Atualizar review existente do mesmo usuario
 
 #### Elementos principais
 
 - Nome do jogo
 - Imagem de capa
-- Dropdown de status
-- Campo de nota (0 a 5)
-- Campo de texto para avaliação
+- Selecao visual de status
+- Campo de nota (1 a 5)
+- Campo de texto para avaliacao
 
 ---
 
@@ -180,6 +196,10 @@ last_name
 email
 password
 ```
+
+Observacao:
+
+- O estado de verificacao do email e controlado separadamente por uma entidade auxiliar.
 
 ---
 
@@ -257,6 +277,20 @@ id (PK)
 game_list_id (FK)
 game_id (FK)
 added_at
+```
+
+---
+
+### UserEmailVerification
+
+Representa o estado de verificacao do email atual do usuario.
+
+```
+id (PK)
+user_id (FK / one-to-one)
+is_verified
+verified_at
+last_verification_email_sent_at
 ```
 
 ---
