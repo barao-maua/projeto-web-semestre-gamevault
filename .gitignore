@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+.venv/
+venv/
+
+.env
+.env.*
+
+*.sqlite3-journal
+db.sqlite3
+media/
+
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json

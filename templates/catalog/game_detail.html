@@ -1,8 +1,13 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ game.title }} - GameVault{% endblock %}
 
 {% block body_class %}game-detail-page{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/game-detail.css' %}">
+{% endblock %}
 
 {% block content %}
 <section class="screen">
@@ -21,7 +26,7 @@
 
         <div class="game-detail-meta-grid">
             <div class="detail-meta-item">
-                <span>Plataforma</span>
+                <span>Gênero</span>
                 <strong>{{ game.genre|default:"Não informada" }}</strong>
             </div>
             <div class="detail-meta-item">
@@ -31,7 +36,7 @@
         </div>
 
         <p class="game-detail-summary">
-            Organize o status do jogo, acompanhe seu progresso e registre sua avaliação em um só lugar.
+            Organize o status do jogo na sua coleção e registre sua avaliação em um só lugar.
         </p>
 
         {% if user.is_authenticated %}
@@ -40,14 +45,12 @@
             <div class="library-status">
                 <div class="library-status-header">
                     <span class="status-badge status-{{ library_entry.status }}">{{ library_entry.get_status_display }}</span>
-                    <span class="progress-text">{{ library_entry.progress }}%</span>
                 </div>
-                <progress value="{{ library_entry.progress }}" max="100">{{ library_entry.progress }}%</progress>
             </div>
             {% else %}
             <div class="library-status library-status--empty">
                 <strong>Esse jogo ainda não está na sua biblioteca.</strong>
-                <p>Adicione agora para controlar o progresso e deixar sua coleção mais completa.</p>
+                <p>Adicione agora para organizar seu status e deixar sua coleção mais completa.</p>
             </div>
             {% endif %}
 
@@ -56,6 +59,8 @@
                 <button class="button" onclick="showLibraryStatusModal({{ game.id }})">
                     Adicionar à Biblioteca
                 </button>
+                {% else %}
+                <a href="{% url 'core:library' %}" class="button">Ver na Biblioteca</a>
                 {% endif %}
 
                 <button class="ghost-button" onclick="showReviewForm()">
@@ -66,7 +71,7 @@
         {% else %}
         <div class="library-status library-status--empty">
             <strong>Faça login para interagir com este jogo.</strong>
-            <p>Você poderá adicionar à biblioteca, acompanhar progresso e publicar avaliações.</p>
+            <p>Você poderá adicionar à biblioteca, organizar o status e publicar avaliações.</p>
         </div>
         {% endif %}
     </article>
@@ -107,12 +112,66 @@
                 <p>Ainda não há avaliações para este jogo.</p>
             </div>
         {% endif %}
+
     </aside>
 </div>
 
 {% if user.is_authenticated %}
+<div id="library-modal" class="modal">
+    <div class="modal-content library-modal-content">
+        <span class="close-modal" onclick="closeLibraryStatusModal()">&times;</span>
+        <h2>Adicionar à Biblioteca</h2>
+        <p class="modal-description">
+            Escolha o status inicial para acompanhar esse jogo na sua coleção.
+        </p>
+
+        <form id="library-form">
+            <input type="hidden" id="library-status" name="status" value="plan_to_play">
+
+            <div class="status-card-grid">
+                <button type="button" class="status-card is-selected" data-status="plan_to_play">
+                    <strong>Planejo Jogar</strong>
+                    <span>Salvar para jogar depois.</span>
+                </button>
+                <button type="button" class="status-card" data-status="playing">
+                    <strong>Jogando</strong>
+                    <span>Estou jogando agora.</span>
+                </button>
+                <button type="button" class="status-card" data-status="completed">
+                    <strong>Concluído</strong>
+                    <span>Já finalizei o jogo.</span>
+                </button>
+                <button type="button" class="status-card" data-status="paused">
+                    <strong>Pausado</strong>
+                    <span>Parei temporariamente.</span>
+                </button>
+                <button type="button" class="status-card" data-status="dropped">
+                    <strong>Abandonado</strong>
+                    <span>Não pretendo continuar.</span>
+                </button>
+            </div>
+
+            <button type="submit" class="button full-button">Adicionar à Biblioteca</button>
+        </form>
+
+        <div id="library-success" class="library-success" hidden>
+            <span class="library-success-icon">✓</span>
+            <h3 id="library-success-title">Jogo adicionado!</h3>
+            <p id="library-success-message">Sua biblioteca foi atualizada.</p>
+            <div class="library-success-actions">
+                <button id="review-after-add-button" class="button" type="button" onclick="reviewAfterLibraryAdd()">
+                    Avaliar agora
+                </button>
+                <button class="ghost-button" type="button" onclick="reloadAfterLibraryAdd()">
+                    Depois
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="review-modal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content review-modal-content">
         <span class="close-modal" onclick="closeReviewForm()">&times;</span>
         <h2>Avaliar {{ game.title }}</h2>
         <form id="review-form">
@@ -125,13 +184,14 @@
                  {% endfor %}
              </div>
          </div>
-            <div class="form-group">
-                <label for="comment">Comentário:</label>
-                <textarea id="comment" name="comment" rows="4" placeholder="Digite sua avaliação..."></textarea>
-            </div>
-            <button type="submit" class="button">Salvar Avaliação</button>
-        </form>
-    </div>
+             <div class="form-group">
+                 <label for="comment">Comentário:</label>
+                 <textarea id="comment" name="comment" rows="4" placeholder="Digite sua avaliação..."></textarea>
+             </div>
+            <p id="review-feedback" class="review-feedback" role="status"></p>
+             <button type="submit" class="button">Salvar Avaliação</button>
+         </form>
+     </div>
 </div>
 {% endif %}
 </section>
@@ -139,6 +199,17 @@
 
 {% block extra_js %}
 <script>
+let selectedLibraryGameId = null;
+let shouldRefreshAfterLibraryModal = false;
+const hasUserReview = {{ user_review|yesno:"true,false" }};
+
+const reviewPromptByStatus = {
+    playing: 'Quer deixar uma primeira impressão enquanto joga?',
+    completed: 'Quer registrar sua avaliação agora que concluiu?',
+    paused: 'Quer salvar uma avaliação parcial antes de voltar?',
+    dropped: 'Quer contar por que abandonou esse jogo?'
+};
+
 function addToLibrary(gameId, status) {
     fetch("{% url 'core:add_to_library' %}", {
         method: 'POST',
@@ -156,42 +227,124 @@ function addToLibrary(gameId, status) {
     })
     .then(data => {
         if (data.success) {
-            alert(data.message);
-            location.reload(); // Recarrega a página para atualizar o status
+            showLibrarySuccess(status);
         } else {
-            alert('Erro: ' + data.message);
+            showLibraryError(data.message || 'Erro ao adicionar jogo à biblioteca.');
         }
     })
     .catch(error => {
-        alert('Erro de conexão: ' + error.message);
+        showLibraryError('Erro de conexão: ' + error.message);
     });
 }
 
 function showLibraryStatusModal(gameId) {
-    // Simple implementation - in a real app, you'd use a proper modal
-    const status = prompt("Selecione o status para este jogo:\n1. Planejo Jogar\n2. Jogando\n3. Concluído\n4. Pausado\n5. Abandonado\n\nDigite o número do status:", "1");
-    
-    const statusMap = {
-        "1": "plan_to_play",
-        "2": "playing",
-        "3": "completed",
-        "4": "paused",
-        "5": "dropped"
-    };
-    
-    const selectedStatus = statusMap[status] || "plan_to_play";
-    if (status !== null) { // User didn't cancel
-        addToLibrary(gameId, selectedStatus);
+    selectedLibraryGameId = gameId;
+    shouldRefreshAfterLibraryModal = false;
+    setSelectedLibraryStatus('plan_to_play');
+    resetLibraryModalState();
+    document.getElementById('library-modal').style.display = 'grid';
+}
+
+function closeLibraryStatusModal() {
+    if (shouldRefreshAfterLibraryModal) {
+        location.reload();
+        return;
     }
+
+    selectedLibraryGameId = null;
+    document.getElementById('library-modal').style.display = 'none';
+    document.getElementById('library-form').reset();
+    setSelectedLibraryStatus('plan_to_play');
+    resetLibraryModalState();
+}
+
+function setSelectedLibraryStatus(status) {
+    document.getElementById('library-status').value = status;
+
+    document.querySelectorAll('.status-card').forEach(card => {
+        card.classList.toggle('is-selected', card.dataset.status === status);
+    });
 }
 
 function showReviewForm() {
-    document.getElementById('review-modal').style.display = 'block';
+    document.getElementById('review-modal').style.display = 'grid';
 }
 
 function closeReviewForm() {
     document.getElementById('review-modal').style.display = 'none';
     document.getElementById('review-form').reset();
+    setReviewFeedback('');
+    document.querySelectorAll('.rating-select.hearts label').forEach(label => {
+        label.classList.remove('selected');
+    });
+}
+
+function resetLibraryModalState() {
+    const libraryForm = document.getElementById('library-form');
+    const successPanel = document.getElementById('library-success');
+    const reviewButton = document.getElementById('review-after-add-button');
+
+    libraryForm.hidden = false;
+    successPanel.hidden = true;
+    reviewButton.hidden = false;
+}
+
+function showLibrarySuccess(status) {
+    const suggestReview = Boolean(reviewPromptByStatus[status]);
+    const libraryForm = document.getElementById('library-form');
+    const successPanel = document.getElementById('library-success');
+    const successTitle = document.getElementById('library-success-title');
+    const successMessage = document.getElementById('library-success-message');
+    const reviewButton = document.getElementById('review-after-add-button');
+
+    shouldRefreshAfterLibraryModal = true;
+    libraryForm.hidden = true;
+    successPanel.hidden = false;
+    successTitle.textContent = 'Jogo adicionado à biblioteca!';
+
+    if (suggestReview) {
+        successMessage.textContent = hasUserReview
+            ? 'Você já avaliou este jogo. Quer atualizar sua avaliação?'
+            : reviewPromptByStatus[status];
+        reviewButton.textContent = hasUserReview ? 'Atualizar avaliação' : 'Avaliar agora';
+        reviewButton.hidden = false;
+        return;
+    }
+
+    successMessage.textContent = 'Quando começar a jogar, você poderá voltar aqui para avaliar.';
+    reviewButton.hidden = true;
+}
+
+function showLibraryError(message) {
+    const successPanel = document.getElementById('library-success');
+    const successTitle = document.getElementById('library-success-title');
+    const successMessage = document.getElementById('library-success-message');
+    const reviewButton = document.getElementById('review-after-add-button');
+
+    successPanel.hidden = false;
+    successTitle.textContent = 'Não foi possível adicionar';
+    successMessage.textContent = message;
+    reviewButton.hidden = true;
+}
+
+function reloadAfterLibraryAdd() {
+    location.reload();
+}
+
+function reviewAfterLibraryAdd() {
+    document.getElementById('library-modal').style.display = 'none';
+    showReviewForm();
+}
+
+function setReviewFeedback(message, isError = false) {
+    const feedback = document.getElementById('review-feedback');
+    if (!feedback) {
+        return;
+    }
+
+    feedback.textContent = message;
+    feedback.classList.toggle('is-error', Boolean(message) && isError);
+    feedback.classList.toggle('is-success', Boolean(message) && !isError);
 }
 
 function getCookie(name) {
@@ -209,67 +362,104 @@ function getCookie(name) {
         return cookieValue;
     }
 
-    // Interactive heart selection for review modal
     document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.status-card').forEach(card => {
+            card.addEventListener('click', function() {
+                setSelectedLibraryStatus(this.dataset.status);
+            });
+        });
+
+        const libraryForm = document.getElementById('library-form');
+        if (libraryForm) {
+            libraryForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                if (!selectedLibraryGameId) {
+                    alert('Jogo não encontrado para adicionar à biblioteca.');
+                    return;
+                }
+
+                const status = document.getElementById('library-status').value;
+                addToLibrary(selectedLibraryGameId, status);
+            });
+        }
+
+        // Selecao interativa de coracoes no modal de avaliacao
         const heartLabels = document.querySelectorAll('.rating-select.hearts label');
         heartLabels.forEach((label, index) => {
             label.addEventListener('click', function(e) {
-                // Remove selected class from all labels
+                // Remove a classe de selecao de todos os rotulos
                 heartLabels.forEach(l => l.classList.remove('selected'));
-                // Add selected class to clicked label and all previous ones
+                // Marca o coracao clicado e todos os anteriores
                 for (let i = 0; i <= index; i++) {
                     heartLabels[i].classList.add('selected');
                 }
-                // Select the corresponding radio button
+                // Seleciona o campo de radio correspondente
                 const radioInput = document.getElementById(`rating${index + 1}`);
                 if (radioInput) {
                     radioInput.checked = true;
                 }
             });
         });
-    });
 
-    // Handle review form submission
-    document.getElementById('review-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const rating = document.querySelector('input[name="rating"]:checked');
-        const comment = document.getElementById('comment').value;
-        
-        if (!rating) {
-            alert('Por favor, selecione uma nota.');
-            return;
-        }
-        
-        fetch("{% url 'core:add_review' game.id %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({
-                rating: parseInt(rating.value),
-                comment: comment
+        // Controla o envio do formulario de avaliacao
+        const reviewForm = document.getElementById('review-form');
+        if (reviewForm) {
+            reviewForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const rating = document.querySelector('input[name="rating"]:checked');
+                const comment = document.getElementById('comment').value;
+                const submitButton = reviewForm.querySelector('button[type="submit"]');
+
+                if (!rating) {
+                    setReviewFeedback('Por favor, selecione uma nota.', true);
+                    return;
+                }
+
+                setReviewFeedback('Salvando avaliação...');
+                if (submitButton) {
+                    submitButton.disabled = true;
+                }
+
+                fetch("{% url 'core:add_review' game.id %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        rating: parseInt(rating.value),
+                        comment: comment
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro de rede ou servidor');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        setReviewFeedback(data.message);
+                        setTimeout(() => {
+                            closeReviewForm();
+                            location.reload();
+                        }, 700);
+                    } else {
+                        setReviewFeedback(data.message || 'Erro ao salvar avaliação.', true);
+                    }
+                })
+                .catch(error => {
+                    setReviewFeedback('Erro de conexão: ' + error.message, true);
+                })
+                .finally(() => {
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                    }
+                });
             })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erro de rede ou servidor');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                alert(data.message);
-                closeReviewForm();
-                location.reload(); // Recarrega a página para mostrar a nova avaliação
-            } else {
-                alert('Erro: ' + data.message);
-            }
-        })
-        .catch(error => {
-            alert('Erro de conexão: ' + error.message);
-        });
+        }
     });
 </script>
 {% endblock %}

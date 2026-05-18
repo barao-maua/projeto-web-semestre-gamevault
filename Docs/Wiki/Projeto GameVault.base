@@ -1,0 +1,88 @@
+filters:
+  and:
+    - file.inFolder("Docs/Wiki")
+    - file.ext == "md"
+formulas:
+  atualizado_em: file.mtime.format("YYYY-MM-DD HH:mm")
+  pasta_curta: file.folder.replace("Docs/Wiki/", "")
+  tipo_label: if(tipo, tipo, "sem tipo")
+  status_label: if(status, status, "sem status")
+properties:
+  file.name:
+    displayName: Nota
+  file.folder:
+    displayName: Pasta
+  file.path:
+    displayName: Caminho
+  tipo:
+    displayName: Tipo
+  status:
+    displayName: Status
+  area:
+    displayName: Area
+  projeto:
+    displayName: Projeto
+  arquivo_relacionado:
+    displayName: Arquivo Relacionado
+  formula.atualizado_em:
+    displayName: Atualizado
+  formula.pasta_curta:
+    displayName: Secao
+  formula.tipo_label:
+    displayName: Tipo
+  formula.status_label:
+    displayName: Status
+views:
+  - type: table
+    name: Todas as Notas
+    groupBy:
+      property: area
+      direction: ASC
+    order:
+      - file.name
+      - tipo
+      - status
+      - area
+      - formula.pasta_curta
+      - formula.atualizado_em
+  - type: table
+    name: Documentacao Tecnica
+    filters:
+      and:
+        - area == "tecnico"
+    order:
+      - file.name
+      - tipo
+      - status
+      - arquivo_relacionado
+      - formula.atualizado_em
+  - type: table
+    name: Funcionalidades
+    filters:
+      and:
+        - area == "funcionalidades"
+    order:
+      - file.name
+      - tipo
+      - status
+      - arquivo_relacionado
+      - formula.atualizado_em
+  - type: table
+    name: Planejamento
+    filters:
+      and:
+        - area == "documentacao" || area == "planejamento"
+    order:
+      - file.name
+      - tipo
+      - status
+      - formula.pasta_curta
+      - formula.atualizado_em
+  - type: cards
+    name: Cards por Area
+    order:
+      - file.name
+      - formula.tipo_label
+      - formula.status_label
+      - area
+      - formula.pasta_curta

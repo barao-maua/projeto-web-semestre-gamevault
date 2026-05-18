@@ -1,0 +1,7 @@
+Ola, {{ user.username }}.
+
+Use o link abaixo para verificar seu email no GameVault:
+
+{{ verification_url }}
+
+Se voce nao solicitou esta verificacao, ignore esta mensagem.

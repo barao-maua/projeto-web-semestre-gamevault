@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 
 from .views import (
     diferenciais_view,
@@ -8,6 +9,8 @@ from .views import (
     logout_view,
     register_view,
     profile_view,
+    verify_email_view,
+    resend_verification_email_view,
     library_view,
     add_to_library_view,
     update_library_entry_view,
@@ -16,6 +19,7 @@ from .views import (
     game_detail_view,
     add_review_view,
 )
+from .forms import GameVaultSetPasswordForm
 
 app_name = "core"
 
@@ -25,8 +29,47 @@ urlpatterns = [
     path("diferenciais/", diferenciais_view, name="diferenciais"),
     path("login/", login_view, name="login"),
     path("logout/", logout_view, name="logout"),
+    path(
+        "password-reset/",
+        auth_views.PasswordResetView.as_view(
+            template_name="registration/password_reset_form.html",
+            email_template_name="registration/password_reset_email.html",
+            subject_template_name="registration/password_reset_subject.txt",
+            success_url="/password-reset/done/",
+        ),
+        name="password_reset",
+    ),
+    path(
+        "password-reset/done/",
+        auth_views.PasswordResetDoneView.as_view(
+            template_name="registration/password_reset_done.html"
+        ),
+        name="password_reset_done",
+    ),
+    path(
+        "reset/<uidb64>/<token>/",
+        auth_views.PasswordResetConfirmView.as_view(
+            template_name="registration/password_reset_confirm.html",
+            form_class=GameVaultSetPasswordForm,
+            success_url="/reset/done/",
+        ),
+        name="password_reset_confirm",
+    ),
+    path(
+        "reset/done/",
+        auth_views.PasswordResetCompleteView.as_view(
+            template_name="registration/password_reset_complete.html"
+        ),
+        name="password_reset_complete",
+    ),
     path("register/", register_view, name="register"),
     path("profile/", profile_view, name="profile"),
+    path("verify-email/<str:token>/", verify_email_view, name="verify_email"),
+    path(
+        "resend-verification-email/",
+        resend_verification_email_view,
+        name="resend_verification_email",
+    ),
     path("library/", library_view, name="library"),
     path("add-to-library/", add_to_library_view, name="add_to_library"),
     path(

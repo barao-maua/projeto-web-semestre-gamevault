@@ -1,6 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Cadastre-se - GameVault{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/auth.css' %}">
+{% endblock %}
 
 {% block content %}
 <section class="screen auth-shell">
@@ -18,6 +23,11 @@
     {% endif %}
     <form method="post">
         {% csrf_token %}
+        {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+            <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        {% endif %}
         <div class="field">
             {{ form.username.label_tag }}
             {{ form.username }}
@@ -29,11 +39,40 @@
             {% endfor %}
         </div>
         <div class="field">
+            {{ form.email.label_tag }}
+            {{ form.email }}
+            {% if form.email.help_text %}
+            <div class="form-help-text">{{ form.email.help_text }}</div>
+            {% endif %}
+            {% for error in form.email.errors %}
+            <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+        <div class="field">
             {{ form.password1.label_tag }}
             {{ form.password1 }}
-            {% if form.password1.help_text %}
-            <div class="form-help-text">{{ form.password1.help_text }}</div>
-            {% endif %}
+            <div class="password-checklist" id="password-checklist">
+                <div class="password-checklist-item" data-password-rule="length">
+                    <span class="password-rule-icon">•</span>
+                    <span>Pelo menos 8 caracteres</span>
+                </div>
+                <div class="password-checklist-item" data-password-rule="uppercase">
+                    <span class="password-rule-icon">•</span>
+                    <span>Pelo menos uma letra maiúscula</span>
+                </div>
+                <div class="password-checklist-item" data-password-rule="lowercase">
+                    <span class="password-rule-icon">•</span>
+                    <span>Pelo menos uma letra minúscula</span>
+                </div>
+                <div class="password-checklist-item" data-password-rule="number">
+                    <span class="password-rule-icon">•</span>
+                    <span>Pelo menos um número</span>
+                </div>
+                <div class="password-checklist-item" data-password-rule="special">
+                    <span class="password-rule-icon">•</span>
+                    <span>Pelo menos um caractere especial</span>
+                </div>
+            </div>
             {% for error in form.password1.errors %}
             <div class="form-error">{{ error }}</div>
             {% endfor %}
@@ -41,9 +80,7 @@
         <div class="field">
             {{ form.password2.label_tag }}
             {{ form.password2 }}
-            {% if form.password2.help_text %}
-            <div class="form-help-text">{{ form.password2.help_text }}</div>
-            {% endif %}
+            <div class="password-match-status" id="password-match-status">Digite a confirmação para comparar as senhas.</div>
             {% for error in form.password2.errors %}
             <div class="form-error">{{ error }}</div>
             {% endfor %}
@@ -56,4 +93,71 @@
         <p>Já tem uma conta? <a href="{% url 'core:login' %}">Faça login</a></p>
     </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const password1 = document.getElementById('id_password1');
+    const password2 = document.getElementById('id_password2');
+    const passwordMatchStatus = document.getElementById('password-match-status');
+
+    if (!password1 || !password2 || !passwordMatchStatus) {
+        return;
+    }
+
+    function toggleRule(ruleName, isValid) {
+        const rule = document.querySelector(`[data-password-rule="${ruleName}"]`);
+        if (!rule) {
+            return;
+        }
+
+        rule.classList.toggle('is-valid', isValid);
+        const icon = rule.querySelector('.password-rule-icon');
+        if (icon) {
+            icon.textContent = isValid ? '✓' : '•';
+        }
+    }
+
+    function updatePasswordFeedback() {
+        const value = password1.value;
+        toggleRule('length', value.length >= 8);
+        toggleRule('uppercase', /[A-Z]/.test(value));
+        toggleRule('lowercase', /[a-z]/.test(value));
+        toggleRule('number', /\d/.test(value));
+        toggleRule('special', /[^A-Za-z0-9]/.test(value));
+    }
+
+    function updatePasswordMatch() {
+        const hasConfirmation = password2.value.length > 0;
+        const matches = hasConfirmation && password1.value === password2.value;
+
+        passwordMatchStatus.classList.remove('is-valid', 'is-invalid');
+
+        if (!hasConfirmation) {
+            passwordMatchStatus.textContent = 'Digite a confirmação para comparar as senhas.';
+            return;
+        }
+
+        if (matches) {
+            passwordMatchStatus.textContent = 'As senhas coincidem.';
+            passwordMatchStatus.classList.add('is-valid');
+            return;
+        }
+
+        passwordMatchStatus.textContent = 'As senhas ainda não coincidem.';
+        passwordMatchStatus.classList.add('is-invalid');
+    }
+
+    password1.addEventListener('input', function() {
+        updatePasswordFeedback();
+        updatePasswordMatch();
+    });
+
+    password2.addEventListener('input', updatePasswordMatch);
+
+    updatePasswordFeedback();
+    updatePasswordMatch();
+});
+</script>
 {% endblock %}

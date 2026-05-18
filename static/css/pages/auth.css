@@ -1,0 +1,123 @@
+.auth-shell {
+    width: min(560px, 100%);
+    margin: 0 auto;
+}
+
+.auth-shell form {
+    display: grid;
+    gap: 16px;
+}
+
+.auth-footer {
+    margin-top: 18px;
+    text-align: center;
+}
+
+.auth-footer a {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.auth-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    overflow: hidden;
+}
+
+.auth-panel {
+    padding: 36px 40px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: rgba(47, 76, 103, 0.52);
+}
+
+.auth-panel + .auth-panel {
+    border-left: 1px solid rgba(255, 255, 255, 0.32);
+}
+
+.panel-title {
+    margin-bottom: 26px;
+    font-size: 1.45rem;
+    text-align: center;
+    letter-spacing: 0.03em;
+}
+
+.form-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.mini-note {
+    margin-top: 16px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.88rem;
+}
+
+.mini-note strong {
+    color: var(--text);
+}
+
+.password-checklist {
+    display: grid;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.password-checklist-item,
+.password-match-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 0.88rem;
+}
+
+.password-rule-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    background: rgba(214, 227, 244, 0.1);
+}
+
+.password-checklist-item.is-valid,
+.password-match-status.is-valid {
+    color: #b9f85d;
+}
+
+.password-checklist-item.is-valid .password-rule-icon,
+.password-match-status.is-valid::before {
+    color: #13202c;
+    background: #b9f85d;
+}
+
+.password-match-status.is-valid::before,
+.password-match-status.is-invalid::before {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    content: "";
+}
+
+.password-match-status.is-valid::before {
+    content: "✓";
+}
+
+.password-match-status.is-invalid {
+    color: #ffb2b8;
+}
+
+.password-match-status.is-invalid::before {
+    color: #fff;
+    background: rgba(255, 107, 107, 0.7);
+    content: "!";
+}

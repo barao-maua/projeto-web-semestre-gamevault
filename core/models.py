@@ -132,3 +132,29 @@ class GameListItem(models.Model):
 
     def __str__(self):
         return f"{self.game_list.name} - {self.game.title}"
+
+
+class UserEmailVerification(models.Model):
+    """Estado de verificacao do email atual do usuario."""
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="email_verification",
+        verbose_name="Usuario",
+    )
+    is_verified = models.BooleanField(default=False, verbose_name="Email verificado")
+    verified_at = models.DateTimeField(
+        null=True, blank=True, verbose_name="Verificado em"
+    )
+    last_verification_email_sent_at = models.DateTimeField(
+        null=True, blank=True, verbose_name="Ultimo envio de verificacao"
+    )
+
+    class Meta:
+        verbose_name = "Verificacao de Email"
+        verbose_name_plural = "Verificacoes de Email"
+
+    def __str__(self):
+        status = "verificado" if self.is_verified else "pendente"
+        return f"{self.user.username} - {status}"

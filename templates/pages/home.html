@@ -1,6 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}GameVault - Sua Biblioteca de Jogos{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/home.css' %}">
+{% endblock %}
 
 {% block content %}
 <section class="screen">
@@ -63,7 +68,7 @@
             <p>Explore nossa coleção e adicione os jogos que você joga ou planeja jogar.</p>
         </div>
     </div>
-    
+
     <div class="library-grid">
         {% for jogo in featured_games %}
         <article class="game-card">
@@ -79,7 +84,7 @@
                 </div>
             </div>
             <div class="game-rating">
-                {% comment %} Show varying ratings for visual interest: 3, 4, or 5 hearts {% endcomment %}
+                {% comment %} Mostra notas variadas para dar interesse visual: 3, 4 ou 5 coracoes {% endcomment %}
                 {% if forloop.counter0 == 0 %}&hearts; &hearts; &hearts;{% endif %}
                 {% if forloop.counter0 == 1 %}&hearts; &hearts; &hearts; &hearts;{% endif %}
                 {% if forloop.counter0 == 2 %}&hearts; &hearts; &hearts; &hearts; &hearts;{% endif %}
