@@ -71,6 +71,10 @@
     margin-top: 14px;
 }
 
+.game-card-content .source-badge {
+    margin-bottom: 2px;
+}
+
 .game-genre,
 .game-release {
     color: var(--muted);

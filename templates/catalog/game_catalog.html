@@ -28,12 +28,16 @@
         <div class="game-card">
             <div class="game-card-image">
                 {% if game.catalog_cover_image %}
-                <img src="{{ game.catalog_cover_image }}" alt="{{ game.title }}" style="object-position: {{ game.catalog_cover_position }};">
+                <img src="{{ game.catalog_cover_image }}" alt="{{ game.title }}" style="object-position: {{ game.catalog_cover_position }};" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+                <div class="placeholder-image" style="display: none;">Sem capa</div>
                 {% else %}
                 <div class="placeholder-image">Sem capa</div>
                 {% endif %}
             </div>
             <div class="game-card-content">
+                {% if game.steam_app_id %}
+                <span class="source-badge source-badge--steam">Steam</span>
+                {% endif %}
                 <h3>{{ game.title }}</h3>
                 <p class="game-genre">{{ game.genre|default:"Gênero não informado" }}</p>
                 <p class="game-description">{{ game.description|truncatewords:20 }}</p>

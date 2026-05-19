@@ -320,6 +320,12 @@ Provaveis:
 - sync basico;
 - admin.
 
+Status atual da Fase 1:
+
+- implementacao local concluida;
+- `steam_app_id`, `steam_type`, `last_synced_at`, servico interno, sync individual, sync em lote e suporte no admin ja estao ativos;
+- o catalogo continua lendo apenas do banco local.
+
 ## Fase 2 Recomendada
 
 - acao no admin;
@@ -327,20 +333,33 @@ Provaveis:
 - sync em lote;
 - politica de atualizacao mais refinada.
 
+Status atual da Fase 2:
+
+- fonte real ativa para detalhes por `app_id`;
+- importacao em lote ativa via busca publica da Steam Store;
+- selo visual de origem Steam ativo no catalogo e no detalhe do jogo;
+- fallback visual de imagem validado com placeholder local na UI principal.
+
 ## Checklist Refinado
 
-- [ ] Definir campo `steam_app_id` em `Game`.
-- [ ] Criar migration.
-- [ ] Definir servico interno de integracao.
-- [ ] Implementar busca por `app_id`.
-- [ ] Normalizar payload remoto.
-- [ ] Criar sync create/update para `Game`.
-- [ ] Definir politica de atualizacao dos campos.
-- [ ] Criar comando Django para sync.
-- [ ] Adicionar suporte no admin.
-- [ ] Testar importacao de alguns jogos reais.
-- [ ] Validar fallback de imagem.
-- [ ] Atualizar documentacao tecnica e funcional.
+- [x] Definir campo `steam_app_id` em `Game`.
+- [x] Criar migration.
+- [x] Definir servico interno de integracao.
+- [x] Implementar busca por `app_id`.
+- [x] Normalizar payload remoto.
+- [x] Criar sync create/update para `Game`.
+- [x] Definir politica de atualizacao dos campos.
+- [x] Criar comando Django para sync.
+- [x] Adicionar suporte no admin.
+- [x] Testar importacao de alguns jogos reais.
+- [x] Validar fallback de imagem.
+- [x] Atualizar documentacao tecnica e funcional.
+
+Observacao:
+
+- A Fase 1 com mock foi substituida por integracao real no fluxo de detalhes por `app_id`.
+- O sync em lote usa a busca publica da Steam Store para descobrir jogos e depois enriquece cada item via `appdetails`.
+- O filtro operacional atual continua restrito a apps do tipo `game`.
 
 ## Criterio De Pronto
 

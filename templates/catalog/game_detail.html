@@ -14,7 +14,8 @@
 <div class="game-detail-hero">
     <article class="game-detail-image">
         {% if game.cover_image %}
-        <img src="{{ game.cover_image }}" alt="{{ game.title }}">
+        <img src="{{ game.cover_image }}" alt="{{ game.title }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+        <div class="placeholder-image" style="display: none;">Sem capa</div>
         {% else %}
         <div class="placeholder-image">Sem capa</div>
         {% endif %}
@@ -22,6 +23,14 @@
 
     <article class="game-detail-info">
         <p class="eyebrow">Ficha do jogo</p>
+        {% if game.steam_app_id %}
+        <div class="detail-source-row">
+            <span class="source-badge source-badge--steam">Dados sincronizados da Steam</span>
+            {% if game.last_synced_at %}
+            <small>Ultima sincronizacao: {{ game.last_synced_at|date:"d/m/Y H:i" }}</small>
+            {% endif %}
+        </div>
+        {% endif %}
         <h1>{{ game.title }}</h1>
 
         <div class="game-detail-meta-grid">
@@ -211,19 +220,12 @@ const reviewPromptByStatus = {
 };
 
 function addToLibrary(gameId, status) {
-    fetch("{% url 'core:add_to_library' %}", {
+    GameVaultHTTP.fetchJson("{% url 'core:add_to_library' %}", {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({game_id: gameId, status: status})
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Erro de rede ou servidor');
-        }
-        return response.json();
     })
     .then(data => {
         if (data.success) {
@@ -304,9 +306,9 @@ function showLibrarySuccess(status) {
 
     if (suggestReview) {
         successMessage.textContent = hasUserReview
-            ? 'Você já avaliou este jogo. Quer atualizar sua avaliação?'
+            ? 'Você já avaliou este jogo. Quer registrar uma nova avaliação no seu histórico?'
             : reviewPromptByStatus[status];
-        reviewButton.textContent = hasUserReview ? 'Atualizar avaliação' : 'Avaliar agora';
+        reviewButton.textContent = hasUserReview ? 'Nova avaliação' : 'Avaliar agora';
         reviewButton.hidden = false;
         return;
     }
@@ -346,21 +348,6 @@ function setReviewFeedback(message, isError = false) {
     feedback.classList.toggle('is-error', Boolean(message) && isError);
     feedback.classList.toggle('is-success', Boolean(message) && !isError);
 }
-
-function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
 
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.status-card').forEach(card => {
@@ -422,22 +409,15 @@ function getCookie(name) {
                     submitButton.disabled = true;
                 }
 
-                fetch("{% url 'core:add_review' game.id %}", {
+                GameVaultHTTP.fetchJson("{% url 'core:add_review' game.id %}", {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         rating: parseInt(rating.value),
                         comment: comment
                     })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Erro de rede ou servidor');
-                    }
-                    return response.json();
                 })
                 .then(data => {
                     if (data.success) {

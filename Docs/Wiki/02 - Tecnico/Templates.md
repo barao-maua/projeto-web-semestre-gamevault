@@ -78,10 +78,10 @@ templates/
 `templates/components/navbar.html` adapta links conforme autenticacao:
 
 - Usuario logado: Inicio, Minha Biblioteca, Catalogo, Perfil e Sair.
-- Visitante: Inicio, Biblioteca, Avaliacoes, Login e Cadastro.
+- Visitante: Inicio, Catalogo, Sobre, Diferenciais, Login e Cadastro.
 - Mostra um chip de usuario com nome ou estado de visitante.
 - O chip do usuario autenticado funciona como atalho para o perfil.
-- O logout agora passa por um modal de confirmacao visual.
+- O logout agora passa por um modal de confirmacao visual com envio `POST`.
 
 ### Footer
 
@@ -115,9 +115,9 @@ templates/
 - status atual do jogo na biblioteca, quando houver;
 - modal visual para adicionar o jogo a biblioteca;
 - etapa de confirmacao apos adicionar;
-- sugestao opcional para avaliar o jogo;
+- sugestao opcional para registrar uma nova avaliacao no historico;
 - modal de avaliacao com feedback visual inline;
-- lista de avaliacoes existentes.
+- lista principal com apenas a review mais recente de cada usuario.
 
 ### Biblioteca
 
@@ -127,7 +127,9 @@ templates/
 - Status visual da entrada.
 - Coracoes dinamicos baseados na avaliacao pessoal do usuario.
 - Modal para editar status da entrada.
-- Acao JavaScript para remover da biblioteca usando `fetch`.
+- Modal para registrar nova avaliacao apos mudar status.
+- Modal visual de confirmacao e sucesso para remover da biblioteca.
+- Acoes JavaScript com helper global de `fetch` e tratamento de sessao expirada.
 
 ### Registro, Login e Perfil
 
@@ -135,7 +137,7 @@ Os templates em `templates/registration/` suportam autenticacao, perfil, verific
 
 - `login.html`: login por usuario ou email e link de esqueci minha senha.
 - `register.html`: cadastro com email obrigatorio e checklist visual de senha.
-- `profile.html`: edicao de username/email, status de verificacao e reenvio.
+- `profile.html`: edicao de username/email, status de verificacao, reenvio e logout via `POST`.
 - `password_reset_*.html`: fluxo completo de redefinicao de senha.
 - `verify_email_*.txt`: assunto e corpo do email de verificacao.
 

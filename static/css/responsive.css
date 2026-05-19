@@ -61,7 +61,6 @@
         flex-direction: column;
     }
 
-    .auth-grid,
     .stats-grid,
     .library-grid,
     .games-grid,
@@ -84,11 +83,6 @@
     .library-header,
     .catalog-header {
         align-items: flex-start;
-    }
-
-    .auth-panel + .auth-panel {
-        border-left: none;
-        border-top: 1px solid rgba(255, 255, 255, 0.32);
     }
 
     .detail-main {
@@ -125,10 +119,6 @@
 
     .nav-link {
         width: 100%;
-    }
-
-    .auth-panel {
-        padding: 28px 18px;
     }
 
     h1 {

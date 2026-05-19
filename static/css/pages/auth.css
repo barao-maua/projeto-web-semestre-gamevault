@@ -18,47 +18,6 @@
     font-weight: 600;
 }
 
-.auth-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0;
-    overflow: hidden;
-}
-
-.auth-panel {
-    padding: 36px 40px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-md);
-    background: rgba(47, 76, 103, 0.52);
-}
-
-.auth-panel + .auth-panel {
-    border-left: 1px solid rgba(255, 255, 255, 0.32);
-}
-
-.panel-title {
-    margin-bottom: 26px;
-    font-size: 1.45rem;
-    text-align: center;
-    letter-spacing: 0.03em;
-}
-
-.form-grid {
-    display: grid;
-    gap: 16px;
-}
-
-.mini-note {
-    margin-top: 16px;
-    text-align: center;
-    color: var(--muted);
-    font-size: 0.88rem;
-}
-
-.mini-note strong {
-    color: var(--text);
-}
-
 .password-checklist {
     display: grid;
     gap: 8px;

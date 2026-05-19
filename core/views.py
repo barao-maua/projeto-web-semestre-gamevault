@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -26,6 +26,14 @@ from .forms import (
     GameVaultReviewForm,
     GameVaultUserCreationForm,
 )
+from .services.steam_auth import (
+    build_steam_login_url,
+    get_or_create_user_from_steam_identity,
+    refresh_steam_link_profile,
+    validate_steam_openid_callback,
+)
+from .services.steam import SteamSyncError
+from .services.steam_library import sync_owned_games_for_user
 
 
 IMAGE_VARIANT_EXTENSIONS = (".jpg", ".jpeg", ".png", ".webp", ".avif")
@@ -91,6 +99,28 @@ def attach_variant_cover_metadata(games, variant, image_attribute, position_attr
 
 def request_expects_json(request):
     return request.headers.get("Content-Type", "").startswith("application/json")
+
+
+def get_latest_reviews_for_user_and_games(user, game_ids):
+    latest_reviews = {}
+    reviews = Review.objects.filter(user=user, game_id__in=game_ids).order_by(
+        "game_id", "-created_at"
+    )
+    for review in reviews:
+        latest_reviews.setdefault(review.game_id, review)
+    return latest_reviews
+
+
+def get_latest_reviews_for_game(game):
+    latest_reviews = {}
+    reviews = Review.objects.filter(game=game).select_related("user").order_by(
+        "user_id", "-created_at"
+    )
+    for review in reviews:
+        latest_reviews.setdefault(review.user_id, review)
+    return sorted(
+        latest_reviews.values(), key=lambda review: review.created_at, reverse=True
+    )
 
 
 def get_or_create_email_verification(user):
@@ -179,6 +209,48 @@ def login_view(request):
     return render(request, "registration/login.html", {"form": form, "next": next_url})
 
 
+def steam_login_view(request):
+    return redirect(build_steam_login_url(request))
+
+
+def steam_callback_view(request):
+    try:
+        steam_id = validate_steam_openid_callback(request.GET)
+        user, steam_link, created = get_or_create_user_from_steam_identity(steam_id)
+        try:
+            steam_link = refresh_steam_link_profile(steam_link)
+        except SteamSyncError:
+            pass
+
+        login(request, user)
+
+        try:
+            sync_result = sync_owned_games_for_user(user)
+            messages.success(
+                request,
+                "Login com Steam realizado com sucesso. "
+                f"Biblioteca sincronizada: {sync_result['created_entries']} jogo(s) novos, "
+                f"{sync_result['existing_entries']} ja existentes.",
+            )
+        except SteamSyncError as exc:
+            messages.warning(
+                request,
+                "Login com Steam realizado, mas nao foi possivel sincronizar a biblioteca agora: "
+                f"{exc}",
+            )
+
+        if created:
+            messages.info(
+                request,
+                "Sua conta local do GameVault foi criada automaticamente a partir do login Steam.",
+            )
+        return redirect("core:library")
+    except SteamSyncError as exc:
+        messages.error(request, f"Nao foi possivel entrar com Steam: {exc}")
+        return redirect("core:login")
+
+
+@require_POST
 def logout_view(request):
     logout(request)
     messages.info(request, "Você saiu com sucesso.")
@@ -215,6 +287,7 @@ def register_view(request):
 @login_required
 def profile_view(request):
     verification = get_or_create_email_verification(request.user)
+    steam_link = getattr(request.user, "steam_account_link", None)
 
     if request.method == "POST":
         old_email = request.user.email
@@ -246,8 +319,31 @@ def profile_view(request):
     return render(
         request,
         "registration/profile.html",
-        {"form": form, "email_verification": verification},
+        {
+            "form": form,
+            "email_verification": verification,
+            "steam_link": steam_link,
+        },
     )
+
+
+@login_required
+@require_POST
+def steam_sync_library_view(request):
+    if not hasattr(request.user, "steam_account_link"):
+        messages.error(request, "Sua conta nao esta autenticada pela Steam.")
+        return redirect("core:profile")
+
+    try:
+        result = sync_owned_games_for_user(request.user)
+        messages.success(
+            request,
+            "Biblioteca Steam sincronizada com sucesso. "
+            f"Novos jogos: {result['created_entries']}. Ja existentes: {result['existing_entries']}. Ignorados: {result['skipped_entries']}."
+        )
+    except SteamSyncError as exc:
+        messages.error(request, f"Nao foi possivel sincronizar sua biblioteca Steam: {exc}")
+    return redirect("core:profile")
 
 
 def verify_email_view(request, token):
@@ -304,10 +400,7 @@ def library_view(request):
         LibraryEntry.objects.filter(user=request.user).select_related("game")
     )
     game_ids = [entry.game_id for entry in library_entries]
-    reviews_by_game_id = {
-        review.game_id: review
-        for review in Review.objects.filter(user=request.user, game_id__in=game_ids)
-    }
+    reviews_by_game_id = get_latest_reviews_for_user_and_games(request.user, game_ids)
 
     for entry in library_entries:
         entry.user_review = reviews_by_game_id.get(entry.game_id)
@@ -516,10 +609,14 @@ def game_detail_view(request, game_id):
         except LibraryEntry.DoesNotExist:
             pass
 
-        user_review = Review.objects.filter(user=request.user, game=game).first()
+        user_review = (
+            Review.objects.filter(user=request.user, game=game)
+            .order_by("-created_at")
+            .first()
+        )
 
     # Obter avaliações do jogo
-    reviews = Review.objects.filter(game=game).select_related("user")
+    reviews = get_latest_reviews_for_game(game)
 
     context = {
         "game": game,
@@ -552,8 +649,7 @@ def add_review_view(request, game_id):
         )
 
     game = get_object_or_404(Game, id=game_id)
-    review = Review.objects.filter(user=request.user, game=game).first()
-    form = GameVaultReviewForm(form_data, instance=review)
+    form = GameVaultReviewForm(form_data)
 
     if not form.is_valid():
         message = form.errors.get("rating", form.non_field_errors())
@@ -566,7 +662,6 @@ def add_review_view(request, game_id):
         messages.error(request, error_message)
         return redirect("core:game_detail", game_id=game_id)
 
-    created = review is None
     review = form.save(commit=False)
     review.user = request.user
     review.game = game
@@ -578,7 +673,7 @@ def add_review_view(request, game_id):
             {
                 "success": True,
                 "message": message,
-                "created": created,
+                "created": True,
             }
         )
 

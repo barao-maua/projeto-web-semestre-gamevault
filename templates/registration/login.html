@@ -55,6 +55,9 @@
             <button type="submit" class="button">Entrar</button>
         </div>
     </form>
+    <div class="form-submit">
+        <a href="{% url 'core:steam_login' %}" class="ghost-button">Entrar com Steam</a>
+    </div>
     <div class="auth-footer">
         <p>Não tem uma conta? <a href="{% url 'core:register' %}">Cadastre-se</a></p>
         <p><a href="{% url 'core:password_reset' %}">Esqueci minha senha</a></p>

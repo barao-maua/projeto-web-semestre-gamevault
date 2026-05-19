@@ -46,6 +46,7 @@ O template renderiza:
 - contraste reforcado no campo de busca;
 - grid de jogos;
 - capa ou placeholder;
+- selo visual para jogos sincronizados da Steam;
 - genero;
 - descricao resumida;
 - link para detalhes.
@@ -58,6 +59,8 @@ O template mostra:
 
 - capa;
 - titulo;
+- selo de origem Steam quando `steam_app_id` existe;
+- ultima sincronizacao quando disponivel;
 - genero usado visualmente como plataforma;
 - data de lancamento;
 - descricao;
@@ -93,6 +96,17 @@ Apos adicionar um jogo a biblioteca, o modal mostra uma etapa de confirmacao.
 - O modal de avaliacao recebeu fundo mais opaco e feedback visual inline.
 - O fluxo de adicionar a biblioteca ganhou uma etapa de confirmacao com CTA de avaliacao.
 - A busca do catalogo recebeu ajustes de contraste e tratamento de autofill do navegador.
+
+## Evolucao Steam - Fase 1
+
+O catalogo continua funcionando 100% a partir do banco local, mas a base para integracao com Steam ja foi preparada:
+
+- `Game` agora aceita `steam_app_id`;
+- existe servico interno desacoplado em `core/services/steam.py`;
+- existe comando tecnico `python manage.py sync_steam_game <app_id>`;
+- o admin passou a exibir campos de sincronizacao.
+
+Na Fase 1, a origem externa ainda e mockada para validar arquitetura e fluxo de sincronizacao sem depender de uma API real.
 
 ## Capas E Variantes
 

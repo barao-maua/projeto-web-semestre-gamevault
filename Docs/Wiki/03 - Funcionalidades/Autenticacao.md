@@ -27,7 +27,7 @@ A autenticacao do [[GameVault]] usa os recursos padrao do Django para cadastro, 
 | Caminho | Nome | View | Template |
 | --- | --- | --- | --- |
 | `/login/` | `core:login` | `login_view` | `registration/login.html` |
-| `/logout/` | `core:logout` | `logout_view` | nenhum template; redireciona |
+| `/logout/` | `core:logout` | `logout_view` | nenhum template; aceita `POST` e redireciona |
 | `/register/` | `core:register` | `register_view` | `registration/register.html` |
 | `/profile/` | `core:profile` | `profile_view` | `registration/profile.html` |
 | `/verify-email/<token>/` | `core:verify_email` | `verify_email_view` | nenhum template; redireciona |
@@ -53,11 +53,11 @@ Fluxo:
 5. O sistema cria registro de verificacao de email pendente.
 6. O sistema tenta enviar link de verificacao por email.
 7. O sistema faz login automatico.
-8. O usuario e redirecionado para a home.
+8. O usuario e redirecionado para a biblioteca.
 
 ## Login
 
-`login_view` usa `GameVaultAuthenticationForm` e `authenticate`.
+`login_view` usa `GameVaultAuthenticationForm`.
 
 Fluxo:
 
@@ -70,7 +70,13 @@ Fluxo:
 
 ## Logout
 
-`logout_view` encerra a sessao com `logout(request)` e redireciona para a home.
+`logout_view` agora exige `POST`, encerra a sessao com `logout(request)` e redireciona para a home.
+
+Na interface:
+
+- a navbar de usuario autenticado abre um modal de confirmacao visual;
+- o botao final desse modal envia um formulario `POST` para `/logout/`;
+- o perfil tambem expoe um botao de sair via `POST`.
 
 ## Perfil
 
@@ -105,7 +111,7 @@ Fluxo:
 
 `templates/components/navbar.html` muda os links conforme `user.is_authenticated`:
 
-- Visitante: Inicio, Biblioteca, Avaliacoes, Login e Cadastro.
+- Visitante: Inicio, Catalogo, Sobre, Diferenciais, Login e Cadastro.
 - Usuario logado: Inicio, Minha Biblioteca, Catalogo, Perfil e Sair.
 
 ## Relacoes Com Outras Areas

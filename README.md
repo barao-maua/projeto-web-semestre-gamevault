@@ -135,16 +135,16 @@ Exibir os jogos cadastrados pelo usuário e permitir o gerenciamento da bibliote
 #### Funcionalidades
 
 - Visualização da lista de jogos
-- Filtro por status
-- Adicionar novo jogo
-- Editar ou remover jogo
+- Editar status do jogo
+- Remover jogo da biblioteca
+- Abrir modal para registrar nova avaliação após mudar status
 
 #### Elementos principais
 
-- Barra de busca
 - Cards de jogos
-- Botão **Adicionar Jogo**
-- Filtro por status
+- Botão **Explorar Catálogo**
+- Botão **Editar**
+- Botão **Remover**
 
 ---
 
@@ -159,7 +159,7 @@ Permitir visualizar informações detalhadas e registrar avaliações.
 - Alterar status do jogo
 - Avaliar jogo
 - Escrever review
-- Atualizar review existente do mesmo usuario
+- Registrar nova review no historico do mesmo usuario
 
 #### Elementos principais
 
@@ -250,6 +250,11 @@ created_at
 updated_at
 ```
 
+Observacao:
+
+- Um mesmo usuario pode registrar varias reviews para o mesmo jogo ao longo do tempo.
+- A interface principal mostra apenas a review mais recente de cada usuario.
+
 ---
 
 ### GameList
@@ -326,7 +331,7 @@ Atualmente o projeto esta configurado para ser executado no **Windows PowerShell
 ### 1. Abrir a pasta do projeto
 
 ```powershell
-cd "C:\Users\bruno\OneDrive\Area de Trabalho\Codigos\projeto-web-semestre-gamevault"
+cd "C:\Projetos\ProgramacaoWeb\Trabalhos\1Trabalho\projeto-web-semestre-gamevault"
 ```
 
 ### 2. Ativar o ambiente virtual
@@ -346,9 +351,9 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 Antes de subir o servidor pela primeira vez, aplique as migracoes, carregue os jogos iniciais e crie o superusuario de demonstracao:
 
 ```powershell
-python manage.py migrate
-python manage.py seed_games
-python manage.py create_demo_superuser
+python .\manage.py migrate
+python .\manage.py seed_games
+python .\manage.py create_demo_superuser
 ```
 
 Credenciais padrao do admin de demonstracao:
@@ -366,13 +371,13 @@ Ao rodar `python manage.py create_demo_superuser`, o projeto tambem prepara um e
 - review de exemplo cadastrada para o mesmo jogo
 
 ```powershell
-python manage.py runserver
+python .\manage.py runserver
 ```
 
 Se preferir, tambem e possivel rodar sem ativar o ambiente virtual:
 
 ```powershell
-.\.venv\Scripts\python.exe manage.py runserver
+.\.venv\Scripts\python.exe .\manage.py runserver
 ```
 
 ### 4. Acessar no navegador
@@ -388,7 +393,7 @@ http://127.0.0.1:8000/
 Para validar a configuracao do Django:
 
 ```powershell
-python manage.py check
+python .\manage.py check
 ```
 
 ### 6. Acessar o Django Admin

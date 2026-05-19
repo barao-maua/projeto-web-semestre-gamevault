@@ -35,6 +35,7 @@ Esta nota centraliza tarefas, inconsistencias e pontos que precisam de revisao n
 - [x] Revisar mensagens de erro retornadas pelos endpoints JSON.
 - [x] Implementar verificacao de email e redefinicao de senha por email.
 - [x] Permitir login por usuario ou email.
+- [x] Permitir historico de reviews por usuario, exibindo apenas a avaliacao mais recente na interface principal.
 
 ## Interface
 
@@ -50,6 +51,7 @@ Esta nota centraliza tarefas, inconsistencias e pontos que precisam de revisao n
 - [x] Revisar `.gitignore` para ambiente Python/Django.
 - [ ] Rodar `python manage.py check` no ambiente local antes da proxima entrega.
 - [x] Verificar se as views JSON principais usam `@require_POST` nos endpoints de alteracao.
+- [x] Melhorar falha controlada de `fetch` para sessao expirada e resposta nao JSON.
 - [ ] Avaliar tratamento de excecoes genericas em `core/views.py`.
 
 ## Obsidian/Wiki

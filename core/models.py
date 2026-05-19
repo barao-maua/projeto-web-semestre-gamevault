@@ -5,6 +5,13 @@ from django.contrib.auth.models import User
 class Game(models.Model):
     """Modelo base para jogos no catálogo"""
 
+    steam_app_id = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        unique=True,
+        verbose_name="Steam App ID",
+    )
+    steam_type = models.CharField(max_length=30, blank=True, verbose_name="Tipo Steam")
     title = models.CharField(max_length=200, verbose_name="Título")
     description = models.TextField(blank=True, verbose_name="Descrição")
     release_date = models.DateField(
@@ -12,6 +19,9 @@ class Game(models.Model):
     )
     genre = models.CharField(max_length=100, blank=True, verbose_name="Gênero")
     cover_image = models.URLField(blank=True, verbose_name="URL da Capa")
+    last_synced_at = models.DateTimeField(
+        null=True, blank=True, verbose_name="Última sincronização"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -79,10 +89,6 @@ class Review(models.Model):
     class Meta:
         verbose_name = "Avaliação"
         verbose_name_plural = "Avaliações"
-        unique_together = [
-            "user",
-            "game",
-        ]  # Um usuário só pode ter uma avaliação por jogo
         ordering = ["-created_at"]
 
     def __str__(self):
@@ -158,3 +164,36 @@ class UserEmailVerification(models.Model):
     def __str__(self):
         status = "verificado" if self.is_verified else "pendente"
         return f"{self.user.username} - {status}"
+
+
+class SteamAccountLink(models.Model):
+    """Associacao automatica entre usuario local e conta Steam."""
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="steam_account_link",
+        verbose_name="Usuario",
+    )
+    steam_id = models.CharField(max_length=32, unique=True, verbose_name="Steam ID")
+    persona_name = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name="Nome publico Steam",
+    )
+    profile_url = models.URLField(blank=True, verbose_name="URL do perfil Steam")
+    avatar_url = models.URLField(blank=True, verbose_name="Avatar Steam")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Criado em")
+    last_login_at = models.DateTimeField(
+        null=True, blank=True, verbose_name="Ultimo login Steam"
+    )
+    last_library_sync_at = models.DateTimeField(
+        null=True, blank=True, verbose_name="Ultima sincronizacao da biblioteca"
+    )
+
+    class Meta:
+        verbose_name = "Conta Steam vinculada"
+        verbose_name_plural = "Contas Steam vinculadas"
+
+    def __str__(self):
+        return f"{self.user.username} - Steam {self.steam_id}"

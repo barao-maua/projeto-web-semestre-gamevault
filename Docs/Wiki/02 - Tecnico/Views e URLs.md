@@ -25,6 +25,7 @@ As rotas do [[GameVault]] sao definidas em `core/urls.py` e apontam para funcoes
 
 - `/admin/`: admin do Django.
 - `/`: todas as rotas do app `core`.
+- `/media/`: arquivos locais servidos apenas em `DEBUG`, preparando uploads futuros como foto de perfil.
 
 ## Rotas Do App Core
 
@@ -34,7 +35,7 @@ As rotas do [[GameVault]] sao definidas em `core/urls.py` e apontam para funcoes
 | `/sobre/` | `core:sobre` | `sobre_view` | Pagina institucional. |
 | `/diferenciais/` | `core:diferenciais` | `diferenciais_view` | Pagina institucional de diferenciais. |
 | `/login/` | `core:login` | `login_view` | Login de usuario. |
-| `/logout/` | `core:logout` | `logout_view` | Encerramento de sessao. |
+| `/logout/` | `core:logout` | `logout_view` | Encerramento de sessao via `POST`. |
 | `/password-reset/` | `core:password_reset` | `PasswordResetView` | Solicita redefinicao de senha por email. |
 | `/password-reset/done/` | `core:password_reset_done` | `PasswordResetDoneView` | Confirma solicitacao de reset. |
 | `/reset/<uidb64>/<token>/` | `core:password_reset_confirm` | `PasswordResetConfirmView` | Define nova senha. |
@@ -49,7 +50,7 @@ As rotas do [[GameVault]] sao definidas em `core/urls.py` e apontam para funcoes
 | `/remove-from-library/` | `core:remove_from_library` | `remove_from_library_view` | Remove item da biblioteca via JSON. |
 | `/catalog/` | `core:game_catalog` | `game_catalog_view` | Lista e busca jogos. |
 | `/game/<game_id>/` | `core:game_detail` | `game_detail_view` | Exibe detalhes de um jogo. |
-| `/game/<game_id>/review/` | `core:add_review` | `add_review_view` | Cria ou atualiza avaliacao via JSON. |
+| `/game/<game_id>/review/` | `core:add_review` | `add_review_view` | Cria nova avaliacao no historico do usuario. |
 
 ## Grupos De Views
 
@@ -64,7 +65,7 @@ As rotas do [[GameVault]] sao definidas em `core/urls.py` e apontam para funcoes
 ### Autenticacao
 
 - `login_view`: usa `GameVaultAuthenticationForm`, aceita username ou email e redireciona para a biblioteca quando nao ha `next`.
-- `logout_view`: encerra a sessao e redireciona para home.
+- `logout_view`: exige `POST`, encerra a sessao e redireciona para home.
 - `register_view`: usa `GameVaultUserCreationForm`, cria usuario com email, envia verificacao e autentica.
 - `profile_view`: exige login com `@login_required` e permite editar username/email.
 - `verify_email_view`: valida token e marca email como verificado.
@@ -75,11 +76,29 @@ O layout base tambem pode exibir um banner global quando o usuario autenticado a
 
 ### Biblioteca e avaliacoes
 
-- `library_view`: exige login e lista entradas do usuario com `select_related("game")`.
+- `library_view`: exige login, lista entradas do usuario com `select_related("game")` e anexa a review mais recente do usuario para cada jogo.
 - `add_to_library_view`: exige login, aceita JSON e `POST` tradicional, e usa `get_or_create` para evitar duplicidade.
 - `update_library_entry_view`: exige login e `POST`; altera status e progresso.
 - `remove_from_library_view`: exige login e `POST`; remove entrada da biblioteca.
-- `add_review_view`: exige login; cria ou atualiza avaliacao do usuario para um jogo.
+- `add_review_view`: exige login; cria uma nova avaliacao no historico do usuario para um jogo.
+
+Os fluxos AJAX principais agora usam um helper comum no frontend para lidar com:
+
+- sessao expirada com retorno de HTML de login;
+- resposta nao JSON;
+- CSRF e `credentials` de mesma origem.
+
+## Operacoes Tecnicas De Integracao
+
+A Fase 1 da integracao Steam nao adiciona novas rotas publicas.
+
+Ela adiciona operacoes tecnicas em outras camadas:
+
+- servico interno `core/services/steam.py`;
+- comando `python manage.py sync_steam_game <app_id>`;
+- suporte visual no `GameAdmin` para `steam_app_id` e `last_synced_at`.
+
+O catalogo continua lendo apenas do banco local.
 
 ## Helpers De Imagem
 

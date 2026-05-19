@@ -73,6 +73,37 @@
         <p><strong>Data de cadastro:</strong> {{ user.date_joined|date:"d/m/Y H:i" }}</p>
     </div>
 
-    <a href="{% url 'core:logout' %}" class="ghost-button">Sair</a>
+    <div class="email-status-card {% if steam_link %}is-verified{% else %}is-pending{% endif %}">
+        <span>Conta Steam</span>
+        <strong>
+            {% if steam_link %}
+                {{ steam_link.persona_name|default:steam_link.steam_id }}
+            {% else %}
+                Nenhuma conta Steam conectada
+            {% endif %}
+        </strong>
+        {% if steam_link %}
+        <small>Steam ID: {{ steam_link.steam_id }}</small>
+        {% if steam_link.last_library_sync_at %}
+        <small>Ultima sincronizacao da biblioteca em {{ steam_link.last_library_sync_at|date:"d/m/Y H:i" }}</small>
+        {% endif %}
+        <div class="profile-actions">
+            <form method="post" action="{% url 'core:steam_sync_library' %}" class="profile-secondary-action">
+                {% csrf_token %}
+                <button type="submit" class="button">Sincronizar biblioteca Steam</button>
+            </form>
+        </div>
+        {% else %}
+        <small>Use o login pela Steam para criar automaticamente sua conta e importar sua biblioteca.</small>
+        <div class="profile-actions">
+            <a href="{% url 'core:steam_login' %}" class="ghost-button">Entrar com Steam</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <form method="post" action="{% url 'core:logout' %}" class="profile-secondary-action">
+        {% csrf_token %}
+        <button type="submit" class="ghost-button">Sair</button>
+    </form>
 </div>
 {% endblock %}

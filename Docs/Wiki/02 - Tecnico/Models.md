@@ -25,15 +25,18 @@ Representa um jogo disponivel no catalogo.
 
 Campos principais:
 
+- `steam_app_id`: chave opcional da integracao com Steam.
 - `title`: titulo do jogo.
 - `description`: descricao opcional.
 - `release_date`: data de lancamento opcional.
 - `genre`: genero opcional.
 - `cover_image`: URL da capa.
+- `last_synced_at`: data e hora da ultima sincronizacao externa.
 - `created_at` e `updated_at`: controle de criacao e atualizacao.
 
 Regras:
 
+- `steam_app_id` e opcional, mas deve ser unico quando preenchido.
 - Ordenacao padrao por `title`.
 - Nome amigavel no admin: `Jogo` e `Jogos`.
 
@@ -75,7 +78,9 @@ Campos principais:
 
 Regra importante:
 
-- `unique_together = ["user", "game"]`: um usuario so pode ter uma avaliacao por jogo.
+- Nao existe mais restricao de unicidade por `user + game`.
+- Um usuario pode registrar varias reviews para o mesmo jogo ao longo do tempo.
+- A interface principal usa apenas a review mais recente de cada usuario como estado visivel principal.
 
 ### GameList
 
@@ -139,10 +144,12 @@ erDiagram
 ## Observacoes
 
 - O projeto usa o model `User` padrao de `django.contrib.auth.models`.
-- As constraints evitam duplicacao de jogos na biblioteca, avaliacoes duplicadas e itens duplicados em listas.
+- As constraints evitam duplicacao de jogos na biblioteca e itens duplicados em listas.
+- Reviews duplicadas por usuario/jogo agora fazem parte do historico funcional do produto.
 - O email do usuario fica em `User.email`, enquanto a verificacao desse email fica separada em `UserEmailVerification`.
 - `LibraryEntry.progress` continua existindo no model, mas a interface atual da entrega prioriza status e avaliacao na experiencia principal.
 - O `README` principal foi alinhado ao codigo atual durante a limpeza do vault.
+- A Fase 1 da integracao Steam adicionou chave externa e timestamp de sincronizacao sem alterar a leitura local do catalogo.
 
 ## Notas Relacionadas
 

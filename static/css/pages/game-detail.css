@@ -55,6 +55,19 @@
     margin-bottom: 18px;
 }
 
+.detail-source-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.detail-source-row small {
+    color: var(--muted);
+    font-size: 0.88rem;
+}
+
 .game-detail-meta-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -102,38 +115,6 @@
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
-}
-
-.inline-action-form {
-    display: flex;
-    align-items: end;
-    gap: 12px;
-}
-
-.inline-action-form--stacked {
-    display: grid;
-    gap: 10px;
-    min-width: min(100%, 280px);
-}
-
-.inline-form-label {
-    color: var(--muted);
-    font-size: 0.86rem;
-}
-
-.inline-form-select {
-    width: 100%;
-    border: 1px solid transparent;
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    color: var(--text);
-    background: #365777;
-    outline: none;
-}
-
-.inline-form-select:focus {
-    border-color: rgba(181, 224, 0, 0.6);
-    box-shadow: 0 0 0 3px rgba(181, 224, 0, 0.12);
 }
 
 .game-detail-description {
@@ -199,10 +180,6 @@
     align-items: center;
 }
 
-.review-form-card {
-    margin-top: 16px;
-}
-
 .review-header {
     display: flex;
     align-items: center;
@@ -236,19 +213,8 @@
     color: var(--muted);
 }
 
-.modal {
-    position: fixed;
-    inset: 0;
-    display: none;
-    place-items: center;
-    padding: 20px;
-    background: rgba(9, 13, 20, 0.72);
-    z-index: 30;
-}
-
 .modal-content {
     width: min(520px, 100%);
-    position: relative;
 }
 
 .library-modal-content,
@@ -259,18 +225,6 @@
 
 .review-modal-content {
     width: min(520px, 100%);
-}
-
-.modal-description {
-    margin-bottom: 18px;
-}
-
-.close-modal {
-    position: absolute;
-    top: 12px;
-    right: 16px;
-    font-size: 1.5rem;
-    cursor: pointer;
 }
 
 .form-group {
@@ -324,33 +278,6 @@
 
 .rating-select.hearts input[type="radio"] {
     display: none;
-}
-
-.status-card-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-}
-
-.status-card {
-    display: grid;
-    gap: 6px;
-    min-height: 96px;
-    padding: 16px;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    color: var(--text);
-    text-align: left;
-    background: rgba(18, 26, 37, 0.58);
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.status-card:hover,
-.status-card.is-selected {
-    border-color: rgba(181, 224, 0, 0.85);
-    background: rgba(181, 224, 0, 0.18);
-    transform: translateY(-1px);
 }
 
 .library-modal-content .full-button {
@@ -414,15 +341,6 @@
 
 .review-feedback.is-error {
     color: #ff9ca5;
-}
-
-.status-card strong {
-    color: var(--text);
-}
-
-.status-card span {
-    color: var(--muted);
-    font-size: 0.9rem;
 }
 
 @media (max-width: 560px) {

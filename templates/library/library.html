@@ -49,11 +49,18 @@
                     class="library-action-button edit-library-button"
                     type="button"
                     data-entry-id="{{ entry.id }}"
+                    data-game-id="{{ entry.game.id }}"
                     data-game-title="{{ entry.game.title }}"
                     data-status="{{ entry.status }}"
+                    data-has-review="{{ entry.user_review|yesno:'true,false' }}"
                 >Editar</button>
                 <a href="{% url 'core:game_detail' entry.game.id %}" class="library-action-button library-action-button--primary">Detalhes</a>
-                <button class="library-action-button library-action-button--danger" type="button" onclick="removeFromLibrary({{ entry.id }})">Remover</button>
+                <button
+                    class="library-action-button library-action-button--danger remove-library-button"
+                    type="button"
+                    data-entry-id="{{ entry.id }}"
+                    data-game-title="{{ entry.game.title }}"
+                >Remover</button>
             </div>
         </div>
         {% endfor %}
@@ -106,19 +113,99 @@
         </form>
     </div>
 </div>
+
+<div id="library-review-modal" class="library-modal" aria-hidden="true">
+    <div class="library-modal-content library-review-modal-content" role="dialog" aria-modal="true" aria-labelledby="library-review-title">
+        <button class="close-modal" type="button" onclick="closeLibraryReviewModal()" aria-label="Fechar">&times;</button>
+        <p class="eyebrow">Atualizar avaliação</p>
+        <h2 id="library-review-title">Avaliar jogo</h2>
+        <p class="modal-description">Sua opinião pode mudar com o tempo. Atualize a nota e o comentário sempre que quiser.</p>
+
+        <form id="library-review-form">
+            <div class="form-group">
+                <label for="library-review-rating">Nota:</label>
+                <div class="rating-select hearts" id="library-review-rating">
+                    {% for i in "12345" %}
+                    <input type="radio" id="library-rating{{ forloop.counter }}" name="rating" value="{{ forloop.counter }}">
+                    <label for="library-rating{{ forloop.counter }}">♥</label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="library-review-comment">Comentário:</label>
+                <textarea id="library-review-comment" name="comment" rows="4" placeholder="Escreva sua nova opinião sobre o jogo..."></textarea>
+            </div>
+
+            <p id="library-review-feedback" class="library-modal-feedback" role="status"></p>
+
+            <div class="library-review-actions">
+                <button type="submit" class="button">Salvar avaliação</button>
+                <button type="button" class="ghost-button" onclick="skipLibraryReview()">Agora não</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="remove-library-modal" class="library-modal" aria-hidden="true">
+    <div class="library-modal-content library-remove-modal-content" role="dialog" aria-modal="true" aria-labelledby="remove-library-title">
+        <button class="close-modal" type="button" onclick="closeRemoveLibraryModal()" aria-label="Fechar">&times;</button>
+        <div id="remove-library-confirmation">
+            <p class="eyebrow">Remover da biblioteca</p>
+            <h2 id="remove-library-title">Excluir jogo da coleção?</h2>
+            <p id="remove-library-message" class="modal-description">Este jogo será removido da sua biblioteca.</p>
+            <p id="remove-library-feedback" class="library-modal-feedback" role="status"></p>
+            <div class="library-review-actions">
+                <button type="button" class="ghost-button" onclick="closeRemoveLibraryModal()">Cancelar</button>
+                <button type="button" class="button library-remove-button" onclick="confirmRemoveFromLibrary()">Remover</button>
+            </div>
+        </div>
+
+        <div id="remove-library-success" class="library-success" hidden>
+            <span class="library-success-icon">✓</span>
+            <h3 id="remove-library-success-title">Jogo removido!</h3>
+            <p id="remove-library-success-message">O jogo foi removido da sua biblioteca.</p>
+            <div class="library-success-actions">
+                <button type="button" class="button" onclick="reloadAfterLibraryRemoval()">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+let pendingReviewGameId = null;
+let pendingReviewTitle = '';
+let pendingReviewStatus = 'plan_to_play';
+let shouldReloadAfterEditClose = false;
+let shouldReloadAfterReviewClose = false;
+let shouldReloadAfterRemoveClose = false;
+let pendingRemovalEntryId = null;
+let pendingRemovalGameTitle = '';
+
+const reviewPromptByStatus = {
+    playing: 'Quer deixar uma primeira impressão enquanto joga?',
+    completed: 'Agora que concluiu, vale registrar a avaliação final.',
+    paused: 'Quer salvar uma opinião parcial antes de voltar?',
+    dropped: 'Se desistiu do jogo, conte o motivo na sua avaliação.'
+};
+
 function openEditLibraryModal(button) {
     const entryId = button.dataset.entryId;
+    const gameId = button.dataset.gameId;
     const title = button.dataset.gameTitle;
     const status = button.dataset.status;
+    const hasReview = button.dataset.hasReview === 'true';
 
     document.getElementById('edit-entry-id').value = entryId;
     document.getElementById('edit-library-title').textContent = `Atualizar ${title}`;
     setSelectedLibraryStatus(status);
     setEditFeedback('');
+
+    pendingReviewGameId = gameId;
+    pendingReviewTitle = title;
+    seedLibraryReviewForm({ hasReview: hasReview });
 
     const modal = document.getElementById('edit-library-modal');
     modal.style.display = 'grid';
@@ -126,11 +213,18 @@ function openEditLibraryModal(button) {
 }
 
 function closeEditLibraryModal() {
+    if (shouldReloadAfterEditClose) {
+        location.reload();
+        return;
+    }
+
     const modal = document.getElementById('edit-library-modal');
     modal.style.display = 'none';
     modal.setAttribute('aria-hidden', 'true');
     document.getElementById('edit-library-form').reset();
     setEditFeedback('');
+    pendingReviewStatus = 'plan_to_play';
+    shouldReloadAfterEditClose = false;
 }
 
 function setSelectedLibraryStatus(status) {
@@ -147,40 +241,137 @@ function setEditFeedback(message, isError = false) {
     feedback.classList.toggle('is-error', isError);
 }
 
-function removeFromLibrary(entryId) {
-    if (confirm('Tem certeza que deseja remover este jogo da sua biblioteca?')) {
-        fetch("{% url 'core:remove_from_library' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({entry_id: entryId})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Erro: ' + data.message);
-            }
-        });
-    }
+function setLibraryReviewFeedback(message, isError = false) {
+    const feedback = document.getElementById('library-review-feedback');
+    feedback.textContent = message;
+    feedback.classList.toggle('is-error', isError);
 }
 
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
+function seedLibraryReviewForm({ hasReview }) {
+    document.getElementById('library-review-title').textContent = hasReview
+        ? `Nova avaliação para ${pendingReviewTitle}`
+        : `Avaliar ${pendingReviewTitle}`;
+    document.getElementById('library-review-comment').value = '';
+    setLibraryReviewFeedback('');
+
+    const heartLabels = document.querySelectorAll('#library-review-modal .rating-select.hearts label');
+    heartLabels.forEach(label => label.classList.remove('selected'));
+    document.querySelectorAll('#library-review-modal input[name="rating"]').forEach(input => {
+        input.checked = false;
+    });
+}
+
+function shouldPromptReview(status) {
+    return Object.prototype.hasOwnProperty.call(reviewPromptByStatus, status);
+}
+
+function openLibraryReviewModal() {
+    if (!pendingReviewGameId) {
+        location.reload();
+        return;
     }
-    return cookieValue;
+
+    const title = pendingReviewTitle || 'jogo';
+    const description = reviewPromptByStatus[pendingReviewStatus]
+        || 'Registre uma nova avaliação para manter seu histórico de opinião.';
+    document.getElementById('library-review-title').textContent = `Avaliar ${title}`;
+    document.querySelector('#library-review-modal .modal-description').textContent = description;
+
+    closeEditLibraryModal();
+    const modal = document.getElementById('library-review-modal');
+    modal.style.display = 'grid';
+    modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeLibraryReviewModal() {
+    if (shouldReloadAfterReviewClose) {
+        location.reload();
+        return;
+    }
+
+    const modal = document.getElementById('library-review-modal');
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+    setLibraryReviewFeedback('');
+    shouldReloadAfterReviewClose = false;
+}
+
+function skipLibraryReview() {
+    closeLibraryReviewModal();
+    location.reload();
+}
+
+function isSessionExpiredError(message) {
+    return typeof message === 'string' && message.includes('sessão expirou');
+}
+
+function openRemoveLibraryModal(button) {
+    pendingRemovalEntryId = button.dataset.entryId;
+    pendingRemovalGameTitle = button.dataset.gameTitle;
+    shouldReloadAfterRemoveClose = false;
+
+    document.getElementById('remove-library-title').textContent = `Remover ${pendingRemovalGameTitle}?`;
+    document.getElementById('remove-library-message').textContent = `"${pendingRemovalGameTitle}" será removido da sua biblioteca. Você poderá adicioná-lo novamente depois, se quiser.`;
+    document.getElementById('remove-library-feedback').textContent = '';
+    document.getElementById('remove-library-feedback').classList.remove('is-error');
+    document.getElementById('remove-library-confirmation').hidden = false;
+    document.getElementById('remove-library-success').hidden = true;
+
+    const modal = document.getElementById('remove-library-modal');
+    modal.style.display = 'grid';
+    modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeRemoveLibraryModal() {
+    if (shouldReloadAfterRemoveClose) {
+        location.reload();
+        return;
+    }
+
+    const modal = document.getElementById('remove-library-modal');
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+    pendingRemovalEntryId = null;
+    pendingRemovalGameTitle = '';
+    shouldReloadAfterRemoveClose = false;
+}
+
+function reloadAfterLibraryRemoval() {
+    location.reload();
+}
+
+function confirmRemoveFromLibrary() {
+    if (!pendingRemovalEntryId) {
+        closeRemoveLibraryModal();
+        return;
+    }
+
+    const feedback = document.getElementById('remove-library-feedback');
+    feedback.textContent = 'Removendo jogo da biblioteca...';
+    feedback.classList.remove('is-error');
+
+    GameVaultHTTP.fetchJson("{% url 'core:remove_from_library' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({entry_id: pendingRemovalEntryId})
+        })
+        .then(data => {
+            if (data.success) {
+                document.getElementById('remove-library-confirmation').hidden = true;
+                document.getElementById('remove-library-success-title').textContent = 'Jogo removido da biblioteca!';
+                document.getElementById('remove-library-success-message').textContent = `"${pendingRemovalGameTitle}" foi removido com sucesso.`;
+                document.getElementById('remove-library-success').hidden = false;
+            }
+        })
+        .catch(error => {
+            feedback.textContent = 'Erro de conexão: ' + error.message;
+            feedback.classList.add('is-error');
+            if (isSessionExpiredError(error.message)) {
+                shouldReloadAfterRemoveClose = true;
+            }
+        });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -202,21 +393,25 @@ document.addEventListener('DOMContentLoaded', function() {
             event.preventDefault();
             setEditFeedback('Salvando alterações...');
 
-            fetch("{% url 'core:update_library_entry' %}", {
+            GameVaultHTTP.fetchJson("{% url 'core:update_library_entry' %}", {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     entry_id: document.getElementById('edit-entry-id').value,
                     status: document.getElementById('edit-entry-status').value
                 })
             })
-            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     setEditFeedback(data.message);
+                    pendingReviewStatus = document.getElementById('edit-entry-status').value;
+                    if (shouldPromptReview(pendingReviewStatus)) {
+                        openLibraryReviewModal();
+                        return;
+                    }
+
                     location.reload();
                     return;
                 }
@@ -225,6 +420,73 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 setEditFeedback('Erro de conexão: ' + error.message, true);
+                if (isSessionExpiredError(error.message)) {
+                    shouldReloadAfterEditClose = true;
+                }
+            });
+        });
+    }
+
+    document.querySelectorAll('.remove-library-button').forEach(button => {
+        button.addEventListener('click', function() {
+            openRemoveLibraryModal(this);
+        });
+    });
+
+    const libraryReviewLabels = document.querySelectorAll('#library-review-modal .rating-select.hearts label');
+    libraryReviewLabels.forEach((label, index) => {
+        label.addEventListener('click', function() {
+            libraryReviewLabels.forEach(item => item.classList.remove('selected'));
+            for (let i = 0; i <= index; i++) {
+                libraryReviewLabels[i].classList.add('selected');
+            }
+
+            const radioInput = document.getElementById(`library-rating${index + 1}`);
+            if (radioInput) {
+                radioInput.checked = true;
+            }
+        });
+    });
+
+    const reviewForm = document.getElementById('library-review-form');
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const rating = document.querySelector('#library-review-modal input[name="rating"]:checked');
+            const comment = document.getElementById('library-review-comment').value;
+
+            if (!rating) {
+                setLibraryReviewFeedback('Selecione uma nota para salvar a avaliação.', true);
+                return;
+            }
+
+            setLibraryReviewFeedback('Salvando avaliação...');
+
+            GameVaultHTTP.fetchJson(`/game/${pendingReviewGameId}/review/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    rating: parseInt(rating.value, 10),
+                    comment: comment
+                })
+            })
+            .then(data => {
+                if (data.success) {
+                    setLibraryReviewFeedback(data.message);
+                    location.reload();
+                    return;
+                }
+
+                setLibraryReviewFeedback(data.message || 'Erro ao salvar avaliação.', true);
+            })
+            .catch(error => {
+                setLibraryReviewFeedback('Erro de conexão: ' + error.message, true);
+                if (isSessionExpiredError(error.message)) {
+                    shouldReloadAfterReviewClose = true;
+                }
             });
         });
     }

@@ -73,17 +73,28 @@ Foco: remover sobras de fluxos antigos e reduzir risco de drift.
 
 ### Itens
 
-- [ ] Remover CSS morto de `auth.css` (`auth-grid`, `auth-panel`, etc.) se realmente nao for mais usado.
-- [ ] Remover CSS morto de `game-detail.css` (`inline-action-form`, etc.) se o fluxo modal atual for o definitivo.
-- [ ] Revisar imports potencialmente mortos, como `authenticate` em views, quando aplicavel.
-- [ ] Revisar settings nao utilizados, como `SITE_BASE_URL`, e decidir se ficam ou saem.
-- [ ] Reduzir duplicacao de logica JS do checklist de senha entre cadastro e reset.
-- [ ] Reduzir duplicacao de estilos de modal e status cards entre biblioteca e detalhe do jogo.
+- [x] Remover CSS morto de `auth.css` (`auth-grid`, `auth-panel`, etc.) se realmente nao for mais usado.
+- [x] Remover CSS morto de `game-detail.css` (`inline-action-form`, etc.) se o fluxo modal atual for o definitivo.
+- [x] Revisar imports potencialmente mortos, como `authenticate` em views, quando aplicavel.
+- [x] Revisar settings nao utilizados, como `SITE_BASE_URL`, e decidir se ficam ou saem.
+- [x] Reduzir duplicacao de logica JS do checklist de senha entre cadastro e reset.
+- [x] Reduzir duplicacao de estilos de modal e status cards entre biblioteca e detalhe do jogo.
+
+Implementacao realizada neste lote:
+
+- CSS legado de autenticacao removido de `auth.css` e referencias responsivas associadas limpas.
+- Estilos mortos de fluxo antigo removidos de `game-detail.css`.
+- Checklist de senha extraido para parcial compartilhado e script unico em `static/js/password-feedback.js`.
+- Estilos de modal e `status-card` centralizados em `static/css/components.css` para reuso entre biblioteca e detalhe do jogo.
+- `SITE_BASE_URL` removido de `config/settings.py` por nao ter uso no codigo atual.
+- Import `authenticate` mantido em `core/views.py` apos revisao, pois segue em uso no login.
 
 ### Critério de pronto
 
 - O codigo nao mantem estilos ou helpers claramente abandonados.
 - Regras repetidas de senha/modal ficam centralizadas ou justificadas.
+
+Status do lote: concluido.
 
 ## Lote 3 - Robustez De Integracao E UX Tecnica
 
@@ -91,17 +102,28 @@ Foco: evitar comportamentos quebrados em casos reais de uso.
 
 ### Itens
 
-- [ ] Tratar melhor `fetch` quando a sessao expira e o backend devolve HTML de login.
-- [ ] Ajustar os fluxos AJAX para lidar com resposta nao JSON sem quebrar o front.
-- [ ] Revisar se logout continua por GET ou se deve evoluir para POST no futuro.
-- [ ] Rever a navbar de visitante para nao apontar para paginas mock como se fossem fluxo real.
-- [ ] Revisar estrategia de active state na navbar para nao depender apenas de `request.path == ...`.
-- [ ] Confirmar estrategia de `MEDIA_URL` e `MEDIA_ROOT` antes da implementacao de foto de perfil.
+- [x] Tratar melhor `fetch` quando a sessao expira e o backend devolve HTML de login.
+- [x] Ajustar os fluxos AJAX para lidar com resposta nao JSON sem quebrar o front.
+- [x] Revisar se logout continua por GET ou se deve evoluir para POST no futuro.
+- [x] Rever a navbar de visitante para nao apontar para paginas mock como se fossem fluxo real.
+- [x] Revisar estrategia de active state na navbar para nao depender apenas de `request.path == ...`.
+- [x] Confirmar estrategia de `MEDIA_URL` e `MEDIA_ROOT` antes da implementacao de foto de perfil.
+
+Implementacao realizada neste lote:
+
+- Helper global `static/js/http.js` criado para centralizar `fetch`, CSRF, sessao expirada e resposta nao JSON.
+- Fluxos AJAX de biblioteca e detalhe do jogo migrados para o helper comum, com falha controlada em sessao expirada e HTML inesperado.
+- Logout migrado de GET para POST em `logout_view`, modal da navbar e perfil.
+- Navbar publica revisada para apontar para fluxos reais (`Catalogo`, `Sobre`, `Diferenciais`) em vez de rotulos mock.
+- Active state da navbar revisado para usar `request.resolver_match.url_name`, incluindo destaque correto para detalhe do jogo dentro de `Catalogo`.
+- Estrategia atual de media confirmada: `MEDIA_URL = "/media/"`, `MEDIA_ROOT = BASE_DIR / "media"` e servico local habilitado em `config/urls.py` apenas em `DEBUG`.
 
 ### Critério de pronto
 
 - Os fluxos `fetch` falham de forma controlada.
 - A navegacao publica nao induz o usuario a fluxos demonstrativos inconsistentes.
+
+Status do lote: concluido.
 
 ## Lote 4 - Alinhamento Final De Documentacao
 
@@ -109,15 +131,24 @@ Foco: garantir que README e wiki descrevam o sistema real.
 
 ### Itens
 
-- [ ] Revisar `README.md` para remover descricoes de telas/filtros que nao existem mais.
-- [ ] Revisar a documentacao de autenticacao sempre que login, email ou reset mudarem.
-- [ ] Revisar `Pendencias.md` e `Entrega Final - Alternativa A.md` para evitar status conflitante.
-- [ ] Revisar notas tecnicas (`Templates`, `Models`, `Views e URLs`) apos cada lote tecnico acima.
+- [x] Revisar `README.md` para remover descricoes de telas/filtros que nao existem mais.
+- [x] Revisar a documentacao de autenticacao sempre que login, email ou reset mudarem.
+- [x] Revisar `Pendencias.md` e `Entrega Final - Alternativa A.md` para evitar status conflitante.
+- [x] Revisar notas tecnicas (`Templates`, `Models`, `Views e URLs`) apos cada lote tecnico acima.
+
+Implementacao realizada neste lote:
+
+- `README.md` revisado para remover referencias a filtro/barra de busca da biblioteca e alinhar o fluxo atual de reviews, biblioteca e execucao local.
+- Nota [[Autenticacao]] atualizada para refletir login por form proprio, logout via `POST` e navegacao publica real.
+- `Pendencias.md` e `Entrega Final - Alternativa A.md` alinhados com o estado atual de historico de reviews, robustez de `fetch` e autenticacao.
+- Notas tecnicas `Templates`, `Models` e `Views e URLs` revisadas para refletir logout via `POST`, helper global de AJAX, servico de `media/` em `DEBUG` e historico de reviews com exibicao principal da review mais recente.
 
 ### Critério de pronto
 
 - README, wiki funcional e wiki tecnica nao se contradizem.
 - Pendencias e checklist da entrega apontam para o mesmo estado do projeto.
+
+Status do lote: concluido.
 
 ## Ordem Recomendada De Execucao
 

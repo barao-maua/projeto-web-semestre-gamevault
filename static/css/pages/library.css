@@ -72,79 +72,16 @@
     background: rgba(255, 111, 111, 0.12);
 }
 
-.library-modal {
-    position: fixed;
-    inset: 0;
-    display: none;
-    place-items: center;
-    padding: 20px;
-    background: rgba(9, 13, 20, 0.72);
-    z-index: 30;
-}
-
 .library-modal-content {
     width: min(680px, 100%);
-    position: relative;
-    padding: 24px;
-    border: 1px solid var(--line);
-    border-radius: 24px;
-    background: rgba(31, 45, 64, 0.96);
-    box-shadow: var(--shadow);
 }
 
-.close-modal {
-    position: absolute;
-    top: 12px;
-    right: 16px;
-    border: 0;
-    color: var(--muted);
-    font-size: 1.5rem;
-    background: transparent;
-    cursor: pointer;
+.library-review-modal-content {
+    width: min(560px, 100%);
 }
 
-.close-modal:hover {
-    color: var(--text);
-}
-
-.modal-description {
-    margin-bottom: 18px;
-}
-
-.status-card-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-}
-
-.status-card {
-    display: grid;
-    gap: 6px;
-    min-height: 96px;
-    padding: 16px;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    color: var(--text);
-    text-align: left;
-    background: rgba(18, 26, 37, 0.58);
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.status-card:hover,
-.status-card.is-selected {
-    border-color: rgba(181, 224, 0, 0.85);
-    background: rgba(181, 224, 0, 0.18);
-    transform: translateY(-1px);
-}
-
-.status-card strong {
-    color: var(--text);
-}
-
-.status-card span {
-    color: var(--muted);
-    font-size: 0.9rem;
+.library-remove-modal-content {
+    width: min(520px, 100%);
 }
 
 .library-modal-feedback {
@@ -163,6 +100,67 @@
     margin-top: 18px;
 }
 
+.library-review-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.library-remove-button {
+    min-width: 132px;
+}
+
+.rating-select {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.rating-select.hearts input[type="radio"] {
+    display: none;
+}
+
+.rating-select.hearts label {
+    cursor: pointer;
+    font-size: 2rem;
+    color: rgba(214, 227, 244, 0.4);
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.rating-select.hearts label:hover,
+.rating-select.hearts label.selected {
+    color: var(--accent);
+    transform: scale(1.12);
+}
+
+.form-group {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.form-group textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    background: rgba(18, 26, 37, 0.9);
+    outline: none;
+    resize: vertical;
+}
+
+.form-group textarea::placeholder {
+    color: rgba(243, 246, 251, 0.55);
+}
+
+.form-group textarea:focus {
+    border-color: rgba(181, 224, 0, 0.6);
+    box-shadow: 0 0 0 3px rgba(181, 224, 0, 0.12);
+}
+
 @media (max-width: 560px) {
     .library-card-actions {
         grid-template-columns: 1fr;
@@ -170,6 +168,10 @@
 
     .status-card-grid {
         grid-template-columns: 1fr;
+    }
+
+    .library-review-actions {
+        flex-direction: column;
     }
 
 }

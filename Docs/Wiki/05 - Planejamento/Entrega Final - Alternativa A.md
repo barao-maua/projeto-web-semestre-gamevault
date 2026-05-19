@@ -174,14 +174,14 @@ As avaliacoes serao tratadas como funcionalidade secundaria, pois o CRUD princip
 - [x] Validar envio de avaliacao no detalhe do jogo.
 - [x] Validar exibicao de avaliacoes.
 - [x] Confirmar que apenas usuario logado pode avaliar.
-- [x] Confirmar que uma nova avaliacao do mesmo usuario atualiza a anterior.
+- [x] Confirmar que uma nova avaliacao do mesmo usuario entra no historico e a interface principal mostra apenas a mais recente.
 - [x] Melhorar feedback visual do modal de avaliacao.
 
 Observacao da revisao:
 
 - O envio de avaliacao foi validado no detalhe do jogo.
 - A exibicao de avaliacoes foi revisada no detalhe do jogo.
-- Uma nova avaliacao do mesmo usuario sobrescreve a anterior, conforme regra atual.
+- Uma nova avaliacao do mesmo usuario agora preserva historico no banco; a interface principal mostra apenas a review mais recente de cada usuario.
 - O modal de avaliacao recebeu fundo opaco e feedback visual inline para reduzir dependencias de popup nativo.
 
 ## Parte 6 - Interface E Fluxo De Demonstracao
@@ -202,6 +202,7 @@ Observacao da revisao:
 - [x] Atualizar [[Views e URLs]] se alguma rota mudar.
 - [x] Atualizar [[Biblioteca do Usuario]] se o fluxo de edicao mudar.
 - [x] Atualizar [[Autenticacao]] se houver ajuste de login/cadastro.
+- [x] Atualizar [[Autenticacao]] para refletir logout via `POST`.
 - [ ] Criar roteiro de apresentacao.
 - [ ] Listar responsabilidades dos integrantes.
 - [x] Registrar dificuldades tecnicas encontradas em [[Dificuldades Tecnicas]].
