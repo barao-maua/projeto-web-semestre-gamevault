@@ -16,18 +16,26 @@
         <p class="eyebrow">Coleção pessoal</p>
         <h1>Minha Biblioteca</h1>
     </div>
-    <a href="{% url 'core:game_catalog' %}" class="button">Explorar Catálogo</a>
+    <div class="library-header-actions">
+        <form method="get" class="library-search-form">
+            <input type="text" name="q" value="{{ query }}" placeholder="Buscar na sua biblioteca...">
+            <button type="submit" class="button">Buscar</button>
+        </form>
+        <a href="{% url 'core:game_catalog' %}" class="button">Explorar Catálogo</a>
+    </div>
 </div>
 
 {% if library_entries %}
     <div class="library-grid">
         {% for entry in library_entries %}
         <div class="game-card" data-entry-card="{{ entry.id }}">
-            <div class="game-cover" style="
+            <div class="game-cover game-cover--library-media">
                 {% if entry.game.cover_image %}
-                    background-image: url('{{ entry.game.cover_image }}');
+                <img src="{{ entry.game.cover_image }}" alt="{{ entry.game.title }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+                <div class="placeholder-image" style="display: none;">Sem capa</div>
+                {% else %}
+                <div class="placeholder-image">Sem capa</div>
                 {% endif %}
-            ">
                 <div class="cover-caption">
                     <span>{{ entry.game.genre|default:"Jogo" }}</span>
                     <strong>{{ entry.game.title }}</strong>
@@ -67,9 +75,21 @@
     </div>
 {% else %}
     <div class="empty-library">
-        <p>Sua biblioteca está vazia. Comece adicionando jogos!</p>
+        <p>{% if query %}Nenhum jogo encontrado para a sua busca.{% else %}Sua biblioteca está vazia. Comece adicionando jogos!{% endif %}</p>
         <a href="{% url 'core:game_catalog' %}" class="button">Explorar Catálogo</a>
     </div>
+{% endif %}
+
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+<div class="library-pagination">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="ghost-button">Anterior</a>
+    {% endif %}
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="ghost-button">Próxima</a>
+    {% endif %}
+</div>
 {% endif %}
 </section>
 

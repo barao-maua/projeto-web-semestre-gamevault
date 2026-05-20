@@ -41,7 +41,11 @@
                 <h3>{{ game.title }}</h3>
                 <p class="game-genre">{{ game.genre|default:"Gênero não informado" }}</p>
                 <p class="game-description">{{ game.description|truncatewords:20 }}</p>
+                {% if game.steam_app_id %}
+                <a href="{% url 'core:steam_game_detail' game.steam_app_id %}" class="ghost-button">Ver detalhes</a>
+                {% else %}
                 <a href="{% url 'core:game_detail' game.id %}" class="ghost-button">Ver detalhes</a>
+                {% endif %}
             </div>
         </div>
         {% endfor %}
@@ -53,6 +57,18 @@
             <p>Tente uma busca diferente.</p>
         {% endif %}
     </div>
+{% endif %}
+
+{% if total_pages > 1 %}
+<div class="catalog-pagination">
+    {% if has_previous %}
+    <a href="?page={{ previous_page }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="ghost-button">Anterior</a>
+    {% endif %}
+    <span>Página {{ current_page }} de {{ total_pages }}</span>
+    {% if has_next %}
+    <a href="?page={{ next_page }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="ghost-button">Próxima</a>
+    {% endif %}
+</div>
 {% endif %}
 </section>
 {% endblock %}

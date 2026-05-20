@@ -6,6 +6,62 @@
     margin-bottom: 24px;
 }
 
+.library-header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.game-cover--library-media {
+    display: grid;
+    place-items: center;
+    background-position: center center;
+}
+
+.game-cover--library-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center center;
+    padding: 10px;
+    background: rgba(18, 26, 37, 0.92);
+}
+
+.game-cover--library-media .placeholder-image {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    color: var(--muted);
+    background: rgba(18, 26, 37, 0.92);
+}
+
+.library-search-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: min(420px, 100%);
+}
+
+.library-search-form input {
+    flex: 1;
+    padding: 12px 14px;
+    border: 1px solid rgba(214, 227, 244, 0.18);
+    border-radius: 12px;
+    color: var(--text);
+    background: rgba(18, 26, 37, 0.82);
+    outline: none;
+}
+
+.library-search-form input:focus {
+    border-color: rgba(181, 224, 0, 0.6);
+    box-shadow: 0 0 0 3px rgba(181, 224, 0, 0.12);
+}
+
 .library-rating {
     display: flex;
     justify-content: center;
@@ -107,6 +163,15 @@
     margin-top: 16px;
 }
 
+.library-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 24px;
+}
+
 .library-remove-button {
     min-width: 132px;
 }
@@ -162,6 +227,11 @@
 }
 
 @media (max-width: 560px) {
+    .library-header-actions,
+    .library-search-form {
+        width: 100%;
+    }
+
     .library-card-actions {
         grid-template-columns: 1fr;
     }

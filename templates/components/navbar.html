@@ -13,14 +13,13 @@
             {% if user.is_authenticated %}
                 <a class="nav-link{% if current_url_name == 'home' %} is-active{% endif %}" href="{% url 'core:home' %}">Início</a>
                 <a class="nav-link{% if current_url_name == 'library' %} is-active{% endif %}" href="{% url 'core:library' %}">Minha Biblioteca</a>
-                <a class="nav-link{% if current_url_name == 'game_catalog' or current_url_name == 'game_detail' %} is-active{% endif %}" href="{% url 'core:game_catalog' %}">Catálogo</a>
+                <a class="nav-link{% if current_url_name == 'game_catalog' or current_url_name == 'game_detail' or current_url_name == 'steam_game_detail' %} is-active{% endif %}" href="{% url 'core:game_catalog' %}">Catálogo</a>
                 <a class="nav-link{% if current_url_name == 'profile' %} is-active{% endif %}" href="{% url 'core:profile' %}">Perfil</a>
                 <button class="nav-link nav-link-button" type="button" onclick="openLogoutModal()">Sair</button>
             {% else %}
                 <a class="nav-link{% if current_url_name == 'home' %} is-active{% endif %}" href="{% url 'core:home' %}">Início</a>
-                <a class="nav-link{% if current_url_name == 'game_catalog' or current_url_name == 'game_detail' %} is-active{% endif %}" href="{% url 'core:game_catalog' %}">Catálogo</a>
+                <a class="nav-link{% if current_url_name == 'game_catalog' or current_url_name == 'game_detail' or current_url_name == 'steam_game_detail' %} is-active{% endif %}" href="{% url 'core:game_catalog' %}">Catálogo</a>
                 <a class="nav-link{% if current_url_name == 'sobre' %} is-active{% endif %}" href="{% url 'core:sobre' %}">Sobre</a>
-                <a class="nav-link{% if current_url_name == 'diferenciais' %} is-active{% endif %}" href="{% url 'core:diferenciais' %}">Diferenciais</a>
                 <a class="nav-link{% if current_url_name == 'login' %} is-active{% endif %}" href="{% url 'core:login' %}">Login</a>
                 <a class="nav-link{% if current_url_name == 'register' %} is-active{% endif %}" href="{% url 'core:register' %}">Cadastro</a>
             {% endif %}
@@ -29,11 +28,11 @@
         {% if user.is_authenticated %}
         <a href="{% url 'core:profile' %}" class="user-chip user-chip-link">
             <div class="user-chip-text">
-                <strong>{{ user.username }}</strong>
+                <strong>{% if global_steam_link and global_steam_link.persona_name %}{{ global_steam_link.persona_name }}{% else %}{{ user.username }}{% endif %}</strong>
                 <span class="session-active-label">Sessão ativa</span>
             </div>
             <span class="user-avatar">
-                {{ user.username|first|upper }}
+                {% if global_steam_link and global_steam_link.persona_name %}{{ global_steam_link.persona_name|first|upper }}{% else %}{{ user.username|first|upper }}{% endif %}
             </span>
         </a>
         {% else %}

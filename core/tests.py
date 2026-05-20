@@ -218,7 +218,62 @@ class GameDetailInteractionTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'href="/catalog/"')
         self.assertContains(response, ">Sobre<")
-        self.assertContains(response, ">Diferenciais<")
+        self.assertNotContains(response, ">Diferenciais<")
+
+    def test_library_view_filters_by_query(self):
+        self.client.force_login(self.user)
+        another_game = Game.objects.create(title="Celeste", genre="Plataforma")
+        LibraryEntry.objects.create(user=self.user, game=self.game, status="playing")
+        LibraryEntry.objects.create(user=self.user, game=another_game, status="paused")
+
+        response = self.client.get(reverse("core:library"), {"q": "Hollow"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Hollow Knight")
+        self.assertNotContains(response, "Celeste")
+
+    def test_library_view_paginates_large_collections(self):
+        self.client.force_login(self.user)
+        for index in range(30):
+            game = Game.objects.create(title=f"Game {index}")
+            LibraryEntry.objects.create(user=self.user, game=game)
+
+        response = self.client.get(reverse("core:library"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Página 1 de 2")
+
+    @patch("core.views.ensure_game_cached_from_catalog_item")
+    @patch("core.views.normalize_steam_catalog_page")
+    @patch("core.views.fetch_steam_catalog_page")
+    def test_catalog_uses_steam_pagination_view(
+        self,
+        mocked_fetch_catalog_page,
+        mocked_normalize_catalog_page,
+        mocked_cached_game,
+    ):
+        steam_game = Game.objects.create(title="Portal 2", steam_app_id=620, genre="Puzzle")
+        mocked_fetch_catalog_page.return_value = {"results_html": "", "total_count": 1}
+        mocked_normalize_catalog_page.return_value = {
+            "items": [{"steam_app_id": 620, "title": "Portal 2"}],
+            "total_count": 1,
+        }
+        mocked_cached_game.return_value = steam_game
+
+        response = self.client.get(reverse("core:game_catalog"), {"page": 1})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Portal 2")
+        self.assertContains(response, 'href="/steam-game/620/"')
+
+    @patch("core.views.get_or_sync_game_by_steam_app_id")
+    def test_steam_game_detail_uses_app_id_route(self, mocked_sync_game):
+        mocked_sync_game.return_value = self.game
+
+        response = self.client.get(reverse("core:steam_game_detail", args=[620]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Hollow Knight")
 
 
 class SteamIntegrationPhaseOneTests(TestCase):
@@ -507,3 +562,13 @@ class SteamDirectLoginTests(TestCase):
         self.assertEqual(result["existing_entries"], 1)
         entry = LibraryEntry.objects.get(user=user, game=self.game)
         self.assertEqual(entry.status, "playing")
+
+    def test_navbar_prefers_steam_persona_name(self):
+        user = User.objects.create_user(username="steam_local")
+        SteamAccountLink.objects.create(user=user, steam_id="76561198000000000", persona_name="Steam Hero")
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("core:home"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Steam Hero")

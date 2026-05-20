@@ -2,7 +2,6 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 
 from .views import (
-    diferenciais_view,
     home_view,
     sobre_view,
     login_view,
@@ -20,6 +19,7 @@ from .views import (
     remove_from_library_view,
     game_catalog_view,
     game_detail_view,
+    steam_game_detail_view,
     add_review_view,
 )
 from .forms import GameVaultSetPasswordForm
@@ -29,7 +29,6 @@ app_name = "core"
 urlpatterns = [
     path("", home_view, name="home"),
     path("sobre/", sobre_view, name="sobre"),
-    path("diferenciais/", diferenciais_view, name="diferenciais"),
     path("login/", login_view, name="login"),
     path("steam/login/", steam_login_view, name="steam_login"),
     path("steam/callback/", steam_callback_view, name="steam_callback"),
@@ -84,5 +83,6 @@ urlpatterns = [
     path("remove-from-library/", remove_from_library_view, name="remove_from_library"),
     path("catalog/", game_catalog_view, name="game_catalog"),
     path("game/<int:game_id>/", game_detail_view, name="game_detail"),
+    path("steam-game/<int:app_id>/", steam_game_detail_view, name="steam_game_detail"),
     path("game/<int:game_id>/review/", add_review_view, name="add_review"),
 ]

@@ -76,8 +76,10 @@
     <div class="email-status-card {% if steam_link %}is-verified{% else %}is-pending{% endif %}">
         <span>Conta Steam</span>
         <strong>
-            {% if steam_link %}
+            {% if steam_link and steam_link.persona_name %}
                 {{ steam_link.persona_name|default:steam_link.steam_id }}
+            {% elif steam_link %}
+                {{ user.username }}
             {% else %}
                 Nenhuma conta Steam conectada
             {% endif %}

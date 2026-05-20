@@ -59,48 +59,4 @@
         </aside>
     </div>
 </section>
-
-<section class="screen" id="catalogo">
-    <div class="screen-header">
-        <div>
-            <p class="eyebrow">Catálogo de Jogos</p>
-            <h2>Descubra novos jogos para sua biblioteca</h2>
-            <p>Explore nossa coleção e adicione os jogos que você joga ou planeja jogar.</p>
-        </div>
-    </div>
-
-    <div class="library-grid">
-        {% for jogo in featured_games %}
-        <article class="game-card">
-            <div class="game-cover" style="
-                {% if jogo.home_cover_image %}
-                    background-image: url('{{ jogo.home_cover_image }}');
-                    background-position: {{ jogo.home_cover_position }};
-                {% endif %}
-            ">
-                <div class="cover-caption">
-                    <span>{{ jogo.genre|default:"Aventura" }}</span>
-                    <strong>{{ jogo.title }}</strong>
-                </div>
-            </div>
-            <div class="game-rating">
-                {% comment %} Mostra notas variadas para dar interesse visual: 3, 4 ou 5 coracoes {% endcomment %}
-                {% if forloop.counter0 == 0 %}&hearts; &hearts; &hearts;{% endif %}
-                {% if forloop.counter0 == 1 %}&hearts; &hearts; &hearts; &hearts;{% endif %}
-                {% if forloop.counter0 == 2 %}&hearts; &hearts; &hearts; &hearts; &hearts;{% endif %}
-                {% if forloop.counter0 == 3 %}&hearts; &hearts; &hearts; &hearts;{% endif %}
-                {% if forloop.counter0 == 4 %}&hearts; &hearts; &hearts;{% endif %}
-                {% if forloop.counter0 == 5 %}&hearts; &hearts; &hearts; &hearts; &hearts;{% endif %}
-            </div>
-            <div class="game-actions">
-                <a href="{% url 'core:game_detail' jogo.id %}" class="ghost-button">Detalhes</a>
-                <span>|</span>
-                <a href="#" class="ghost-button">Adicionar</a>
-            </div>
-        </article>
-        {% empty %}
-        <p class="eyebrow">Nenhum jogo encontrado no catálogo.</p>
-        {% endfor %}
-    </div>
-</section>
 {% endblock %}

@@ -5,6 +5,10 @@
     margin-top: 20px;
 }
 
+.meta-grid--secondary {
+    margin-top: 20px;
+}
+
 .meta-card {
     max-width: 740px;
     padding: 18px;
@@ -17,4 +21,8 @@
     display: block;
     margin-bottom: 8px;
     color: var(--text);
+}
+
+.meta-card p {
+    margin-bottom: 0;
 }

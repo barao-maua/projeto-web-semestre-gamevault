@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Biblioteca | GameVault{% endblock %}
+{% block title %}Sobre | GameVault{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/sobre.css' %}">
@@ -11,80 +11,46 @@
 <section class="screen">
     <div class="screen-header">
         <div>
-            <h1>Catalogo de jogos</h1>
+            <p class="eyebrow">Sobre o MVP</p>
+            <h1>GameVault e um catalogo pessoal para organizar, avaliar e redescobrir jogos.</h1>
             <p>
-                A tela principal da colecao mostra cards com os jogos cadastrados, notas rapidas e acoes visuais
-                para editar ou remover cada item da biblioteca pessoal.
+                O MVP do GameVault foi construido para reunir catalogo, biblioteca pessoal e historico de avaliacoes em uma experiencia unica.
+                O foco atual e permitir que o usuario encontre jogos, adicione-os a propria colecao, avalie ao longo do tempo e acompanhe tudo com apoio da Steam como fonte de dados.
             </p>
         </div>
         <div class="inline-actions">
-            <a class="ghost-button" href="{% url 'core:home' %}">Voltar ao login</a>
-            <a class="button" href="{% url 'core:diferenciais' %}">Abrir detalhes</a>
+            <a class="ghost-button" href="{% url 'core:game_catalog' %}">Abrir catálogo</a>
+            <a class="button" href="{% url 'core:login' %}">Entrar no GameVault</a>
         </div>
     </div>
 
     <div class="meta-grid">
         <article class="meta-card">
-            <strong>Busca rapida</strong>
-            <p>Espaco pensado para localizar jogos da biblioteca com facilidade.</p>
+            <strong>Catálogo amplo</strong>
+            <p>O catalogo usa a Steam como fonte de descoberta e sincroniza os dados localmente quando o usuario interage com um jogo.</p>
         </article>
         <article class="meta-card">
-            <strong>Filtro por status</strong>
-            <p>Backlog, jogando, concluido e dropado em uma mesma navegacao.</p>
+            <strong>Biblioteca pessoal</strong>
+            <p>Cada usuario monta sua propria biblioteca, organiza status e consegue localizar os jogos rapidamente com busca e paginacao.</p>
         </article>
         <article class="meta-card">
-            <strong>Acao principal</strong>
-            <p>Botao dedicado para adicionar um novo jogo ao acervo do usuario.</p>
+            <strong>Historico de opiniao</strong>
+            <p>As avaliacoes podem mudar com o tempo, por isso o GameVault preserva novas reviews no historico e destaca a opiniao mais recente.</p>
         </article>
     </div>
 
-    <div class="library-grid">
-        <article class="game-card">
-            <div class="game-cover">
-                <img src="{% static 'img/HollowKnight.jpg' %}" alt="Capa de Hollow Knight">
-                <div class="cover-caption">
-                    <span>Metroidvania</span>
-                    <strong>Hollow Knight</strong>
-                </div>
-            </div>
-            <div class="game-rating">&hearts; &hearts; &hearts; &hearts; &hearts;</div>
-            <div class="game-actions">
-                <a href="{% url 'core:diferenciais' %}">Editar</a>
-                <span>|</span>
-                <a href="#">Remover</a>
-            </div>
+    <div class="meta-grid meta-grid--secondary">
+        <article class="meta-card">
+            <strong>Login local e Steam</strong>
+            <p>O usuario pode entrar com conta local ou com Steam, com criacao automatica do perfil local e sincronizacao da biblioteca quando possivel.</p>
         </article>
-
-        <article class="game-card">
-            <div class="game-cover">
-                <img src="{% static 'img/cyberpunk2077.jpg' %}" alt="Capa de Cyberpunk 2077">
-                <div class="cover-caption">
-                    <span>RPG futurista</span>
-                    <strong>Cyberpunk 2077</strong>
-                </div>
-            </div>
-            <div class="game-rating">&hearts; &hearts; &hearts; &hearts;</div>
-            <div class="game-actions">
-                <a href="{% url 'core:diferenciais' %}">Editar</a>
-                <span>|</span>
-                <a href="#">Remover</a>
-            </div>
+        <article class="meta-card">
+            <strong>Dados locais persistentes</strong>
+            <p>Mesmo quando a Steam e a fonte dos metadados, o GameVault continua usando o banco local para biblioteca, reviews e relacionamentos.</p>
         </article>
-
-        <article class="game-card">
-            <div class="game-cover game-cover--focus-top">
-                <img src="{% static 'img/EldenRing.png' %}" alt="Capa de Elden Ring">
-                <div class="cover-caption">
-                    <span>Fantasia sombria</span>
-                    <strong>Elden Ring</strong>
-                </div>
-            </div>
-            <div class="game-rating">&hearts; &hearts; &hearts; &hearts;</div>
-            <div class="game-actions">
-                <a href="{% url 'core:diferenciais' %}">Editar</a>
-                <span>|</span>
-                <a href="#">Remover</a>
-            </div>
+        <article class="meta-card">
+            <strong>Evolucao planejada</strong>
+            <p>As proximas etapas incluem refinamento da integracao Steam, limpeza dos jogos legados e ampliacao dos recursos sociais e de listas.</p>
         </article>
     </div>
 </section>

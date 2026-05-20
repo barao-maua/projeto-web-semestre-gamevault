@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.core import signing
+from django.core.paginator import Paginator
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -33,6 +34,12 @@ from .services.steam_auth import (
     validate_steam_openid_callback,
 )
 from .services.steam import SteamSyncError
+from .services.steam import (
+    ensure_game_cached_from_catalog_item,
+    fetch_steam_catalog_page,
+    get_or_sync_game_by_steam_app_id,
+    normalize_steam_catalog_page,
+)
 from .services.steam_library import sync_owned_games_for_user
 
 
@@ -123,6 +130,34 @@ def get_latest_reviews_for_game(game):
     )
 
 
+def build_game_detail_context(request, game):
+    in_library = False
+    library_entry = None
+    user_review = None
+    if request.user.is_authenticated:
+        try:
+            library_entry = LibraryEntry.objects.get(user=request.user, game=game)
+            in_library = True
+        except LibraryEntry.DoesNotExist:
+            pass
+
+        user_review = (
+            Review.objects.filter(user=request.user, game=game)
+            .order_by("-created_at")
+            .first()
+        )
+
+    reviews = get_latest_reviews_for_game(game)
+
+    return {
+        "game": game,
+        "in_library": in_library,
+        "library_entry": library_entry,
+        "user_review": user_review,
+        "reviews": reviews,
+    }
+
+
 def get_or_create_email_verification(user):
     verification, _ = UserEmailVerification.objects.get_or_create(user=user)
     return verification
@@ -164,26 +199,11 @@ def send_verification_email(request, user):
 
 def home_view(request):
     """View para exibir a página inicial com catálogo de jogos em destaque"""
-    # Buscar alguns jogos para exibir na homepage (limitar a 6 para não sobrecarregar)
-    featured_games = attach_variant_cover_metadata(
-        list(Game.objects.all()[:6]),
-        "home",
-        "home_cover_image",
-        "home_cover_position",
-    )
-
-    context = {
-        "featured_games": featured_games,
-    }
-    return render(request, "pages/home.html", context)
+    return render(request, "pages/home.html")
 
 
 def sobre_view(request):
     return render(request, "pages/sobre.html")
-
-
-def diferenciais_view(request):
-    return render(request, "pages/diferenciais.html")
 
 
 def login_view(request):
@@ -396,16 +416,30 @@ def resend_verification_email_view(request):
 @login_required
 def library_view(request):
     """View para listar os jogos da biblioteca do usuário"""
-    library_entries = list(
-        LibraryEntry.objects.filter(user=request.user).select_related("game")
+    query = request.GET.get("q", "").strip()
+    library_entries_qs = LibraryEntry.objects.filter(user=request.user).select_related(
+        "game"
     )
+    if query:
+        library_entries_qs = library_entries_qs.filter(
+            Q(game__title__icontains=query) | Q(game__genre__icontains=query)
+        )
+
+    paginator = Paginator(library_entries_qs, 24)
+    page_number = request.GET.get("page") or 1
+    page_obj = paginator.get_page(page_number)
+    library_entries = list(page_obj.object_list)
     game_ids = [entry.game_id for entry in library_entries]
     reviews_by_game_id = get_latest_reviews_for_user_and_games(request.user, game_ids)
 
     for entry in library_entries:
         entry.user_review = reviews_by_game_id.get(entry.game_id)
 
-    context = {"library_entries": library_entries}
+    context = {
+        "library_entries": library_entries,
+        "page_obj": page_obj,
+        "query": query,
+    }
     return render(request, "library/library.html", context)
 
 
@@ -572,15 +606,46 @@ def remove_from_library_view(request):
 
 def game_catalog_view(request):
     """View para exibir o catálogo de jogos"""
-    query = request.GET.get("q", "")
-    games = Game.objects.all()
+    query = request.GET.get("q", "").strip()
+    try:
+        page = int(request.GET.get("page") or 1)
+    except ValueError:
+        page = 1
 
-    if query:
-        games = games.filter(
-            Q(title__icontains=query)
-            | Q(genre__icontains=query)
-            | Q(description__icontains=query)
-        )
+    page_size = 24
+    is_fallback = False
+    try:
+        steam_page = fetch_steam_catalog_page(page=page, page_size=page_size, query=query)
+        normalized_page = normalize_steam_catalog_page(steam_page)
+
+        games = []
+        for item in normalized_page["items"]:
+            try:
+                game = ensure_game_cached_from_catalog_item(
+                    item["steam_app_id"], item.get("title", "")
+                )
+            except SteamSyncError:
+                game = Game.objects.filter(steam_app_id=item["steam_app_id"]).first()
+                if game is None:
+                    continue
+            games.append(game)
+
+        total_count = normalized_page["total_count"]
+        total_pages = max(1, (total_count + page_size - 1) // page_size)
+    except SteamSyncError:
+        is_fallback = True
+        games_qs = Game.objects.all()
+        if query:
+            games_qs = games_qs.filter(
+                Q(title__icontains=query)
+                | Q(genre__icontains=query)
+                | Q(description__icontains=query)
+            )
+        paginator = Paginator(games_qs, page_size)
+        page_obj = paginator.get_page(page)
+        games = list(page_obj.object_list)
+        total_pages = paginator.num_pages or 1
+        page = page_obj.number
 
     games = attach_variant_cover_metadata(
         list(games),
@@ -589,7 +654,17 @@ def game_catalog_view(request):
         "catalog_cover_position",
     )
 
-    context = {"games": games, "query": query}
+    context = {
+        "games": games,
+        "query": query,
+        "current_page": page,
+        "total_pages": total_pages,
+        "has_previous": page > 1,
+        "has_next": page < total_pages,
+        "previous_page": page - 1,
+        "next_page": page + 1,
+        "catalog_is_fallback": is_fallback,
+    }
     return render(request, "catalog/game_catalog.html", context)
 
 
@@ -597,34 +672,14 @@ def game_catalog_view(request):
 def game_detail_view(request, game_id):
     """View para exibir detalhes de um jogo"""
     game = get_object_or_404(Game, id=game_id)
+    context = build_game_detail_context(request, game)
+    return render(request, "catalog/game_detail.html", context)
 
-    # Verificar se o jogo está na biblioteca do usuário (se logado)
-    in_library = False
-    library_entry = None
-    user_review = None
-    if request.user.is_authenticated:
-        try:
-            library_entry = LibraryEntry.objects.get(user=request.user, game=game)
-            in_library = True
-        except LibraryEntry.DoesNotExist:
-            pass
 
-        user_review = (
-            Review.objects.filter(user=request.user, game=game)
-            .order_by("-created_at")
-            .first()
-        )
-
-    # Obter avaliações do jogo
-    reviews = get_latest_reviews_for_game(game)
-
-    context = {
-        "game": game,
-        "in_library": in_library,
-        "library_entry": library_entry,
-        "user_review": user_review,
-        "reviews": reviews,
-    }
+@ensure_csrf_cookie
+def steam_game_detail_view(request, app_id):
+    game = get_or_sync_game_by_steam_app_id(app_id)
+    context = build_game_detail_context(request, game)
     return render(request, "catalog/game_detail.html", context)
 
 

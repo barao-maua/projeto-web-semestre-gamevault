@@ -85,6 +85,37 @@ def fetch_steam_applist(start=0, count=50, language=DEFAULT_STEAM_LANGUAGE):
     return payload
 
 
+def fetch_steam_catalog_page(page=1, page_size=24, query="", language=DEFAULT_STEAM_LANGUAGE):
+    if page < 1:
+        raise SteamSyncError("Pagina invalida para o catalogo Steam.")
+    if page_size <= 0:
+        raise SteamSyncError("Quantidade por pagina invalida para o catalogo Steam.")
+
+    start = (page - 1) * page_size
+    query_string = urlencode(
+        {
+            "query": query or "",
+            "start": start,
+            "count": page_size,
+            "infinite": 1,
+            "supportedlang": language,
+            "ndl": 1,
+            "category1": STEAM_GAME_CATEGORY_ID,
+        }
+    )
+    payload = fetch_json(f"{STEAM_SEARCH_RESULTS_URL}?{query_string}")
+    if "results_html" not in payload:
+        raise SteamSyncError("Resposta paginada do catalogo da Steam invalida.")
+    return payload
+
+
+def normalize_steam_catalog_page(payload):
+    return {
+        "items": normalize_steam_applist(payload),
+        "total_count": int(payload.get("total_count") or 0),
+    }
+
+
 def normalize_steam_applist(payload):
     results_html = payload.get("results_html", "")
     normalized_apps = []
@@ -267,3 +298,26 @@ def sync_steam_catalog(offset=0, limit=100):
         "processed_games": processed_games,
         "next_offset": next_offset,
     }
+
+
+def get_or_sync_game_by_steam_app_id(app_id):
+    game = Game.objects.filter(steam_app_id=app_id).first()
+    if game is not None:
+        return sync_existing_game(game)
+
+    game, _ = sync_game_from_steam(app_id)
+    return game
+
+
+def ensure_game_cached_from_catalog_item(app_id, title=""):
+    game = Game.objects.filter(steam_app_id=app_id).first()
+    if game is not None:
+        return game
+
+    try:
+        game, _ = sync_game_from_steam(app_id)
+        return game
+    except SteamSyncError:
+        if title:
+            return Game.objects.create(title=title, steam_app_id=app_id, steam_type="game")
+        raise
