@@ -10,6 +10,56 @@
     box-shadow: var(--shadow);
 }
 
+.profile-avatar-card {
+    display: grid;
+    gap: 12px;
+    padding: 18px;
+    border: 1px solid rgba(214, 227, 244, 0.12);
+    border-radius: var(--radius-md);
+    background: rgba(47, 76, 103, 0.42);
+}
+
+.profile-avatar-card span,
+.profile-avatar-card small {
+    color: var(--muted);
+}
+
+.profile-avatar-preview {
+    display: grid;
+    place-items: center;
+    position: relative;
+    width: 112px;
+    height: 112px;
+    max-width: 112px;
+    max-height: 112px;
+    min-width: 112px;
+    min-height: 112px;
+    flex-shrink: 0;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 2px solid rgba(214, 227, 244, 0.18);
+    background: linear-gradient(135deg, #f6f8fb 0%, #96afd2 100%);
+    line-height: 0;
+}
+
+.profile-avatar-preview img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 112px;
+    max-height: 112px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 50%;
+}
+
+.profile-avatar-preview span {
+    color: #0f1724;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
 .user-info {
     display: grid;
     gap: 10px;
@@ -30,6 +80,11 @@
 .profile-form {
     display: grid;
     gap: 16px;
+}
+
+.profile-avatar-field {
+    display: grid;
+    gap: 8px;
 }
 
 .email-status-card {
@@ -65,4 +120,20 @@
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+}
+
+.profile-avatar-remove-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    width: fit-content;
+    padding: 8px 12px;
+    border: 1px solid rgba(214, 227, 244, 0.12);
+    border-radius: 999px;
+    background: rgba(20, 28, 40, 0.35);
+    color: var(--muted);
+}
+
+.profile-avatar-remove-toggle input {
+    margin: 0;
 }

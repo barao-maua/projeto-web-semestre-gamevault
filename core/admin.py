@@ -9,6 +9,7 @@ from .models import (
     Review,
     SteamAccountLink,
     UserEmailVerification,
+    UserProfile,
 )
 from .services.steam import SteamSyncError, sync_existing_game
 
@@ -109,3 +110,9 @@ class SteamAccountLinkAdmin(admin.ModelAdmin):
     )
     search_fields = ("user__username", "steam_id", "persona_name")
     list_filter = ("last_login_at", "last_library_sync_at", "created_at")
+
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ("user", "avatar")
+    search_fields = ("user__username", "user__email")

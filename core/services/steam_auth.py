@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-from core.models import SteamAccountLink
+from core.models import SteamAccountLink, UserEmailVerification
 from core.services.steam import SteamSyncError, fetch_json
 
 
@@ -113,9 +113,28 @@ def build_steam_username(steam_id, persona_name=""):
     return candidate[:30]
 
 
+def ensure_steam_user_email_verified(user):
+    verification, _ = UserEmailVerification.objects.get_or_create(user=user)
+    update_fields = []
+
+    if not verification.is_verified:
+        verification.is_verified = True
+        update_fields.append("is_verified")
+
+    if verification.verified_at is None:
+        verification.verified_at = timezone.now()
+        update_fields.append("verified_at")
+
+    if update_fields:
+        verification.save(update_fields=update_fields)
+
+    return verification
+
+
 def get_or_create_user_from_steam_identity(steam_id):
     steam_link = SteamAccountLink.objects.filter(steam_id=steam_id).select_related("user").first()
     if steam_link is not None:
+        ensure_steam_user_email_verified(steam_link.user)
         return steam_link.user, steam_link, False
 
     try:
@@ -133,6 +152,7 @@ def get_or_create_user_from_steam_identity(steam_id):
         avatar_url=profile.get("avatarfull", "") or "",
         last_login_at=timezone.now(),
     )
+    ensure_steam_user_email_verified(user)
     return user, steam_link, True
 
 

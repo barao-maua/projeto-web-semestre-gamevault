@@ -32,7 +32,15 @@
                 <span class="session-active-label">Sessão ativa</span>
             </div>
             <span class="user-avatar">
-                {% if global_steam_link and global_steam_link.persona_name %}{{ global_steam_link.persona_name|first|upper }}{% else %}{{ user.username|first|upper }}{% endif %}
+                {% if global_steam_link and global_steam_link.avatar_url %}
+                <img src="{{ global_steam_link.avatar_url }}" alt="Avatar Steam de {% if global_steam_link.persona_name %}{{ global_steam_link.persona_name }}{% else %}{{ user.username }}{% endif %}" width="32" height="32">
+                {% elif global_user_profile and global_user_profile.avatar %}
+                <img src="{{ global_user_profile.avatar.url }}" alt="Avatar local de {{ user.username }}" width="32" height="32">
+                {% elif global_steam_link and global_steam_link.persona_name %}
+                {{ global_steam_link.persona_name|first|upper }}
+                {% else %}
+                {{ user.username|first|upper }}
+                {% endif %}
             </span>
         </a>
         {% else %}

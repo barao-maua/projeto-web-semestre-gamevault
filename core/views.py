@@ -7,6 +7,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django.core import signing
 from django.core.paginator import Paginator
@@ -20,15 +21,17 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db.models import Q
 import json
 
-from .models import Game, LibraryEntry, Review, UserEmailVerification
+from .models import Game, LibraryEntry, Review, UserEmailVerification, UserProfile
 from .forms import (
     GameVaultAuthenticationForm,
+    GameVaultAvatarForm,
     GameVaultProfileForm,
     GameVaultReviewForm,
     GameVaultUserCreationForm,
 )
 from .services.steam_auth import (
     build_steam_login_url,
+    ensure_steam_user_email_verified,
     get_or_create_user_from_steam_identity,
     refresh_steam_link_profile,
     validate_steam_openid_callback,
@@ -163,6 +166,11 @@ def get_or_create_email_verification(user):
     return verification
 
 
+def get_or_create_user_profile(user):
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+    return profile
+
+
 def invalidate_email_verification(user):
     verification = get_or_create_email_verification(user)
     verification.is_verified = False
@@ -237,6 +245,7 @@ def steam_callback_view(request):
     try:
         steam_id = validate_steam_openid_callback(request.GET)
         user, steam_link, created = get_or_create_user_from_steam_identity(steam_id)
+        ensure_steam_user_email_verified(user)
         try:
             steam_link = refresh_steam_link_profile(steam_link)
         except SteamSyncError:
@@ -308,13 +317,30 @@ def register_view(request):
 def profile_view(request):
     verification = get_or_create_email_verification(request.user)
     steam_link = getattr(request.user, "steam_account_link", None)
+    user_profile = get_or_create_user_profile(request.user)
 
     if request.method == "POST":
+        uploaded_avatar = request.FILES.get("avatar")
+        uploaded_avatar_name = None
+        uploaded_avatar_bytes = None
+        if uploaded_avatar is not None:
+            uploaded_avatar_name = uploaded_avatar.name
+            uploaded_avatar_bytes = uploaded_avatar.read()
+            uploaded_avatar.seek(0)
+
         old_email = request.user.email
         form = GameVaultProfileForm(
             request.POST, instance=request.user, user=request.user
         )
-        if form.is_valid():
+        avatar_form = GameVaultAvatarForm(
+            request.POST,
+            request.FILES,
+            instance=user_profile,
+        )
+        is_profile_valid = form.is_valid()
+        is_avatar_valid = steam_link is not None or avatar_form.is_valid()
+
+        if is_profile_valid and is_avatar_valid:
             user = form.save()
             if user.email.lower() != (old_email or "").lower():
                 verification = invalidate_email_verification(user)
@@ -329,20 +355,40 @@ def profile_view(request):
                         request,
                         "Perfil atualizado, mas nao foi possivel enviar o email de verificacao agora.",
                     )
-            else:
-                messages.success(request, "Perfil atualizado com sucesso.")
+
+            if steam_link is None:
+                remove_avatar = avatar_form.cleaned_data.get("remove_avatar")
+                has_new_avatar = uploaded_avatar_name is not None and uploaded_avatar_bytes is not None
+
+                if remove_avatar and user_profile.avatar:
+                    user_profile.avatar.delete(save=False)
+                    user_profile.avatar = None
+                    user_profile.save()
+                elif has_new_avatar:
+                    if user_profile.avatar:
+                        user_profile.avatar.delete(save=False)
+                    avatar_content = ContentFile(uploaded_avatar_bytes)
+                    user_profile.avatar.save(uploaded_avatar_name, avatar_content, save=True)
+
+            messages.success(request, "Perfil atualizado com sucesso.")
             return redirect("core:profile")
+
+        if steam_link is None and avatar_form.errors:
+            messages.error(request, "Nao foi possivel atualizar sua foto de perfil.")
         messages.error(request, "Corrija os campos destacados para atualizar o perfil.")
     else:
         form = GameVaultProfileForm(instance=request.user, user=request.user)
+        avatar_form = GameVaultAvatarForm(instance=user_profile)
 
     return render(
         request,
         "registration/profile.html",
         {
             "form": form,
+            "avatar_form": avatar_form,
             "email_verification": verification,
             "steam_link": steam_link,
+            "user_profile": user_profile,
         },
     )
 

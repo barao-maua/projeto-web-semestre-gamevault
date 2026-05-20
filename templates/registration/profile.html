@@ -4,7 +4,7 @@
 {% block title %}Perfil - GameVault{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/pages/profile.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/profile.css' %}?v=3">
 {% endblock %}
 
 {% block content %}
@@ -14,26 +14,62 @@
     <div class="email-status-card {% if email_verification.is_verified %}is-verified{% else %}is-pending{% endif %}">
         <span>Status do email</span>
         <strong>
-            {% if email_verification.is_verified %}
+            {% if steam_link %}
+                Conta autenticada via Steam
+            {% elif email_verification.is_verified %}
                 Email verificado
             {% else %}
                 Email pendente de verificação
             {% endif %}
         </strong>
-        {% if email_verification.verified_at %}
+        {% if steam_link and not user.email %}
+        <small>O login Steam nao fornece email ao GameVault. Se quiser, voce pode cadastrar um email local depois.</small>
+        {% elif email_verification.verified_at %}
         <small>Verificado em {{ email_verification.verified_at|date:"d/m/Y H:i" }}</small>
         {% else %}
         <small>Verifique seu email para confirmar que este endereço pertence a você.</small>
         {% endif %}
     </div>
 
-    <form method="post" class="profile-form">
+    <form method="post" class="profile-form" enctype="multipart/form-data">
         {% csrf_token %}
         {% if form.non_field_errors %}
             {% for error in form.non_field_errors %}
             <div class="form-error">{{ error }}</div>
             {% endfor %}
         {% endif %}
+
+        <div class="profile-avatar-card">
+            <span>Foto de perfil</span>
+            <div class="profile-avatar-preview">
+                {% if steam_link and steam_link.avatar_url %}
+                <img src="{{ steam_link.avatar_url }}" alt="Avatar Steam de {% if steam_link.persona_name %}{{ steam_link.persona_name }}{% else %}{{ user.username }}{% endif %}" width="112" height="112">
+                {% elif user_profile and user_profile.avatar %}
+                <img src="{{ user_profile.avatar.url }}" alt="Avatar local de {{ user.username }}" width="112" height="112">
+                {% else %}
+                <span>{{ user.username|first|upper }}</span>
+                {% endif %}
+            </div>
+            {% if steam_link %}
+            <small>Sua foto principal vem da Steam e e atualizada automaticamente a cada novo login.</small>
+            {% else %}
+            <small>Envie uma imagem sua para usar como avatar no GameVault.</small>
+            <div class="field profile-avatar-field">
+                {{ avatar_form.avatar.label_tag }}
+                {{ avatar_form.avatar }}
+                {% for error in avatar_form.avatar.errors %}
+                <div class="form-error">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            {% if user_profile and user_profile.avatar %}
+            <label class="profile-avatar-remove-toggle">
+                {{ avatar_form.remove_avatar }}
+                <span>Remover foto atual</span>
+            </label>
+            {% endif %}
+            {% endif %}
+        </div>
 
         <div class="field">
             {{ form.username.label_tag }}

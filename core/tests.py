@@ -1,15 +1,26 @@
 import json
-from io import StringIO
+from io import BytesIO, StringIO
 from unittest.mock import patch
 
+from PIL import Image
 from django.core.management.base import CommandError
 from django.core.management import call_command
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-from .models import Game, GameList, GameListItem, LibraryEntry, Review, SteamAccountLink
+from .models import (
+    Game,
+    GameList,
+    GameListItem,
+    LibraryEntry,
+    Review,
+    SteamAccountLink,
+    UserEmailVerification,
+    UserProfile,
+)
 from .services.steam import (
     SteamSyncError,
     fetch_steam_applist,
@@ -19,7 +30,11 @@ from .services.steam import (
     sync_game_from_steam,
     sync_steam_catalog,
 )
-from .services.steam_auth import build_steam_username, get_or_create_user_from_steam_identity
+from .services.steam_auth import (
+    build_steam_username,
+    ensure_steam_user_email_verified,
+    get_or_create_user_from_steam_identity,
+)
 
 
 class MockHTTPResponse:
@@ -275,6 +290,44 @@ class GameDetailInteractionTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Hollow Knight")
 
+    @patch("core.services.steam.fetch_json")
+    def test_catalog_search_uses_term_parameter_for_steam_query(self, mocked_fetch_json):
+        def fake_fetch_json(url):
+            if "search/results" in url:
+                return {
+                    "success": 1,
+                    "results_html": (
+                        '<a data-ds-appid="400"><span class="title">Portal</span></a>'
+                    ),
+                    "total_count": 1,
+                }
+
+            return {
+                "400": {
+                    "success": True,
+                    "data": {
+                        "name": "Portal",
+                        "type": "game",
+                        "short_description": "Puzzle",
+                        "genres": [{"description": "Puzzle"}],
+                        "header_image": "https://example.com/portal.jpg",
+                        "release_date": {"coming_soon": False, "date": "Oct 10, 2007"},
+                    },
+                }
+            }
+
+        mocked_fetch_json.side_effect = fake_fetch_json
+
+        response = self.client.get(reverse("core:game_catalog"), {"q": "Portal"})
+
+        requested_urls = [call.args[0] for call in mocked_fetch_json.call_args_list]
+        search_url = next(url for url in requested_urls if "search/results" in url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("term=Portal", search_url)
+        self.assertNotIn("query=Portal", search_url)
+        self.assertContains(response, "Portal")
+
 
 class SteamIntegrationPhaseOneTests(TestCase):
     def build_appdetails_response(
@@ -484,6 +537,19 @@ class SteamDirectLoginTests(TestCase):
         self.assertEqual(steam_link.user, user)
         self.assertEqual(steam_link.steam_id, "76561198000000000")
         self.assertEqual(steam_link.persona_name, "SteamPlayer")
+        verification = UserEmailVerification.objects.get(user=user)
+        self.assertTrue(verification.is_verified)
+        self.assertIsNotNone(verification.verified_at)
+
+    def test_ensure_steam_user_email_verified_marks_existing_user_verified(self):
+        user = User.objects.create_user(username="steam_local")
+        verification = UserEmailVerification.objects.create(user=user, is_verified=False)
+
+        ensure_steam_user_email_verified(user)
+
+        verification.refresh_from_db()
+        self.assertTrue(verification.is_verified)
+        self.assertIsNotNone(verification.verified_at)
 
     @patch("core.views.sync_owned_games_for_user")
     @patch("core.views.refresh_steam_link_profile")
@@ -517,6 +583,41 @@ class SteamDirectLoginTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("_auth_user_id", self.client.session)
+
+    @patch("core.views.sync_owned_games_for_user")
+    @patch("core.views.refresh_steam_link_profile")
+    @patch("core.views.get_or_create_user_from_steam_identity")
+    @patch("core.views.validate_steam_openid_callback")
+    def test_steam_callback_repairs_old_pending_email_verification(
+        self,
+        mocked_validate_callback,
+        mocked_get_or_create_user,
+        mocked_refresh_profile,
+        mocked_sync_library,
+    ):
+        user = User.objects.create_user(username="steam_local")
+        verification = UserEmailVerification.objects.create(user=user, is_verified=False)
+        steam_link = SteamAccountLink.objects.create(
+            user=user,
+            steam_id="76561198000000000",
+            persona_name="SteamPlayer",
+            last_login_at=timezone.now(),
+        )
+        mocked_validate_callback.return_value = "76561198000000000"
+        mocked_get_or_create_user.return_value = (user, steam_link, False)
+        mocked_refresh_profile.return_value = steam_link
+        mocked_sync_library.return_value = {
+            "created_entries": 0,
+            "existing_entries": 0,
+            "skipped_entries": 0,
+            "total_owned_games": 0,
+        }
+
+        response = self.client.get(reverse("core:steam_callback"), {"openid.mode": "id_res"}, follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        verification.refresh_from_db()
+        self.assertTrue(verification.is_verified)
 
     @patch("core.services.steam_library.fetch_owned_games")
     @patch("core.services.steam_library.sync_game_from_steam")
@@ -565,10 +666,230 @@ class SteamDirectLoginTests(TestCase):
 
     def test_navbar_prefers_steam_persona_name(self):
         user = User.objects.create_user(username="steam_local")
-        SteamAccountLink.objects.create(user=user, steam_id="76561198000000000", persona_name="Steam Hero")
+        SteamAccountLink.objects.create(
+            user=user,
+            steam_id="76561198000000000",
+            persona_name="Steam Hero",
+            avatar_url="https://steamcdn/avatar.jpg",
+        )
         self.client.force_login(user)
 
         response = self.client.get(reverse("core:home"))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Steam Hero")
+        self.assertContains(response, "https://steamcdn/avatar.jpg")
+
+
+class EmailVerificationBehaviorTests(TestCase):
+    def test_local_user_starts_with_unverified_email(self):
+        user = User.objects.create_user(username="localuser", email="local@example.com", password="testpass123")
+        verification = UserEmailVerification.objects.create(user=user, is_verified=False)
+
+        self.assertFalse(verification.is_verified)
+        self.assertIsNone(verification.verified_at)
+
+    def test_global_banner_does_not_appear_for_verified_steam_user(self):
+        user = User.objects.create_user(username="steam_local")
+        UserEmailVerification.objects.create(
+            user=user,
+            is_verified=True,
+            verified_at=timezone.now(),
+        )
+        SteamAccountLink.objects.create(user=user, steam_id="76561198000000000")
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("core:home"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Seu email ainda nao foi verificado.")
+
+
+class UserAvatarTests(TestCase):
+    GIF_BYTES = (
+        b"GIF87a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04"
+        b"\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;"
+    )
+
+    def create_uploaded_image(self, name, size=(1, 1), image_format="PNG", quality=None):
+        image = Image.new("RGB", size)
+        if size[0] * size[1] > 10000:
+            pixels = image.load()
+            for y in range(size[1]):
+                for x in range(size[0]):
+                    pixels[x, y] = ((x * 17) % 256, (y * 31) % 256, ((x + y) * 13) % 256)
+
+        image_bytes = BytesIO()
+        save_kwargs = {}
+        if quality is not None:
+            save_kwargs["quality"] = quality
+        image.save(image_bytes, format=image_format, **save_kwargs)
+        image_bytes.seek(0)
+
+        return SimpleUploadedFile(
+            name,
+            image_bytes.getvalue(),
+            content_type=f"image/{image_format.lower()}",
+        )
+
+    def test_local_user_can_upload_avatar(self):
+        user = User.objects.create_user(
+            username="localuser",
+            email="local@example.com",
+            password="testpass123",
+        )
+        UserEmailVerification.objects.create(user=user, is_verified=False)
+        self.client.force_login(user)
+
+        uploaded_avatar = self.create_uploaded_image("avatar.png")
+
+        response = self.client.post(
+            reverse("core:profile"),
+            data={
+                "username": user.username,
+                "email": user.email,
+                "avatar": uploaded_avatar,
+            },
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        profile = UserProfile.objects.get(user=user)
+        self.assertTrue(profile.avatar.name.startswith("avatars/"))
+
+    def test_local_user_can_remove_avatar(self):
+        user = User.objects.create_user(
+            username="localuser",
+            email="local@example.com",
+            password="testpass123",
+        )
+        UserEmailVerification.objects.create(user=user, is_verified=False)
+        profile = UserProfile.objects.create(user=user)
+        profile.avatar.save(
+            "avatar.gif",
+            SimpleUploadedFile("avatar.gif", self.GIF_BYTES, content_type="image/gif"),
+            save=True,
+        )
+        self.client.force_login(user)
+
+        response = self.client.post(
+            reverse("core:profile"),
+            data={
+                "username": user.username,
+                "email": user.email,
+                "remove_avatar": "on",
+            },
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        profile.refresh_from_db()
+        self.assertFalse(bool(profile.avatar))
+
+    def test_local_user_cannot_upload_non_image_avatar(self):
+        user = User.objects.create_user(
+            username="localuser",
+            email="local@example.com",
+            password="testpass123",
+        )
+        UserEmailVerification.objects.create(user=user, is_verified=False)
+        self.client.force_login(user)
+
+        uploaded_avatar = SimpleUploadedFile(
+            "avatar.txt",
+            b"nao sou uma imagem",
+            content_type="text/plain",
+        )
+
+        response = self.client.post(
+            reverse("core:profile"),
+            data={
+                "username": user.username,
+                "email": user.email,
+                "avatar": uploaded_avatar,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Envie uma imagem valida")
+        profile = UserProfile.objects.get(user=user)
+        self.assertFalse(bool(profile.avatar))
+
+    def test_local_user_cannot_upload_avatar_larger_than_1mb(self):
+        user = User.objects.create_user(
+            username="localuser",
+            email="local@example.com",
+            password="testpass123",
+        )
+        UserEmailVerification.objects.create(user=user, is_verified=False)
+        self.client.force_login(user)
+
+        uploaded_avatar = self.create_uploaded_image("avatar.png", size=(184, 184))
+        uploaded_avatar = SimpleUploadedFile(
+            "avatar.png",
+            uploaded_avatar.read() + (b"0" * (1024 * 1024)),
+            content_type="image/png",
+        )
+        self.assertGreater(uploaded_avatar.size, 1024 * 1024)
+
+        response = self.client.post(
+            reverse("core:profile"),
+            data={
+                "username": user.username,
+                "email": user.email,
+                "avatar": uploaded_avatar,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "A imagem deve ter no maximo 1 MB.")
+        profile = UserProfile.objects.get(user=user)
+        self.assertFalse(bool(profile.avatar))
+
+    def test_local_user_cannot_upload_avatar_larger_than_184_pixels(self):
+        user = User.objects.create_user(
+            username="localuser",
+            email="local@example.com",
+            password="testpass123",
+        )
+        UserEmailVerification.objects.create(user=user, is_verified=False)
+        self.client.force_login(user)
+
+        uploaded_avatar = self.create_uploaded_image(
+            "avatar.png",
+            size=(185, 184),
+        )
+
+        response = self.client.post(
+            reverse("core:profile"),
+            data={
+                "username": user.username,
+                "email": user.email,
+                "avatar": uploaded_avatar,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "A imagem deve ter no maximo 184x184 pixels.")
+        profile = UserProfile.objects.get(user=user)
+        self.assertFalse(bool(profile.avatar))
+
+    def test_navbar_uses_local_avatar_when_available(self):
+        user = User.objects.create_user(
+            username="localuser",
+            email="local@example.com",
+            password="testpass123",
+        )
+        UserEmailVerification.objects.create(user=user, is_verified=False)
+        profile = UserProfile.objects.create(user=user)
+        profile.avatar.save(
+            "avatar.gif",
+            SimpleUploadedFile("avatar.gif", self.GIF_BYTES, content_type="image/gif"),
+            save=True,
+        )
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("core:home"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, profile.avatar.url)

@@ -94,7 +94,7 @@ def fetch_steam_catalog_page(page=1, page_size=24, query="", language=DEFAULT_ST
     start = (page - 1) * page_size
     query_string = urlencode(
         {
-            "query": query or "",
+            "term": query or "",
             "start": start,
             "count": page_size,
             "infinite": 1,

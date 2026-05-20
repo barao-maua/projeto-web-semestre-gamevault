@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 
 from django import forms
 from django.contrib.auth import authenticate
@@ -7,7 +8,18 @@ from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-from .models import Review
+from .models import Review, UserProfile
+
+
+AVATAR_MAX_FILE_SIZE = 1024 * 1024
+AVATAR_MAX_DIMENSION = 184
+ALLOWED_AVATAR_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+ALLOWED_AVATAR_CONTENT_TYPES = {
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+}
 
 
 def validate_gamevault_password_strength(password):
@@ -189,3 +201,61 @@ class GameVaultReviewForm(forms.ModelForm):
         if rating < 1 or rating > 5:
             raise forms.ValidationError("A nota deve estar entre 1 e 5.")
         return rating
+
+
+class GameVaultAvatarForm(forms.ModelForm):
+    remove_avatar = forms.BooleanField(required=False, label="Remover foto atual")
+
+    class Meta:
+        model = UserProfile
+        fields = ("avatar",)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["avatar"].label = "Foto de perfil"
+        self.fields["avatar"].error_messages["invalid_image"] = "Envie uma imagem valida."
+
+    def clean_avatar(self):
+        avatar = self.cleaned_data.get("avatar")
+
+        if not avatar:
+            return avatar
+
+        file_extension = Path(avatar.name).suffix.lower()
+        if file_extension not in ALLOWED_AVATAR_EXTENSIONS:
+            raise forms.ValidationError(
+                "Envie uma imagem valida nos formatos JPG, PNG, GIF ou WEBP."
+            )
+
+        content_type = getattr(avatar, "content_type", "") or ""
+        if content_type and content_type.lower() not in ALLOWED_AVATAR_CONTENT_TYPES:
+            raise forms.ValidationError(
+                "Envie uma imagem valida nos formatos JPG, PNG, GIF ou WEBP."
+            )
+
+        if avatar.size > AVATAR_MAX_FILE_SIZE:
+            raise forms.ValidationError("A imagem deve ter no maximo 1 MB.")
+
+        width = getattr(avatar, "image", None)
+        if width is None:
+            raise forms.ValidationError("Envie uma imagem valida.")
+
+        if avatar.image.width > AVATAR_MAX_DIMENSION or avatar.image.height > AVATAR_MAX_DIMENSION:
+            raise forms.ValidationError("A imagem deve ter no maximo 184x184 pixels.")
+
+        return avatar
+
+    def clean(self):
+        cleaned_data = super().clean()
+        avatar = cleaned_data.get("avatar")
+        remove_avatar = cleaned_data.get("remove_avatar")
+
+        if remove_avatar and not avatar:
+            self._errors.pop("avatar", None)
+            cleaned_data["avatar"] = None
+            return cleaned_data
+
+        if not avatar and not remove_avatar and not getattr(self.instance, "avatar", None):
+            return cleaned_data
+
+        return cleaned_data

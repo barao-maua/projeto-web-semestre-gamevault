@@ -197,3 +197,27 @@ class SteamAccountLink(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - Steam {self.steam_id}"
+
+
+class UserProfile(models.Model):
+    """Perfil local do usuario para configuracoes complementares."""
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="profile",
+        verbose_name="Usuario",
+    )
+    avatar = models.ImageField(
+        upload_to="avatars/",
+        null=True,
+        blank=True,
+        verbose_name="Avatar",
+    )
+
+    class Meta:
+        verbose_name = "Perfil do Usuario"
+        verbose_name_plural = "Perfis dos Usuarios"
+
+    def __str__(self):
+        return f"Perfil de {self.user.username}"
