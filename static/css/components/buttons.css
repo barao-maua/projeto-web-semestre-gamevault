@@ -1,0 +1,47 @@
+.button,
+.ghost-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0 20px;
+    border-radius: 12px;
+    transition: 0.2s ease;
+}
+
+.button {
+    border: none;
+    color: #0f1724;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent) 0%, #d7ff55 100%);
+    box-shadow: 0 18px 30px rgba(181, 224, 0, 0.22);
+}
+
+.button,
+.button:visited,
+.button:hover,
+.button:focus {
+    color: #0f1724;
+}
+
+.button:hover {
+    transform: translateY(-1px);
+    background: linear-gradient(135deg, #c8f320 0%, #ddff6f 100%);
+}
+
+.ghost-button {
+    border: 1px solid var(--line);
+    color: var(--text);
+    background: rgba(47, 76, 103, 0.25);
+}
+
+.ghost-button:hover {
+    background: rgba(47, 76, 103, 0.45);
+}
+
+.screen-actions,
+.inline-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}

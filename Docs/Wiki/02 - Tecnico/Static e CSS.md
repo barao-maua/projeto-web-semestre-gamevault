@@ -6,7 +6,7 @@ area: tecnico
 projeto: GameVault
 arquivo_relacionado:
   - static/css/base.css
-  - static/css/components.css
+  - static/css/components/
   - static/css/responsive.css
   - static/css/pages/
 tags:
@@ -25,7 +25,16 @@ Os arquivos estaticos do [[GameVault]] ficam em `static/`. A configuracao em `co
 ```text
 static/css/
   base.css
-  components.css
+  components/
+    badges.css
+    banners.css
+    buttons.css
+    footer.css
+    forms.css
+    game-card.css
+    modals.css
+    navbar.css
+    user-chip.css
   responsive.css
   pages/
     auth.css
@@ -41,7 +50,7 @@ static/css/
 ## Responsabilidades
 
 - `base.css`: variaveis, reset, estrutura global, tipografia, telas base e mensagens.
-- `components.css`: navbar, botoes, formularios, cards, capas, estados vazios, status, footer, banner global de verificacao e modal de logout.
+- `components/*.css`: componentes compartilhados quebrados por bloco visual, como navbar, user chip, botoes, formularios, modais, cards, badges, banners e footer.
 - `responsive.css`: ajustes globais de responsividade, carregado por ultimo.
 - `pages/*.css`: estilos especificos de cada pagina, incluindo feedback visual de formularios e modais.
 
@@ -52,7 +61,7 @@ static/css/
 1. Bootstrap via CDN.
 2. Font Awesome via CDN.
 3. `static/css/base.css`.
-4. `static/css/components.css`.
+4. `static/css/components/*.css` em ordem explicita no template base.
 5. Bloco `extra_css` com CSS especifico da pagina.
 6. `static/css/responsive.css`.
 
@@ -64,7 +73,6 @@ Essa ordem permite que estilos globais sejam definidos primeiro, estilos de pagi
 | --- | --- |
 | `templates/pages/home.html` | `static/css/pages/home.css` |
 | `templates/pages/sobre.html` | `static/css/pages/sobre.css` |
-| `templates/pages/diferenciais.html` | `static/css/pages/diferenciais.css` |
 | `templates/catalog/game_catalog.html` | `static/css/pages/catalog.css` |
 | `templates/catalog/game_detail.html` | `static/css/pages/game-detail.css` |
 | `templates/library/library.html` | `static/css/pages/library.css` |
@@ -72,13 +80,16 @@ Essa ordem permite que estilos globais sejam definidos primeiro, estilos de pagi
 | `templates/registration/register.html` | `static/css/pages/auth.css` |
 | `templates/registration/profile.html` | `static/css/pages/profile.css` |
 
+Arquivo legado sem rota ativa no momento:
+
+- `static/css/pages/diferenciais.css`: mantido como historico visual de uma tela institucional removida do fluxo atual.
+
 ## Ajustes Relevantes Recentes
 
-- `components.css` passou a incluir:
-  - chip de sessao ativa em destaque;
-  - modal de confirmacao de logout;
-  - banner global para email pendente de verificacao;
-  - contraste reforcado para botoes principais.
+- `components/user-chip.css` destaca o chip de sessao ativa.
+- `components/modals.css` centraliza modal de logout e modais compartilhados.
+- `components/banners.css` centraliza o banner global para email pendente de verificacao.
+- `components/buttons.css` concentra os botoes principais e secundario.
 - `auth.css` passou a incluir:
   - checklist visual de senha;
   - status de confirmacao de senha em tempo real.

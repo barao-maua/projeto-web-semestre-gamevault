@@ -15,7 +15,7 @@ tags:
 
 # Models
 
-Os models do [[GameVault]] ficam em `core/models.py` e representam o catalogo de jogos, a biblioteca pessoal do usuario, avaliacoes, listas personalizadas e o estado de verificacao do email do usuario.
+Os models do [[GameVault]] ficam em `core/models.py` e representam o catalogo de jogos, a biblioteca pessoal do usuario, avaliacoes, listas personalizadas, o estado de verificacao do email, o vinculo com a Steam e o perfil local do usuario.
 
 ## Entidades
 
@@ -127,6 +127,38 @@ Regra importante:
 
 - existe no maximo um registro por usuario, via `OneToOneField`.
 
+### SteamAccountLink
+
+Representa o vinculo entre um usuario local e uma conta Steam autenticada.
+
+Campos principais:
+
+- `user`: usuario local vinculado.
+- `steam_id`: identificador unico da conta Steam.
+- `persona_name`: nome publico exibido pela Steam.
+- `profile_url`: URL do perfil publico.
+- `avatar_url`: avatar remoto da Steam.
+- `created_at`: momento em que o vinculo foi criado.
+- `last_login_at`: ultimo login via Steam.
+- `last_library_sync_at`: ultima sincronizacao da biblioteca Steam.
+
+Regra importante:
+
+- existe no maximo um registro por usuario e um por `steam_id`, ambos garantidos por unicidade.
+
+### UserProfile
+
+Representa configuracoes locais complementares do usuario.
+
+Campos principais:
+
+- `user`: usuario dono do perfil.
+- `avatar`: imagem local de perfil salva em `media/avatars/`.
+
+Regra importante:
+
+- existe no maximo um perfil local por usuario, via `OneToOneField`.
+
 ## Relacionamentos
 
 ```mermaid
@@ -139,6 +171,8 @@ erDiagram
     GameList ||--o{ GameListItem : contem
     Game ||--o{ GameListItem : listado_em
     User ||--|| UserEmailVerification : possui
+    User ||--|| SteamAccountLink : vincula
+    User ||--|| UserProfile : possui
 ```
 
 ## Observacoes
@@ -149,7 +183,7 @@ erDiagram
 - O email do usuario fica em `User.email`, enquanto a verificacao desse email fica separada em `UserEmailVerification`.
 - `LibraryEntry.progress` continua existindo no model, mas a interface atual da entrega prioriza status e avaliacao na experiencia principal.
 - O `README` principal foi alinhado ao codigo atual durante a limpeza do vault.
-- A Fase 1 da integracao Steam adicionou chave externa e timestamp de sincronizacao sem alterar a leitura local do catalogo.
+- A integracao Steam hoje ja inclui chave externa, sincronizacao de jogos, login via OpenID e importacao da biblioteca possuida pelo usuario.
 
 ## Notas Relacionadas
 

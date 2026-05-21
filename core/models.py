@@ -18,6 +18,10 @@ class Game(models.Model):
         null=True, blank=True, verbose_name="Data de Lançamento"
     )
     genre = models.CharField(max_length=100, blank=True, verbose_name="Gênero")
+    developers = models.CharField(max_length=255, blank=True, verbose_name="Desenvolvedor")
+    publishers = models.CharField(max_length=255, blank=True, verbose_name="Distribuidora")
+    system_requirements_min = models.TextField(blank=True, verbose_name="Requisitos Minimos")
+    system_requirements_rec = models.TextField(blank=True, verbose_name="Requisitos Recomendados")
     cover_image = models.URLField(blank=True, verbose_name="URL da Capa")
     last_synced_at = models.DateTimeField(
         null=True, blank=True, verbose_name="Última sincronização"

@@ -9,7 +9,6 @@ projeto: GameVault
 arquivo_relacionado:
   - templates/pages/home.html
   - templates/pages/sobre.html
-  - templates/pages/diferenciais.html
   - core/views.py
 tags:
   - gamevault
@@ -19,7 +18,7 @@ tags:
 
 # Paginas Institucionais
 
-As paginas institucionais apresentam o conceito do [[GameVault]], demonstram telas e ajudam na navegacao inicial do projeto.
+As paginas institucionais apresentam o conceito do [[GameVault]], destacam o escopo do MVP e ajudam na navegacao inicial do projeto.
 
 ## Rotas
 
@@ -27,7 +26,6 @@ As paginas institucionais apresentam o conceito do [[GameVault]], demonstram tel
 | --- | --- | --- | --- |
 | `/` | `core:home` | `home_view` | `pages/home.html` |
 | `/sobre/` | `core:sobre` | `sobre_view` | `pages/sobre.html` |
-| `/diferenciais/` | `core:diferenciais` | `diferenciais_view` | `pages/diferenciais.html` |
 
 ## Home
 
@@ -38,10 +36,9 @@ Ela apresenta:
 - proposta do produto;
 - chamadas para login e cadastro;
 - cards visuais de estatisticas;
-- jogos em destaque vindos de `featured_games`;
-- link para detalhes de jogos em destaque.
+- preview conceitual da biblioteca, reviews e status.
 
-`home_view` busca ate seis jogos do banco e anexa metadados visuais de capa para a variante `home`.
+`home_view` atualmente renderiza uma landing page estatica, sem carregar jogos dinamicos do banco.
 
 ## Sobre
 
@@ -50,33 +47,20 @@ Ela apresenta:
 Ela apresenta:
 
 - descricao de uma tela de colecao;
-- exemplos de busca, filtro e acao principal;
-- cards estaticos de jogos;
-- links de navegacao para home e diferenciais.
-
-## Diferenciais
-
-`pages/diferenciais.html` atualmente funciona como uma pagina demonstrativa de detalhes e avaliacoes.
-
-Ela apresenta:
-
-- exemplo de ficha de jogo;
-- area de avaliacao pessoal;
-- avaliacoes da comunidade;
-- interacao visual com coracoes via JavaScript;
-- cards explicando status visual, review pessoal e comunidade.
+- visao do MVP atual;
+- cards explicando catalogo, biblioteca, reviews, login local e Steam.
 
 ## Papel No Projeto
 
 Essas paginas cumprem dois papeis:
 
 - apresentar o produto para visitantes;
-- demonstrar visualmente funcionalidades que tambem aparecem nas telas dinamicas de catalogo, detalhe e biblioteca.
+- contextualizar visualmente funcionalidades que depois aparecem de forma dinamica no catalogo, detalhe e biblioteca.
 
 ## Observacoes
 
-- Os nomes `sobre` e `diferenciais` sao rotas institucionais, mas o conteudo atual esta mais proximo de demonstracoes de biblioteca e avaliacoes.
-- A home ja usa dados reais do model `Game` para jogos em destaque.
+- A rota `/diferenciais/` nao existe mais no estado atual do projeto.
+- A home atual e uma landing page estatica; os dados reais aparecem nas telas de catalogo, detalhe e biblioteca.
 
 ## Relacoes Com Outras Areas
 

@@ -37,7 +37,6 @@ templates/
   pages/
     home.html
     sobre.html
-    diferenciais.html
   catalog/
     game_catalog.html
     game_detail.html
@@ -65,7 +64,7 @@ templates/
 - Define `lang="pt-BR"`.
 - Inclui Bootstrap via CDN.
 - Inclui Font Awesome via CDN.
-- Carrega `base.css`, `components.css`, CSS especifico por pagina e `responsive.css`.
+- Carrega `base.css`, a pasta `components/` em arquivos separados, CSS especifico por pagina e `responsive.css`.
 - Inclui `components/navbar.html` e `components/footer.html`.
 - Renderiza mensagens do Django.
 - Pode renderizar um banner global de email pendente de verificacao para usuarios autenticados.
@@ -78,10 +77,11 @@ templates/
 `templates/components/navbar.html` adapta links conforme autenticacao:
 
 - Usuario logado: Inicio, Minha Biblioteca, Catalogo, Perfil e Sair.
-- Visitante: Inicio, Catalogo, Sobre, Diferenciais, Login e Cadastro.
+- Visitante: Inicio, Catalogo, Sobre, Login e Cadastro.
 - Mostra um chip de usuario com nome ou estado de visitante.
 - O chip do usuario autenticado funciona como atalho para o perfil.
 - O logout agora passa por um modal de confirmacao visual com envio `POST`.
+- Quando houver conta Steam ou avatar local, o chip exibe a imagem correspondente.
 
 ### Footer
 
@@ -96,7 +96,7 @@ templates/
 - Hero de apresentacao.
 - Chamadas para login e cadastro.
 - Cards estatisticos visuais.
-- Jogos em destaque vindos de `featured_games`.
+- Preview conceitual da experiencia do produto.
 
 ### Catalogo
 
@@ -135,9 +135,9 @@ templates/
 
 Os templates em `templates/registration/` suportam autenticacao, perfil, verificacao de email e recuperacao de senha.
 
-- `login.html`: login por usuario ou email e link de esqueci minha senha.
+- `login.html`: login por usuario ou email, link de esqueci minha senha e acao para entrar com Steam.
 - `register.html`: cadastro com email obrigatorio e checklist visual de senha.
-- `profile.html`: edicao de username/email, status de verificacao, reenvio e logout via `POST`.
+- `profile.html`: edicao de username/email, status de verificacao, avatar local ou Steam, reenvio e logout via `POST`.
 - `password_reset_*.html`: fluxo completo de redefinicao de senha.
 - `verify_email_*.txt`: assunto e corpo do email de verificacao.
 
@@ -152,7 +152,6 @@ Cada pagina usa o bloco `extra_css` para carregar um CSS especifico:
 - `login.html` e `register.html` -> `static/css/pages/auth.css`
 - `profile.html` -> `static/css/pages/profile.css`
 - `sobre.html` -> `static/css/pages/sobre.css`
-- `diferenciais.html` -> `static/css/pages/diferenciais.css`
 
 ## Observacao De Evolucao
 

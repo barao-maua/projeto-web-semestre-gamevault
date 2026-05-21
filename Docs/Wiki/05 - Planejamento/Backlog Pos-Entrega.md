@@ -66,18 +66,17 @@ TODO:
 - [ ] Remover cards falsos de editar/remover.
 - [ ] Manter biblioteca real apenas em `/library/`.
 
-### Pagina `/diferenciais/` Com Avaliacoes Fake
+### Rota `/diferenciais/` Removida Do Fluxo Atual
 
 Problema:
 
-- A pagina mostra avaliacoes e pessoas ficticias.
-- Isso conflita com as avaliacoes reais em `Review`.
+- A rota institucional antiga nao faz mais parte do fluxo atual.
+- O historico visual ainda aparece em arquivos legados de documentacao e CSS.
 
 TODO:
 
-- [ ] Reescrever `/diferenciais/` como pagina institucional.
-- [ ] Remover comentarios falsos da comunidade.
-- [ ] Explicar funcionalidades: biblioteca, progresso, avaliacoes e catalogo.
+- [ ] Decidir se a rota sera recriada no futuro ou arquivada definitivamente.
+- [ ] Se voltar, reintroduzir apenas conteudo institucional real.
 - [ ] Manter avaliacoes reais apenas no detalhe do jogo.
 
 ## Media Prioridade
@@ -95,7 +94,7 @@ TODO:
 - [ ] `/library/`: Minha Biblioteca.
 - [ ] `/`: Home/landing.
 - [ ] `/sobre/`: Sobre.
-- [ ] `/diferenciais/`: Diferenciais.
+- [ ] Confirmar oficialmente a ausencia de `/diferenciais/` no fluxo atual.
 
 ### Usuario Deslogado
 
@@ -145,7 +144,7 @@ TODO:
 ## Ordem Recomendada
 
 1. Finalizar CRUD da biblioteca para a entrega final.
-2. Corrigir `/sobre/` e `/diferenciais/` para nao parecerem dados reais falsos.
+2. Consolidar `/sobre/` como pagina institucional real e decidir o destino definitivo da antiga `/diferenciais/`.
 3. Melhorar progresso editavel.
 4. Revisar experiencia de visitante.
 5. Evoluir listas personalizadas.

@@ -85,7 +85,7 @@ Implementacao realizada neste lote:
 - CSS legado de autenticacao removido de `auth.css` e referencias responsivas associadas limpas.
 - Estilos mortos de fluxo antigo removidos de `game-detail.css`.
 - Checklist de senha extraido para parcial compartilhado e script unico em `static/js/password-feedback.js`.
-- Estilos de modal e `status-card` centralizados em `static/css/components.css` para reuso entre biblioteca e detalhe do jogo.
+- Estilos de modal e `status-card` centralizados em `static/css/components/modals.css` para reuso entre biblioteca e detalhe do jogo.
 - `SITE_BASE_URL` removido de `config/settings.py` por nao ter uso no codigo atual.
 - Import `authenticate` mantido em `core/views.py` apos revisao, pois segue em uso no login.
 
@@ -114,7 +114,7 @@ Implementacao realizada neste lote:
 - Helper global `static/js/http.js` criado para centralizar `fetch`, CSRF, sessao expirada e resposta nao JSON.
 - Fluxos AJAX de biblioteca e detalhe do jogo migrados para o helper comum, com falha controlada em sessao expirada e HTML inesperado.
 - Logout migrado de GET para POST em `logout_view`, modal da navbar e perfil.
-- Navbar publica revisada para apontar para fluxos reais (`Catalogo`, `Sobre`, `Diferenciais`) em vez de rotulos mock.
+- Navbar publica revisada para apontar para fluxos reais (`Catalogo` e `Sobre`) em vez de rotulos mock.
 - Active state da navbar revisado para usar `request.resolver_match.url_name`, incluindo destaque correto para detalhe do jogo dentro de `Catalogo`.
 - Estrategia atual de media confirmada: `MEDIA_URL = "/media/"`, `MEDIA_ROOT = BASE_DIR / "media"` e servico local habilitado em `config/urls.py` apenas em `DEBUG`.
 

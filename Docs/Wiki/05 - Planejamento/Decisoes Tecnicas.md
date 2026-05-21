@@ -159,7 +159,7 @@ Motivo:
 Impacto:
 
 - Estilos globais ficam em `base.css`.
-- Componentes compartilhados ficam em `components.css`.
+- Componentes compartilhados ficam em `static/css/components/`, separados por bloco visual.
 - Ajustes responsivos ficam em `responsive.css`.
 - Estilos especificos ficam em `static/css/pages/`.
 

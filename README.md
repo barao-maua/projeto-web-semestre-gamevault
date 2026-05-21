@@ -6,7 +6,7 @@ O **GameVault** é uma aplicação web transacional voltada para o gerenciamento
 
 O objetivo principal é **centralizar e facilitar o controle da coleção de jogos de cada usuário**, permitindo registrar status, avaliações e histórico de interação com os títulos cadastrados.
 
-No estado atual da entrega, o foco principal esta em autenticacao, biblioteca pessoal e avaliacoes. Como evolucao futura prioritaria, o projeto pretende integrar o catalogo a dados vindos da Steam para reduzir cadastro manual de jogos e melhorar consistencia visual das capas.
+No estado atual da entrega, o foco principal esta em autenticacao, catalogo, biblioteca pessoal, avaliacoes e integracao com a Steam. O projeto ja consegue usar a Steam como fonte de descoberta e sincronizacao de dados, mantendo o banco local como base persistente da aplicacao.
 
 ---
 
@@ -22,6 +22,8 @@ Funcionalidades:
 - Login com usuario ou email
 - Verificacao de email sem bloquear acesso
 - Recuperacao de senha por email
+- Login com Steam via OpenID
+- Edicao de perfil com avatar local
 - Acesso a biblioteca pessoal
 
 ---
@@ -35,6 +37,7 @@ Funcionalidades:
 - Adicionar jogos
 - Editar informações
 - Remover jogos da biblioteca
+- Sincronizar jogos possuidos na Steam para a biblioteca local
 
 ---
 
@@ -62,6 +65,7 @@ Funcionalidades:
 
 - Avaliação com nota
 - Comentário ou review sobre o jogo
+- Preservacao do historico de reviews por usuario e jogo
 
 ---
 
@@ -81,24 +85,42 @@ Observacao:
 
 ---
 
+### 6. Integracao com Steam
+
+**Como usuário**, quero aproveitar dados da Steam e, quando fizer sentido, autenticar ou sincronizar minha conta, para reduzir cadastro manual e acelerar a montagem da minha biblioteca.
+
+Funcionalidades:
+
+- Busca de jogos com apoio do catalogo da Steam
+- Cache local de jogos sincronizados
+- Pagina de detalhe por `app_id` da Steam
+- Login com Steam
+- Vinculo entre usuario local e conta Steam
+- Sincronizacao da biblioteca possuida na Steam
+
+---
+
 ## Tipo de Aplicação
 
 O **GameVault** é uma **aplicação web transacional com banco de dados relacional**, onde cada interação realizada pelo usuário é registrada e persistida no sistema.
 
 As operações principais do sistema seguem o modelo **CRUD (Create, Read, Update, Delete)** sobre os seguintes recursos:
 
-- Usuários
+- Usuarios
 - Jogos
 - Entradas na biblioteca
-- Avaliações
+- Avaliacoes
 - Listas personalizadas
+- Vinculos de conta Steam
+- Perfis locais do usuario
 
 Na interface atual, o fluxo mais maduro do sistema esta em:
 
-- autenticacao;
-- catalogo;
+- autenticacao local e Steam;
+- catalogo com fallback local;
 - biblioteca do usuario;
-- avaliacoes.
+- avaliacoes com historico;
+- perfil do usuario.
 
 ---
 
@@ -300,6 +322,36 @@ last_verification_email_sent_at
 
 ---
 
+### SteamAccountLink
+
+Representa o vinculo entre um usuario local e uma conta Steam autenticada.
+
+```text
+id (PK)
+user_id (FK / one-to-one)
+steam_id
+persona_name
+profile_url
+avatar_url
+created_at
+last_login_at
+last_library_sync_at
+```
+
+---
+
+### UserProfile
+
+Representa dados locais complementares do perfil do usuario.
+
+```text
+id (PK)
+user_id (FK / one-to-one)
+avatar
+```
+
+---
+
 ## Relacionamentos
 
 - Um **User** pode possuir vários **LibraryEntry** (1:N)
@@ -309,6 +361,8 @@ last_verification_email_sent_at
 - Um **User** pode criar várias **GameList** (1:N)
 - Uma **GameList** pode conter vários **GameListItem** (1:N)
 - Um **Game** pode estar presente em vários **GameListItem** (1:N)
+- Um **User** pode possuir uma **SteamAccountLink** (1:1)
+- Um **User** pode possuir um **UserProfile** (1:1)
 
 ---
 
@@ -321,6 +375,8 @@ O sistema permite realizar operações **CRUD** sobre os principais recursos da 
 - Entradas na biblioteca
 - Avaliações
 - Listas personalizadas
+- Vinculos com Steam
+- Perfil local do usuario
 
 Essas operações caracterizam o **GameVault como uma aplicação web transacional**, utilizando banco de dados relacional para persistência das informações.
 
@@ -356,6 +412,8 @@ python .\manage.py seed_games
 python .\manage.py create_demo_superuser
 ```
 
+Opcionalmente, se quiser usar os fluxos com Steam e envio real de email, configure as variaveis de ambiente do arquivo `.env` antes de executar o servidor.
+
 Credenciais padrao do admin de demonstracao:
 
 ```text
@@ -369,6 +427,14 @@ Ao rodar `python manage.py create_demo_superuser`, o projeto tambem prepara um e
 - status `playing`
 - progresso `45%`
 - review de exemplo cadastrada para o mesmo jogo
+
+## Observacoes Tecnicas Relevantes
+
+- O catalogo tenta usar a Steam como fonte principal de descoberta em `game_catalog_view`.
+- Se a consulta externa falhar, a aplicacao cai para o banco local sem quebrar a pagina.
+- O login local aceita `username` ou `email`.
+- O projeto tambem possui login com Steam via OpenID e sincronizacao opcional da biblioteca possuida.
+- As reviews sao historicas: uma nova avaliacao nao apaga automaticamente as anteriores.
 
 ```powershell
 python .\manage.py runserver

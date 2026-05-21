@@ -290,6 +290,49 @@ class GameDetailInteractionTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Hollow Knight")
 
+    def test_game_detail_context_includes_standardized_cover_metadata(self):
+        response = self.client.get(reverse("core:game_detail", args=[self.game.id]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["game"].detail_cover_position, "center 20%")
+
+    def test_game_detail_shows_developers_and_publishers_when_available(self):
+        self.game.developers = "Team Cherry"
+        self.game.publishers = "Team Cherry"
+        self.game.save(update_fields=["developers", "publishers"])
+
+        response = self.client.get(reverse("core:game_detail", args=[self.game.id]))
+
+        self.assertContains(response, "Desenvolvedor")
+        self.assertContains(response, "Team Cherry")
+        self.assertContains(response, "Distribuidora")
+
+    def test_game_detail_shows_requirements_when_available(self):
+        self.game.system_requirements_min = "SO: Windows 10\nMemoria: 8 GB de RAM"
+        self.game.system_requirements_rec = "SO: Windows 10\nMemoria: 16 GB de RAM"
+        self.game.save(
+            update_fields=[
+                "system_requirements_min",
+                "system_requirements_rec",
+            ]
+        )
+
+        response = self.client.get(reverse("core:game_detail", args=[self.game.id]))
+
+        self.assertContains(response, "Requisitos de sistema")
+        self.assertContains(response, "Memoria: 8 GB de RAM")
+
+    def test_library_links_to_steam_detail_when_game_has_steam_app_id(self):
+        self.client.force_login(self.user)
+        self.game.steam_app_id = 620
+        self.game.save(update_fields=["steam_app_id"])
+        LibraryEntry.objects.create(user=self.user, game=self.game, status="playing")
+
+        response = self.client.get(reverse("core:library"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'href="/steam-game/620/"')
+
     @patch("core.services.steam.fetch_json")
     def test_catalog_search_uses_term_parameter_for_steam_query(self, mocked_fetch_json):
         def fake_fetch_json(url):
@@ -349,6 +392,12 @@ class SteamIntegrationPhaseOneTests(TestCase):
                     "short_description": short_description,
                     "header_image": f"https://cdn.akamai.steamstatic.com/steam/apps/{app_id}/header.jpg",
                     "release_date": {"date": "Apr 19, 2011"},
+                    "developers": ["Valve"],
+                    "publishers": ["Valve"],
+                    "pc_requirements": {
+                        "minimum": "<strong>SO:</strong> Windows 10<br><strong>Memoria:</strong> 8 GB de RAM",
+                        "recommended": "<strong>SO:</strong> Windows 10<br><strong>Memoria:</strong> 16 GB de RAM",
+                    },
                     "genres": [{"description": "Puzzle"}, {"description": "Adventure"}],
                 },
             }
@@ -377,6 +426,10 @@ class SteamIntegrationPhaseOneTests(TestCase):
         self.assertEqual(game.steam_type, "game")
         self.assertEqual(game.title, "Portal 2")
         self.assertEqual(game.genre, "Puzzle")
+        self.assertEqual(game.developers, "Valve")
+        self.assertEqual(game.publishers, "Valve")
+        self.assertIn("Windows 10", game.system_requirements_min)
+        self.assertIn("16 GB de RAM", game.system_requirements_rec)
         self.assertEqual(game.description, "Descricao real do jogo.")
         self.assertIsNotNone(game.last_synced_at)
 
@@ -434,11 +487,39 @@ class SteamIntegrationPhaseOneTests(TestCase):
                 "short_description": "Descricao curta.",
                 "header_image": "https://cdn.akamai.steamstatic.com/steam/apps/620/header.jpg",
                 "release_date": {"date": "Apr 19, 2011"},
+                "developers": ["Valve"],
+                "publishers": ["Valve"],
+                "pc_requirements": {
+                    "minimum": "<strong>SO:</strong> Windows 10<br><strong>Memoria:</strong> 8 GB de RAM",
+                    "recommended": "<strong>SO:</strong> Windows 10<br><strong>Memoria:</strong> 16 GB de RAM",
+                },
                 "genres": [{"description": "Puzzle"}],
             }
         )
 
         self.assertEqual(normalized["description"], "Descricao real do jogo.")
+        self.assertEqual(normalized["developers"], "Valve")
+        self.assertEqual(normalized["publishers"], "Valve")
+        self.assertIn("SO: Windows 10", normalized["system_requirements_min"])
+        self.assertIn("Memoria: 16 GB de RAM", normalized["system_requirements_rec"])
+
+    def test_normalize_steam_game_parses_brazilian_release_date(self):
+        normalized = normalize_steam_game(
+            {
+                "steam_appid": 620,
+                "type": "game",
+                "name": "Portal 2",
+                "detailed_description": "Descricao.",
+                "short_description": "Descricao curta.",
+                "header_image": "https://cdn.akamai.steamstatic.com/steam/apps/620/header.jpg",
+                "release_date": {"date": "19 abr. 2011"},
+                "developers": ["Valve"],
+                "publishers": ["Valve"],
+                "genres": [{"description": "Puzzle"}],
+            }
+        )
+
+        self.assertEqual(str(normalized["release_date"]), "2011-04-19")
 
     @patch("core.services.steam.urlopen")
     def test_sync_game_uses_english_fallback_when_brazilian_description_is_empty(self, mocked_urlopen):

@@ -20,16 +20,19 @@ tags:
 
 # Autenticacao
 
-A autenticacao do [[GameVault]] usa os recursos padrao do Django para cadastro, login, logout e protecao de paginas que exigem usuario autenticado.
+A autenticacao do [[GameVault]] usa os recursos padrao do Django para cadastro, login, logout e protecao de paginas que exigem usuario autenticado, com extensoes proprias para login por email, verificacao de email, avatar local e entrada com Steam.
 
 ## Rotas
 
 | Caminho | Nome | View | Template |
 | --- | --- | --- | --- |
 | `/login/` | `core:login` | `login_view` | `registration/login.html` |
+| `/steam/login/` | `core:steam_login` | `steam_login_view` | nenhum template; redireciona para a Steam |
+| `/steam/callback/` | `core:steam_callback` | `steam_callback_view` | nenhum template; redireciona |
 | `/logout/` | `core:logout` | `logout_view` | nenhum template; aceita `POST` e redireciona |
 | `/register/` | `core:register` | `register_view` | `registration/register.html` |
 | `/profile/` | `core:profile` | `profile_view` | `registration/profile.html` |
+| `/steam/sync-library/` | `core:steam_sync_library` | `steam_sync_library_view` | nenhum template; aceita `POST` e redireciona |
 | `/verify-email/<token>/` | `core:verify_email` | `verify_email_view` | nenhum template; redireciona |
 | `/resend-verification-email/` | `core:resend_verification_email` | `resend_verification_email_view` | nenhum template; redireciona |
 | `/password-reset/` | `core:password_reset` | `PasswordResetView` | `registration/password_reset_form.html` |
@@ -42,7 +45,7 @@ A autenticacao do [[GameVault]] usa os recursos padrao do Django para cadastro, 
 `register_view` usa `GameVaultUserCreationForm`, baseado em `UserCreationForm`, com email obrigatorio e unico.
 
 > [!note]
-> A evolucao planejada para email unico, verificacao por email e redefinicao de senha esta documentada em [[Spec - Email Verificacao e Reset de Senha]].
+> A nota [[Spec - Email Verificacao e Reset de Senha]] preserva o historico de planejamento, mas boa parte desse fluxo ja foi implementada no codigo atual.
 
 Fluxo:
 
@@ -68,6 +71,19 @@ Fluxo:
 5. Se houver `next`, o destino original e respeitado.
 6. Caso contrario, o usuario e redirecionado para a biblioteca.
 
+## Login Com Steam
+
+O projeto tambem oferece autenticacao via Steam usando OpenID.
+
+Fluxo:
+
+1. Usuario acessa `/steam/login/`.
+2. O sistema redireciona para a autenticacao OpenID da Steam.
+3. A Steam retorna para `/steam/callback/`.
+4. O sistema valida o callback, cria ou localiza a conta local vinculada e marca o usuario como verificado.
+5. Quando possivel, o sistema tenta sincronizar os jogos possuidos na Steam para a biblioteca local.
+6. O usuario autenticado e redirecionado para a biblioteca.
+
 ## Logout
 
 `logout_view` agora exige `POST`, encerra a sessao com `logout(request)` e redireciona para a home.
@@ -88,6 +104,9 @@ O template mostra:
 - email;
 - status de verificacao do email;
 - data de cadastro;
+- avatar local ou avatar da Steam;
+- formulario de upload e remocao de foto quando a conta nao depende da Steam;
+- botao para sincronizar novamente a biblioteca Steam quando houver conta vinculada;
 - botao para reenviar verificacao quando pendente;
 - link para logout.
 
@@ -111,7 +130,7 @@ Fluxo:
 
 `templates/components/navbar.html` muda os links conforme `user.is_authenticated`:
 
-- Visitante: Inicio, Catalogo, Sobre, Diferenciais, Login e Cadastro.
+- Visitante: Inicio, Catalogo, Sobre, Login e Cadastro.
 - Usuario logado: Inicio, Minha Biblioteca, Catalogo, Perfil e Sair.
 
 ## Relacoes Com Outras Areas

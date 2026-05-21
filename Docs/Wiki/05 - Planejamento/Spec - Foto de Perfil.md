@@ -271,9 +271,9 @@ Mostrar:
 
 - usar `UserProfile` como model auxiliar;
 - usar `ImageField` com `upload_to="avatars/"`;
-- limitar tamanho a `2 MB`;
-- aceitar `jpg`, `jpeg`, `png` e `webp`;
-- usar botao explicito para remover foto;
+- limitar tamanho a `1 MB` no codigo atual;
+- aceitar `jpg`, `jpeg`, `png`, `gif` e `webp`;
+- usar checkbox de remocao no formulario atual;
 - manter fallback por inicial em perfil e navbar;
 - nao implementar crop nesta fase.
 
@@ -286,27 +286,27 @@ Mostrar:
 - `templates/registration/profile.html`
 - `templates/components/navbar.html`
 - `static/css/pages/profile.css`
-- `static/css/components.css`
+- `static/css/components/user-chip.css`
 - possivelmente `config/urls.py`
 - documentacao relacionada.
 
 ## Checklist De Implementacao
 
-- [ ] Criar `UserProfile`.
-- [ ] Criar migration.
-- [ ] Criar helper `get_or_create_user_profile(user)`.
-- [ ] Adicionar campo `avatar` ao form de perfil.
-- [ ] Validar extensao do arquivo.
-- [ ] Validar tamanho maximo.
-- [ ] Ajustar `profile_view` para receber `request.FILES`.
-- [ ] Implementar troca de avatar.
-- [ ] Implementar remocao de avatar.
-- [ ] Renderizar avatar no perfil.
-- [ ] Renderizar avatar na navbar.
-- [ ] Manter fallback por inicial.
-- [ ] Garantir serving de `media/` em desenvolvimento.
-- [ ] Atualizar documentacao relacionada.
-- [ ] Testar upload, troca, remocao e fallback.
+- [x] Criar `UserProfile`.
+- [x] Criar migration.
+- [x] Criar helper `get_or_create_user_profile(user)`.
+- [x] Adicionar campo `avatar` ao form de perfil.
+- [x] Validar extensao do arquivo.
+- [x] Validar tamanho maximo.
+- [x] Ajustar `profile_view` para receber `request.FILES`.
+- [x] Implementar troca de avatar.
+- [x] Implementar remocao de avatar.
+- [x] Renderizar avatar no perfil.
+- [x] Renderizar avatar na navbar.
+- [x] Manter fallback por inicial.
+- [x] Garantir serving de `media/` em desenvolvimento.
+- [x] Atualizar documentacao relacionada.
+- [x] Testar upload, troca, remocao e fallback.
 
 ## Critério De Pronto
 

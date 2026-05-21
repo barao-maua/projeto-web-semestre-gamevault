@@ -1,0 +1,74 @@
+.user-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 8px 10px 8px 14px;
+    border-radius: 999px;
+    background: rgba(31, 45, 64, 0.85);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+}
+
+.user-chip-link {
+    transition: 0.2s ease;
+}
+
+.user-chip-link:hover {
+    border-color: rgba(181, 224, 0, 0.3);
+    background: rgba(31, 45, 64, 1);
+    transform: translateY(-1px);
+}
+
+.user-chip-text {
+    min-width: 0;
+    text-align: right;
+}
+
+.user-chip-text strong,
+.user-chip-text span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-chip-text strong {
+    font-size: 0.85rem;
+    color: var(--text);
+}
+
+.user-chip-text span {
+    color: var(--muted);
+    font-size: 0.7rem;
+}
+
+.user-chip-text .session-active-label {
+    color: #b9f85d;
+}
+
+.user-avatar {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    flex-shrink: 0;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 50%;
+    line-height: 0;
+    color: #0f1724;
+    font-size: 0.9rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #f6f8fb 0%, #96afd2 100%);
+}
+
+.user-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}

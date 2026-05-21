@@ -1,0 +1,19 @@
+.site-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 8px 0 24px;
+    border-top: 1px solid rgba(214, 227, 244, 0.12);
+    color: rgba(181, 194, 213, 0.78);
+    font-size: 0.86rem;
+}
+
+.site-footer p {
+    margin-bottom: 0;
+}
+
+.site-footer-nav {
+    display: flex;
+    gap: 16px;
+}

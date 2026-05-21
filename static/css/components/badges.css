@@ -1,0 +1,38 @@
+.source-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.source-badge--steam {
+    color: #13202c;
+    background: linear-gradient(135deg, #79e7ff 0%, #8ef0c1 100%);
+    box-shadow: 0 10px 24px rgba(121, 231, 255, 0.16);
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(181, 224, 0, 0.14);
+    color: var(--text);
+    font-size: 0.86rem;
+    font-weight: 600;
+}
+
+.status-playing,
+.status-completed,
+.status-plan_to_play,
+.status-paused,
+.status-dropped {
+    border: 1px solid rgba(181, 224, 0, 0.25);
+}

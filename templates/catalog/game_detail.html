@@ -6,18 +6,55 @@
 {% block body_class %}game-detail-page{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/pages/game-detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/game-detail.css' %}?v=2">
 {% endblock %}
 
 {% block content %}
 <section class="screen">
-<div class="game-detail-hero">
-    <article class="game-detail-image">
-        {% if game.cover_image %}
-        <img src="{{ game.cover_image }}" alt="{{ game.title }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+<div class="game-detail-hero{% if game.steam_app_id %} game-detail-hero--steam{% endif %}">
+    <article class="game-detail-image{% if game.steam_app_id %} game-detail-image--steam{% endif %}">
+        {% if game.detail_cover_image %}
+        <img src="{{ game.detail_cover_image }}" alt="{{ game.title }}" style="object-position: {{ game.detail_cover_position }};" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
         <div class="placeholder-image" style="display: none;">Sem capa</div>
         {% else %}
         <div class="placeholder-image">Sem capa</div>
+        {% endif %}
+
+        {% if game.developers or game.publishers or game.system_requirements_min or game.system_requirements_rec %}
+        <div class="game-detail-image-meta">
+            {% if game.developers %}
+            <div class="detail-extra-item">
+                <span>Desenvolvedor</span>
+                <strong>{{ game.developers }}</strong>
+            </div>
+            {% endif %}
+            {% if game.publishers %}
+            <div class="detail-extra-item">
+                <span>Distribuidora</span>
+                <strong>{{ game.publishers }}</strong>
+            </div>
+            {% endif %}
+
+            {% if game.system_requirements_min or game.system_requirements_rec %}
+            <div class="detail-requirements">
+                <span class="detail-requirements-title">Requisitos de sistema</span>
+
+                {% if game.system_requirements_min %}
+                <div class="detail-requirements-block">
+                    <strong>Minimos</strong>
+                    <p>{{ game.system_requirements_min|linebreaksbr }}</p>
+                </div>
+                {% endif %}
+
+                {% if game.system_requirements_rec %}
+                <div class="detail-requirements-block">
+                    <strong>Recomendados</strong>
+                    <p>{{ game.system_requirements_rec|linebreaksbr }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
         {% endif %}
     </article>
 

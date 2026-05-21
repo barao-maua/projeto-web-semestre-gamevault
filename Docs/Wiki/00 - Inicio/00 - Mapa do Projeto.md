@@ -42,7 +42,7 @@ Esta nota e o ponto de entrada da wiki do [[GameVault]]. Use este mapa para nave
 - [[Autenticacao]]: cadastro, login e perfil do usuario.
 - [[Catalogo de Jogos]]: listagem e detalhes dos jogos cadastrados.
 - [[Biblioteca do Usuario]]: biblioteca pessoal e status dos jogos.
-- [[Paginas Institucionais]]: home, sobre e diferenciais.
+- [[Paginas Institucionais]]: home e sobre.
 - [[Indice de Funcionalidades]]: caminho recomendado para leitura funcional.
 
 ## Documentacao Tecnica

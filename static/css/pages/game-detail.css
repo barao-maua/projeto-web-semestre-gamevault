@@ -9,6 +9,11 @@
     align-items: stretch;
 }
 
+.game-detail-hero--steam {
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+    align-items: start;
+}
+
 .game-detail-panels {
     grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
     margin-top: 24px;
@@ -29,16 +34,48 @@
 
 .game-detail-image {
     min-height: 520px;
-    padding: 0;
-    overflow: hidden;
+    max-height: 520px;
+    display: grid;
+    align-content: start;
+    gap: 20px;
+    padding: 18px;
     background: linear-gradient(180deg, rgba(30, 43, 60, 0.85) 0%, rgba(17, 24, 34, 0.98) 100%);
 }
 
+.game-detail-image--steam {
+    min-height: auto;
+    max-height: none;
+    height: fit-content;
+    align-self: start;
+    padding: 20px;
+}
+
 .game-detail-image img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    border-radius: 20px;
+    object-fit: contain;
+    object-position: center;
+}
+
+.game-detail-image--steam img {
+    display: block;
     width: 100%;
-    height: 100%;
+    max-width: none;
+    height: auto;
+    max-height: none;
+    aspect-ratio: 460 / 215;
     object-fit: cover;
-    object-position: center top;
+    object-position: center;
+}
+
+.game-detail-image-meta {
+    display: grid;
+    gap: 14px;
+    width: 100%;
+    padding-top: 4px;
 }
 
 .game-detail-info {
@@ -103,6 +140,56 @@
 .game-detail-summary {
     max-width: 52ch;
     margin-bottom: 22px;
+}
+
+.detail-extra-item {
+    display: grid;
+    gap: 6px;
+    width: 100%;
+}
+
+.detail-extra-item span {
+    color: var(--muted);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.detail-extra-item strong {
+    color: var(--text);
+    font-size: 1rem;
+}
+
+.detail-requirements {
+    display: grid;
+    gap: 14px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(214, 227, 244, 0.1);
+}
+
+.detail-requirements-title {
+    color: var(--muted);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.detail-requirements-block {
+    display: grid;
+    gap: 6px;
+}
+
+.detail-requirements-block strong {
+    color: var(--text);
+    font-size: 0.92rem;
+    text-transform: uppercase;
+}
+
+.detail-requirements-block p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.55;
 }
 
 .game-detail-actions {

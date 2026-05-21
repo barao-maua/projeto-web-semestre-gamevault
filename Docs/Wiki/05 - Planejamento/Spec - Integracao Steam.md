@@ -324,7 +324,7 @@ Status atual da Fase 1:
 
 - implementacao local concluida;
 - `steam_app_id`, `steam_type`, `last_synced_at`, servico interno, sync individual, sync em lote e suporte no admin ja estao ativos;
-- o catalogo continua lendo apenas do banco local.
+- o catalogo da interface ja tenta usar a Steam como fonte de descoberta e faz fallback para o banco local quando necessario.
 
 ## Fase 2 Recomendada
 
@@ -360,6 +360,7 @@ Observacao:
 - A Fase 1 com mock foi substituida por integracao real no fluxo de detalhes por `app_id`.
 - O sync em lote usa a busca publica da Steam Store para descobrir jogos e depois enriquece cada item via `appdetails`.
 - O filtro operacional atual continua restrito a apps do tipo `game`.
+- O projeto tambem passou a incluir login com Steam e sincronizacao da biblioteca possuida pelo usuario, expandindo o escopo original desta nota.
 
 ## Criterio De Pronto
 

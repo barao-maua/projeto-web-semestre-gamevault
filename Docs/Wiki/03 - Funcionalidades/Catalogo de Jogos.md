@@ -20,7 +20,7 @@ tags:
 
 # Catalogo de Jogos
 
-O catalogo permite visualizar os jogos cadastrados no sistema, buscar por termo e abrir a pagina de detalhe de cada jogo.
+O catalogo permite visualizar jogos, buscar por termo e abrir a pagina de detalhe de cada jogo. No estado atual, ele tenta usar a Steam como fonte principal de descoberta e usa o banco local como fallback e persistencia da aplicacao.
 
 ## Rotas
 
@@ -28,16 +28,16 @@ O catalogo permite visualizar os jogos cadastrados no sistema, buscar por termo 
 | --- | --- | --- | --- |
 | `/catalog/` | `core:game_catalog` | `game_catalog_view` | `catalog/game_catalog.html` |
 | `/game/<game_id>/` | `core:game_detail` | `game_detail_view` | `catalog/game_detail.html` |
+| `/steam-game/<app_id>/` | `core:steam_game_detail` | `steam_game_detail_view` | `catalog/game_detail.html` |
 
 ## Catalogo
 
-`game_catalog_view` busca jogos com `Game.objects.all()` e aceita o parametro `q` na query string.
+`game_catalog_view` aceita o parametro `q` na query string e segue este fluxo:
 
-A busca filtra por:
-
-- `title`;
-- `genre`;
-- `description`.
+1. tenta buscar uma pagina do catalogo da Steam;
+2. normaliza os itens retornados;
+3. garante cache local para os jogos sincronizados;
+4. se a consulta externa falhar, usa `Game.objects.all()` com busca local por `title`, `genre` e `description`.
 
 O template renderiza:
 
@@ -54,6 +54,8 @@ O template renderiza:
 ## Detalhe Do Jogo
 
 `game_detail_view` busca um `Game` por ID, carrega avaliacoes, verifica se o jogo ja esta na biblioteca do usuario autenticado e identifica se o usuario ja avaliou o jogo.
+
+`steam_game_detail_view` usa `app_id` da Steam, sincroniza ou encontra o `Game` local correspondente e reaproveita o mesmo contexto de detalhe.
 
 O template mostra:
 
@@ -99,14 +101,16 @@ Apos adicionar um jogo a biblioteca, o modal mostra uma etapa de confirmacao.
 
 ## Evolucao Steam - Fase 1
 
-O catalogo continua funcionando 100% a partir do banco local, mas a base para integracao com Steam ja foi preparada:
+O escopo inicial de integracao com Steam ja evoluiu para implementacao funcional:
 
 - `Game` agora aceita `steam_app_id`;
+- `Game` tambem guarda `steam_type` e `last_synced_at`;
 - existe servico interno desacoplado em `core/services/steam.py`;
-- existe comando tecnico `python manage.py sync_steam_game <app_id>`;
-- o admin passou a exibir campos de sincronizacao.
+- existem comandos tecnicos `python manage.py sync_steam_game <app_id>` e `python manage.py sync_steam_catalog ...`;
+- o admin exibe campos de sincronizacao e acao para sincronizar jogos selecionados;
+- o catalogo da interface tenta buscar dados da Steam e cai para fallback local quando necessario.
 
-Na Fase 1, a origem externa ainda e mockada para validar arquitetura e fluxo de sincronizacao sem depender de uma API real.
+O banco local continua sendo a fonte de persistencia para biblioteca, reviews e relacionamentos do produto.
 
 ## Capas E Variantes
 

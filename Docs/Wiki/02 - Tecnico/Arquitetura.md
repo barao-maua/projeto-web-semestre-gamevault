@@ -64,12 +64,13 @@ graph TD
 
 - `/`: home.
 - `/sobre/`: pagina institucional.
-- `/diferenciais/`: pagina institucional.
-- `/login/`, `/logout/`, `/register/`, `/profile/`: autenticacao e perfil.
+- `/login/`, `/steam/login/`, `/logout/`, `/register/`, `/profile/`: autenticacao e perfil.
 - `/catalog/`: catalogo de jogos.
 - `/game/<id>/`: detalhe do jogo.
+- `/steam-game/<app_id>/`: detalhe de jogo vindo da Steam.
 - `/library/`: biblioteca pessoal.
 - Endpoints JSON para biblioteca e avaliacoes.
+- Rotas auxiliares para verificacao de email, reset de senha e sync da biblioteca Steam.
 
 ## Notas Relacionadas
 

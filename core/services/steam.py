@@ -22,6 +22,20 @@ REQUEST_TIMEOUT_SECONDS = 12
 DEFAULT_STEAM_LANGUAGE = "brazilian"
 FALLBACK_STEAM_LANGUAGE = "english"
 STEAM_GAME_CATEGORY_ID = 998
+STEAM_PT_BR_MONTHS = {
+    "jan": "Jan",
+    "fev": "Feb",
+    "mar": "Mar",
+    "abr": "Apr",
+    "mai": "May",
+    "jun": "Jun",
+    "jul": "Jul",
+    "ago": "Aug",
+    "set": "Sep",
+    "out": "Oct",
+    "nov": "Nov",
+    "dez": "Dec",
+}
 
 
 def clean_steam_text(value):
@@ -35,16 +49,60 @@ def clean_steam_text(value):
     return text.strip()
 
 
+def clean_steam_requirements(value):
+    if not value:
+        return ""
+
+    text = unescape(value)
+    text = re.sub(r"<br\s*/?>", "\n", text, flags=re.IGNORECASE)
+    text = strip_tags(text)
+    text = text.replace("\r", "")
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    text = re.sub(r"[ \t]+", " ", text)
+    return text.strip()
+
+
 def parse_steam_release_date(raw_date):
     if not raw_date:
         return None
 
-    for fmt in ("%b %d, %Y", "%d %b, %Y", "%b %d %Y"):
+    normalized_date = raw_date.strip()
+
+    pt_br_match = re.fullmatch(r"(\d{1,2})\s+([A-Za-zÀ-ÿ]{3,})\.?\s*(?:,\s*)?(\d{4})", normalized_date)
+    if pt_br_match:
+        day, raw_month, year = pt_br_match.groups()
+        month_key = raw_month.lower()[:3]
+        english_month = STEAM_PT_BR_MONTHS.get(month_key)
+        if english_month:
+            normalized_date = f"{english_month} {int(day)}, {year}"
+
+    for fmt in ("%b %d, %Y", "%d %b, %Y", "%b %d %Y", "%d %b. %Y"):
         try:
-            return datetime.strptime(raw_date, fmt).date()
+            return datetime.strptime(normalized_date, fmt).date()
         except ValueError:
             continue
     return None
+
+
+def fetch_normalized_steam_game_with_fallback(app_id):
+    payload = fetch_steam_game(app_id, language=DEFAULT_STEAM_LANGUAGE)
+    normalized_data = normalize_steam_game(payload)
+
+    needs_fallback = not normalized_data.get("description") or not normalized_data.get(
+        "release_date"
+    ) or not normalized_data.get("genre")
+
+    if not needs_fallback:
+        return normalized_data
+
+    fallback_payload = fetch_steam_game(app_id, language=FALLBACK_STEAM_LANGUAGE)
+    fallback_data = normalize_steam_game(fallback_payload)
+
+    for field_name in ("description", "release_date", "genre"):
+        if not normalized_data.get(field_name) and fallback_data.get(field_name):
+            normalized_data[field_name] = fallback_data[field_name]
+
+    return normalized_data
 
 
 def fetch_json(url):
@@ -168,6 +226,9 @@ def normalize_steam_game(payload):
 
     genres = payload.get("genres") or []
     primary_genre = genres[0]["description"] if genres else ""
+    developers = ", ".join(payload.get("developers") or [])
+    publishers = ", ".join(payload.get("publishers") or [])
+    pc_requirements = payload.get("pc_requirements") or {}
     description = clean_steam_text(payload.get("detailed_description"))
     if not description:
         description = clean_steam_text(payload.get("short_description"))
@@ -181,6 +242,14 @@ def normalize_steam_game(payload):
             (payload.get("release_date") or {}).get("date")
         ),
         "genre": primary_genre,
+        "developers": developers,
+        "publishers": publishers,
+        "system_requirements_min": clean_steam_requirements(
+            pc_requirements.get("minimum")
+        ),
+        "system_requirements_rec": clean_steam_requirements(
+            pc_requirements.get("recommended")
+        ),
         "cover_image": payload.get("header_image", "") or "",
     }
 
@@ -194,6 +263,10 @@ def apply_steam_data_to_game(game, normalized_data):
         "description",
         "release_date",
         "genre",
+        "developers",
+        "publishers",
+        "system_requirements_min",
+        "system_requirements_rec",
         "cover_image",
     ):
         incoming_value = normalized_data.get(field_name)
@@ -214,21 +287,12 @@ def apply_steam_data_to_game(game, normalized_data):
 
 
 def sync_game_from_steam(app_id):
-    payload = fetch_steam_game(app_id, language=DEFAULT_STEAM_LANGUAGE)
-    normalized_data = normalize_steam_game(payload)
+    normalized_data = fetch_normalized_steam_game_with_fallback(app_id)
 
     if normalized_data.get("steam_type") != "game":
         raise SteamSyncError(
             f"O app_id {normalized_data['steam_app_id']} nao representa um jogo do tipo 'game'."
         )
-
-    if not normalized_data.get("description"):
-        fallback_payload = fetch_steam_game(app_id, language=FALLBACK_STEAM_LANGUAGE)
-        fallback_data = normalize_steam_game(fallback_payload)
-        if fallback_data.get("description"):
-            normalized_data["description"] = fallback_data["description"]
-        if not normalized_data.get("genre") and fallback_data.get("genre"):
-            normalized_data["genre"] = fallback_data["genre"]
 
     game = Game.objects.filter(steam_app_id=normalized_data["steam_app_id"]).first()
     created = game is None
@@ -250,8 +314,7 @@ def sync_existing_game(game):
     if not game.steam_app_id:
         raise SteamSyncError("O jogo selecionado nao possui steam_app_id para sincronizar.")
 
-    payload = fetch_steam_game(game.steam_app_id)
-    normalized_data = normalize_steam_game(payload)
+    normalized_data = fetch_normalized_steam_game_with_fallback(game.steam_app_id)
     updated_fields = apply_steam_data_to_game(game, normalized_data)
 
     if updated_fields:

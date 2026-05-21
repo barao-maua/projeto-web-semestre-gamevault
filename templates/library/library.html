@@ -36,10 +36,6 @@
                 {% else %}
                 <div class="placeholder-image">Sem capa</div>
                 {% endif %}
-                <div class="cover-caption">
-                    <span>{{ entry.game.genre|default:"Jogo" }}</span>
-                    <strong>{{ entry.game.title }}</strong>
-                </div>
             </div>
 
             <div class="game-rating library-rating" aria-label="{% if entry.user_review %}Sua avaliação: {{ entry.user_review.rating }} de 5{% else %}Jogo ainda sem avaliação{% endif %}">
@@ -62,7 +58,11 @@
                     data-status="{{ entry.status }}"
                     data-has-review="{{ entry.user_review|yesno:'true,false' }}"
                 >Editar</button>
+                {% if entry.game.steam_app_id %}
+                <a href="{% url 'core:steam_game_detail' entry.game.steam_app_id %}" class="library-action-button library-action-button--primary">Detalhes</a>
+                {% else %}
                 <a href="{% url 'core:game_detail' entry.game.id %}" class="library-action-button library-action-button--primary">Detalhes</a>
+                {% endif %}
                 <button
                     class="library-action-button library-action-button--danger remove-library-button"
                     type="button"

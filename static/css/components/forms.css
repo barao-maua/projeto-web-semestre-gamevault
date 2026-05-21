@@ -1,0 +1,50 @@
+.field {
+    display: grid;
+    gap: 7px;
+}
+
+.field label {
+    font-size: 0.86rem;
+    color: var(--muted);
+}
+
+.field input,
+.field textarea,
+.field select {
+    width: 100%;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    color: var(--text);
+    background: #365777;
+    outline: none;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+    color: rgba(243, 246, 251, 0.5);
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+    border-color: rgba(181, 224, 0, 0.6);
+    box-shadow: 0 0 0 3px rgba(181, 224, 0, 0.12);
+}
+
+.form-help-text {
+    color: var(--muted);
+    font-size: 0.86rem;
+    margin-top: 4px;
+}
+
+.form-error {
+    margin-top: 6px;
+    color: #ffb2b8;
+    font-size: 0.86rem;
+}
+
+.form-submit {
+    margin-top: 10px;
+    text-align: center;
+}

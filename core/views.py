@@ -134,6 +134,13 @@ def get_latest_reviews_for_game(game):
 
 
 def build_game_detail_context(request, game):
+    attach_variant_cover_metadata(
+        [game],
+        "catalog",
+        "detail_cover_image",
+        "detail_cover_position",
+    )
+
     in_library = False
     library_entry = None
     user_review = None
